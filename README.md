@@ -1,2 +1,2 @@
-# 3x-ui-NGINX-DOH
+# 3x-ui-NGINX-DoT
 Потом...
