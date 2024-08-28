@@ -174,7 +174,7 @@ systemctl restart unattended-upgrades
 echo""
 
 
-### DoH systemd-resolved ###
+### DoT systemd-resolved ###
 echo -e "${blue}Настройка systemd-resolved (DoH)${clear}"
 echo "DNS=9.9.9.9"
 
@@ -948,7 +948,7 @@ Include /etc/ssh/sshd_config.d/*.conf
 
 Port 22
 #AddressFamily any
-#ListenAddress 127.0.0.1
+ListenAddress 127.0.0.1
 #ListenAddress ::
 
 #HostKey /etc/ssh/ssh_host_rsa_key
@@ -1063,7 +1063,6 @@ echo ""
 
 ### UFW ###
 echo -e "${blue}Настройка ufw{clear}"
-ufw allow 22/tcp
 ufw allow 443/tcp
 ufw allow 80/tcp
 ufw allow 2091
@@ -1073,10 +1072,14 @@ echo ""
 
 
 ### Окончание ###
-echo -e "${blue}Окончание настройки, доступ по ссылке${clear}"
+echo -e "${blue}Окончание настройки, доступ по ссылке:${clear}"
 echo ""
 echo -e "${red}https://${domain}/${webBasePath}/${clear}"
 echo ""
 echo -e "${blue}Логин: ${username}, Пароль: ${password}${clear}"
+echo ""
+echo -e "${blue}Подключение по ssh :${clear}"
+echo ""
+echo -e "${red}ssh -p 443 ${username}@www.${domain}${clear}"
 echo ""
 sleep 5
