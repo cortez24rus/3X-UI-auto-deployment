@@ -1074,7 +1074,8 @@ echo ""
 
 ### Окончание ###
 echo -e "${blue}Окончание настройки, доступ по ссылке${clear}"
-echo -e "${blue}https://${domain}/${webBasePath}/${clear}"
+echo ""
+echo -e "${red}https://${domain}/${webBasePath}/${clear}"
 echo ""
 echo -e "${blue}Логин: ${username}, Пароль: ${password}${clear}"
 echo ""
