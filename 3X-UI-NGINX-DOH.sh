@@ -1063,7 +1063,7 @@ echo ""
 
 ### UFW ###
 echo -e "${blue}Настройка ufw{clear}"
-ufw allow ${sshp}/tcp
+ufw allow 22/tcp
 ufw allow 443/tcp
 ufw allow 80/tcp
 ufw allow 2091
