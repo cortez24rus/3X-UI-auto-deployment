@@ -126,6 +126,10 @@ echo -e "${blue}Установка пакета sqlite3${clear}"
 apt-get install sqlite3 -y
 echo ""
 
+echo -e "${blue}Установка пакета ufw${clear}"
+apt-get install ufw -y
+echo ""
+
 echo -e "${blue}Установка пакета Warp${clear}"
 curl -fsSL https://pkg.cloudflareclient.com/pubkey.gpg | gpg --yes --dearmor --output /usr/share/keyrings/cloudflare-warp-archive-keyring.gpg
 echo "deb [signed-by=/usr/share/keyrings/cloudflare-warp-archive-keyring.gpg] https://pkg.cloudflareclient.com/ $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/cloudflare-client.list
@@ -157,6 +161,7 @@ mkdir -p /home/${username}/.ssh/
 touch /home/${username}/.ssh/authorized_keys
 chown ${username}: /home/${username}/.ssh
 chmod 700 /home/${username}/.ssh
+chown ${username}:${username} /home/${username}/.ssh/authorized_keys
 echo ""
 
 
@@ -1056,6 +1061,21 @@ systemctl restart ssh.service
 echo ""
 
 
+### UFW ###
+echo -e "${blue}Настройка ufw{clear}"
+ufw allow ${sshp}/tcp
+ufw allow 443/tcp
+ufw allow 80/tcp
+ufw allow 2091
+yes | ufw enable
+echo ""
+
+
+
 ### Окончание ###
 echo -e "${blue}Окончание настройки, доступ по ссылке${clear}"
 echo -e "${blue}https://${domain}/${webBasePath}/${clear}"
+echo ""
+echo -e "${blue}Логин: ${username}, Пароль: ${password}${clear}"
+echo ""
+sleep 5
