@@ -288,7 +288,6 @@ echo ""
 echo -e "${blue}Настройка NGINX${clear}"
 mkdir -p /etc/nginx/stream-enabled/
 #touch /etc/nginx/.htpasswd
-append='~^(,[ \\t]*)*([!#$%&'\''*+.^_`|~0-9A-Za-z-]+=([!#$%&'\''*+.^_`|~0-9A-Za-z-]+|\"([\\t \\x21\\x23-\\x5B\\x5D-\\x7E\\x80-\\xFF]|\\\\[\\t \\x21-\\x7E\\x80-\\xFF])*\"))?(;([!#$%&'\''*+.^_`|~0-9A-Za-z-]+=([!#$%&'\''*+.^_`|~0-9A-Za-z-]+|\"([\\t \\x21\\x23-\\x5B\\x5D-\\x7E\\x80-\\xFF]|\\\\[\\t \\x21-\\x7E\\x80-\\xFF])*\"))?)*([ \\t]*,([ \\t]*([!#$%&'\''*+.^_`|~0-9A-Za-z-]+=([!#$%&'\''*+.^_`|~0-9A-Za-z-]+|\"([\\t \\x21\\x23-\\x5B\\x5D-\\x7E\\x80-\\xFF]|\\\\[\\t \\x21-\\x7E\\x80-\\xFF])*\"))?(;([!#$%&'\''*+.^_`|~0-9A-Za-z-]+=([!#$%&'\''*+.^_`|~0-9A-Za-z-]+|\"([\\t \\x21\\x23-\\x5B\\x5D-\\x7E\\x80-\\xFF]|\\\\[\\t \\x21-\\x7E\\x80-\\xFF])*\"))?)*)?)*$" "$http_forwarded, $proxy_forwarded_elem'
 
 cat > /etc/nginx/stream-enabled/stream.conf << EOF
 map \$ssl_preread_protocol \$backend {
@@ -364,29 +363,6 @@ http {
 
     # access_log /var/log/nginx/access.log;
     gzip                          on;
-
-    # Connection header for WebSocket reverse proxy
-    map \$http_upgrade \$connection_upgrade {
-    default upgrade;
-    ""      close;
-    }
-    map \$remote_addr \$proxy_forwarded_elem {
-        # IPv4 addresses can be sent as-is
-        ~^[0-9.]+$        "for=\$remote_addr";
-
-		# IPv6 addresses need to be bracketed and quoted
-        ~^[0-9A-Fa-f:.]+$ "for=\"[\$remote_addr]\"";
-
-        # Unix domain socket names cannot be represented in RFC 7239 syntax
-        default           "for=unknown";
-    }
-    map \$http_forwarded \$proxy_add_forwarded {
-        # If the incoming Forwarded header is syntactically valid, append to it
-        "${append}";
-
-        # Otherwise, replace it
-        default "\$proxy_forwarded_elem";
-    }
 
     include /etc/nginx/conf.d/*.conf;
 }
