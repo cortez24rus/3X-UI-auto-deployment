@@ -10,11 +10,11 @@
 >
 > Необходимо подключить домен к cloudflare, добавить DNS записи:
 > 
-> Type    Name          Content       Proxy status
+> Type | Name | Content | Proxy status
 >
-> A       example.com   ip address    Proxied
+> A | example.com | ip address | Proxied
 > 
-> CNAME   www           example.com   DNS only
+> CNAME | www | example.com | DNS only
 >
 > SSL/TLS > Edge Cerificates > Minimum TLS Version (TLS 1.3)
 >
