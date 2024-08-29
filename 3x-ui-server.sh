@@ -79,10 +79,6 @@ echo -e "${blue}Введите ваш API токен Cloudflare (Edit zone DNS) 
 read cftoken
 echo ""
 
-echo -e "${blue}Warp license key${clear}"
-read warpkey
-echo ""
-
 webCertFile=/etc/letsencrypt/live/${domain}/fullchain.pem
 webKeyFile=/etc/letsencrypt/live/${domain}/privkey.pem
 subURI=https://${domain}/${subPath}/
@@ -261,7 +257,6 @@ echo -e "${blue}Настройка warp${clear}"
 yes | warp-cli registration new
 warp-cli mode proxy
 warp-cli connect
-warp-cli registration license $warpkey
 echo ""
 
 
@@ -344,11 +339,9 @@ http {
     keepalive_requests            1000;
     reset_timedout_connection     on;
 
-
     # MIME
     include                       /etc/nginx/mime.types;
     default_type                  application/octet-stream;
-
 
     # SSL
     ssl_session_timeout           1d;
@@ -366,10 +359,8 @@ http {
     resolver                      1.1.1.1 valid=60s;
     resolver_timeout              2s;
 
-
     # access_log /var/log/nginx/access.log;
     gzip                          on;
-
 
     # Connection header for WebSocket reverse proxy
     map \$http_upgrade \$connection_upgrade {
@@ -428,7 +419,7 @@ server {
     ssl_certificate_key         /etc/letsencrypt/live/${domain}/privkey.pem;
     ssl_trusted_certificate     /etc/letsencrypt/live/${domain}/chain.pem;
 
-	# security headers
+    # Security headers
     add_header X-XSS-Protection          "1; mode=block" always;
     add_header X-Content-Type-Options    "nosniff" always;
     add_header Referrer-Policy           "no-referrer-when-downgrade" always;
@@ -438,14 +429,14 @@ server {
     add_header X-Frame-Options           "SAMEORIGIN";
     proxy_hide_header X-Powered-By;
 
-# auth
+    # Auth
     location / {
         auth_basic "Restricted Content";
         auth_basic_user_file /etc/nginx/.htpasswd;
         return 301 https://${domain}\$request_uri;
     }
 
-# 3X-UI
+    # 3X-UI
     location /${webBasePath}/ {
         proxy_pass https://127.0.0.1:${webPort}/${webBasePath}/;
     }
@@ -464,7 +455,7 @@ echo ""
 
 ### Установка 3x-ui ###
 echo -e "${blue}Настройка 3x-ui xray${clear}"
-wget q --show-progress https://github.com/cortez24rus/3x-ui-NGINX-DOH/raw/main/x-ui.db
+wget q --show-progress https://github.com/cortez24rus/3X-UI-auto-deployment/raw/main/x-ui.db
 echo -e "n" | bash <(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh)
 echo ""
 x-ui stop
@@ -912,7 +903,6 @@ EOF
 cp x-ui.db /etc/x-ui/
 sleep 1
 x-ui start
-
 echo ""
 
 
@@ -1068,7 +1058,6 @@ ufw allow 80/tcp
 ufw allow 2091
 yes | ufw enable
 echo ""
-
 
 
 ### Окончание ###
