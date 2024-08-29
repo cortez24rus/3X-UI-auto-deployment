@@ -12,6 +12,7 @@
 > CNAME   www           example.com   DNS only
 >
 > SSL/TLS > Edge Cerificates > Minimum TLS Version (TLS 1.3)
+>
 > SSL/TLS > Edge Cerificates > TLS 1.3 (true) 
 
 > [!NOTE]
