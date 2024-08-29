@@ -12,8 +12,7 @@
 > CNAME   www           example.com   DNS only
 >
 > SSL/TLS > Edge Cerificates > Minimum TLS Version (TLS 1.3)
->                            > TLS 1.3 (true) 
-
+> SSL/TLS > Edge Cerificates > TLS 1.3 (true) 
 
 > [!NOTE]
 > С правилами маршрутизации для России.
