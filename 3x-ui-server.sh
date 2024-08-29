@@ -16,14 +16,13 @@ fi
 
 
 ### Начало установки ###
+echo ""
 echo -e "${red}ВНИМАНИЕ!${clear}"
 echo "Перед запуском скрипта рекомендуется выполнить следующие действия:"
 echo -e "Обновить систему командой ${red}apt update && apt full-upgrade -y${clear}"
 echo -e "Перезагрузить сервер командой ${red}reboot${clear}"
 echo ""
-echo -e "${blue}Скрипт установки 3x-ui${clear}"
-echo ""
-echo -e "${blue}Начать установку? Выберите опцию [y/N]${clear}"
+echo -e "${blue}Скрипт установки 3x-ui. Начать установку? Выберите опцию [y/N]${clear}"
 read answer
 cancel="${red}___Отмена___${clear}"
 
