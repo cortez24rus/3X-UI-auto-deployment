@@ -31,4 +31,6 @@ bash <(curl -Ls https://github.com/cortez24rus/3X-UI-auto-deployment/raw/main/3x
 
 Затем просто введите необходимую информацию:
 
+![pic-ru](https://github.com/cortez24rus/3X-UI-auto-deployment/blob/main/Screenshot%20settings.png)
+
 В конце скрипт покажет необходимые ссылки и данные для входа.
