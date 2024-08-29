@@ -49,10 +49,10 @@ echo -e "${blue}Введите пароль пользователя:${clear}"
 read password
 echo ""
 
-echo -e "${blue}Введите доменное имя под которое маскируетесь:${clear}"
+echo -e "${blue}Введите доменное имя под будете маскировать (Reality):${clear}"
 read reality
 echo ""
-echo -e "${blue}Введите свой домен${clear}"
+echo -e "${blue}Введите свое доменое имя${clear}"
 read domain
 if [[ "$domain" == "www."* ]]
 then
