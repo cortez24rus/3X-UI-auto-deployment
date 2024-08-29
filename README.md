@@ -6,6 +6,15 @@
 > [!IMPORTANT]
 > Рекомендуемая ОС: Debian 12 или Ubuntu 22.04/24.04, виртуализация — KVM. Для настройки понадобится свой домен, прикреплённый к аккаунту Cloudflare. Запускайте от имени root на свежеустановленной системе. Рекомендуется обновить систему и перезагрузить сервер перед запуском скрипта.
 
+> Необходимо подключить домен к cloudflare, добавить DNS записи
+> Type    Name          Content       Proxy status
+> A       example.com   ip address    Proxied
+> CNAME   www           example.com   DNS only
+
+> SSL/TLS > Edge Cerificates > Minimum TLS Version (TLS 1.3)
+>                            > TLS 1.3 (true) 
+
+
 > [!NOTE]
 > С правилами маршрутизации для России.
 
