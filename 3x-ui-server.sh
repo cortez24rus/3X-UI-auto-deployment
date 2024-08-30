@@ -507,7 +507,7 @@ stream_settings_id7=$(cat <<EOF
     ],
     "settings": {
       "publicKey": "GKKuQzfRfJ0Q8IuPcobznJLjzrjagVz2R5krzJGktVg",
-      "fingerprint": "randomized",
+      "fingerprint": "chrome",
       "serverName": "",
       "spiderX": "/"
     }
@@ -558,7 +558,7 @@ stream_settings_id8=$(cat <<EOF
     ],
     "settings": {
       "allowInsecure": false,
-      "fingerprint": "randomized"
+      "fingerprint": "chrome"
     }
   },
   "tcpSettings": {
