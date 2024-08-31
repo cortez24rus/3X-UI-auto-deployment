@@ -460,9 +460,20 @@ panel_installation() {
 	echo ""
 	x-ui stop
 	rm -rf /etc/x-ui/x-ui.db
-	
+
+	stream_settings_id6
+	stream_settings_id7
+	stream_settings_id7
+	database_change
+ 
+	cp x-ui.db /etc/x-ui/
+	sleep 1
+	x-ui start
+	echo ""
+}
+
 	### Изменение базы данных ###
-	# Вносим изменения в stream_settings
+ stream_settings_id6() {
 	stream_settings_id6=$(cat <<EOF
 	{
 	  "network": "kcp",
@@ -491,7 +502,9 @@ panel_installation() {
 	}
 	EOF
 	)
-	
+}
+
+stream_settings_id7() {
 	stream_settings_id7=$(cat <<EOF
 	{
 	  "network": "tcp",
@@ -542,7 +555,9 @@ panel_installation() {
 	}
 	EOF
 	)
-	
+}
+
+stream_settings_id8() {
 	stream_settings_id8=$(cat <<EOF
 	{
 	  "network": "tcp",
@@ -591,7 +606,9 @@ panel_installation() {
 	}
 	EOF
 	)
-	
+}
+
+database_change() {
 	DB_PATH="x-ui.db"
 	# Меняем данные для входа
 	# 1 username
@@ -628,11 +645,6 @@ panel_installation() {
 	UPDATE settings SET value = '${subJsonURI}' WHERE id = 38;
 	SELECT value FROM settings WHERE id=38;
 EOF
-
-	cp x-ui.db /etc/x-ui/
-	sleep 1
-	x-ui start
-	echo ""
 }
 
 
