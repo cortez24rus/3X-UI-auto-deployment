@@ -219,7 +219,7 @@ dns_encryption() {
 	Domains=~.
 	DNSSEC=yes
 	DNSOverTLS=yes
-	EOF
+EOF
 
 	systemctl restart systemd-resolved.service
 	echo ""
@@ -446,7 +446,8 @@ EOF
 	    }
 	}
 EOF
-	nginx -s reload
+
+nginx -s reload
 	echo ""
 }
 
@@ -627,6 +628,7 @@ panel_installation() {
 	UPDATE settings SET value = '${subJsonURI}' WHERE id = 38;
 	SELECT value FROM settings WHERE id=38;
 EOF
+
 	### Изменение json ###
 	cat > /usr/local/x-ui/bin/config.json <<EOF
 	{
@@ -896,11 +898,12 @@ EOF
 	  "observatory": null,
 	  "burstObservatory": null
 	}
-	EOF
+EOF
 	cp x-ui.db /etc/x-ui/
 	sleep 1
 	x-ui start
-	}
+	echo "..."
+}
 
 
 ssh_setup() {
@@ -1044,6 +1047,7 @@ ssh_setup() {
 	#       PermitTTY no
 	#       ForceCommand cvs server
 EOF
+
 	systemctl restart ssh.service
 	echo ""
 }
