@@ -831,9 +831,7 @@ main_script() {
 	warp
 	issuance_of_certificates
 	nginx_setup
-
  	panel_installation
-
 	ssh_setup
 	enabling_security
 	data_output
