@@ -452,7 +452,7 @@ nginx -s reload
 }
 
 
-panel_installation() {
+function panel_installation() {
 	### Установка 3x-ui ###
 	echo -e "${blue}Настройка 3x-ui xray${clear}"
 	wget q --show-progress https://github.com/cortez24rus/3X-UI-auto-deployment/raw/main/x-ui.db
@@ -461,19 +461,7 @@ panel_installation() {
 	x-ui stop
 	rm -rf /etc/x-ui/x-ui.db
 
-	stream_settings_id6
-	stream_settings_id7
-	stream_settings_id7
-	database_change
- 
-	cp x-ui.db /etc/x-ui/
-	sleep 1
-	x-ui start
-	echo ""
-}
-
 	### Изменение базы данных ###
- stream_settings_id6() {
 	stream_settings_id6=$(cat <<EOF
 	{
 	  "network": "kcp",
@@ -502,9 +490,7 @@ panel_installation() {
 	}
 	EOF
 	)
-}
 
-stream_settings_id7() {
 	stream_settings_id7=$(cat <<EOF
 	{
 	  "network": "tcp",
@@ -555,9 +541,7 @@ stream_settings_id7() {
 	}
 	EOF
 	)
-}
 
-stream_settings_id8() {
 	stream_settings_id8=$(cat <<EOF
 	{
 	  "network": "tcp",
@@ -606,9 +590,7 @@ stream_settings_id8() {
 	}
 	EOF
 	)
-}
 
-database_change() {
 	DB_PATH="x-ui.db"
 	# Меняем данные для входа
 	# 1 username
@@ -645,6 +627,10 @@ database_change() {
 	UPDATE settings SET value = '${subJsonURI}' WHERE id = 38;
 	SELECT value FROM settings WHERE id=38;
 EOF
+	cp x-ui.db /etc/x-ui/
+	sleep 1
+	x-ui start
+	echo ""
 }
 
 
