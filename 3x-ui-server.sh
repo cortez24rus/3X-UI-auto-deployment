@@ -896,7 +896,7 @@ EOF
 	  "observatory": null,
 	  "burstObservatory": null
 	}
-EOF
+	EOF
 	cp x-ui.db /etc/x-ui/
 	sleep 1
 	x-ui start
