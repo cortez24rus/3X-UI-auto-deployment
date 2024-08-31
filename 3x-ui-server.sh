@@ -219,7 +219,8 @@ dns_encryption() {
 	Domains=~.
 	DNSSEC=yes
 	DNSOverTLS=yes
-EOF
+	EOF
+
 	systemctl restart systemd-resolved.service
 	echo ""
 }
@@ -328,8 +329,9 @@ nginx_setup() {
 	    ssl_preread         on;
 	    proxy_pass          \$backend;
 	}
-EOF
-	cat > /etc/nginx/nginx.conf <<EOF
+	EOF
+	
+ 	cat > /etc/nginx/nginx.conf <<EOF
 	user                              www-data;
 	pid                               /run/nginx.pid;
 	worker_processes                  auto;
