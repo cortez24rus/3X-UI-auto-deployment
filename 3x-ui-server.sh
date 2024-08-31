@@ -625,29 +625,15 @@ data_output() {
 	sleep 5
 }
 
-
-main_script() {
-	check_root
-	start_installation
-	data_entry
-	installation_of_utilities
-	add_user
-	uattended_upgrade
-	dns_encryption
-	enable_bbr
-	disable_ipv6
-	warp
-	issuance_of_certificates
-	nginx_setup
-
+script() {
 	### Установка 3x-ui ###
 	echo -e "${blue}Настройка 3x-ui xray${clear}"
-	wget q --show-progress https://github.com/cortez24rus/3X-UI-auto-deployment/raw/main/x-ui.db
+	wget -q --show-progress https://github.com/cortez24rus/3X-UI-auto-deployment/raw/main/x-ui.db
 	echo -e "n" | bash <(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh)
 	echo ""
 	x-ui stop
 	rm -rf /etc/x-ui/x-ui.db
-	
+
 	### Изменение базы данных ###
 	stream_settings_id6=$(cat <<EOF
 	{
@@ -677,7 +663,7 @@ main_script() {
 	}
 	EOF
 	)
-	
+
 	stream_settings_id7=$(cat <<EOF
 	{
 	  "network": "tcp",
@@ -728,7 +714,7 @@ main_script() {
 	}
 	EOF
 	)
-	
+
 	stream_settings_id8=$(cat <<EOF
 	{
 	  "network": "tcp",
@@ -777,20 +763,17 @@ main_script() {
 	}
 	EOF
 	)
-	
+
 	DB_PATH="x-ui.db"
-	# Меняем данные для входа
-	# 1 username
-	# 2 inbounds
-	# 3 settings
+
 	sqlite3 $DB_PATH <<EOF
 	UPDATE users SET username = '$username' WHERE id = 1;
 	UPDATE users SET password = '$password' WHERE id = 1;
-	
+
 	UPDATE inbounds SET stream_settings = '$stream_settings_id6' WHERE id = 6;
 	UPDATE inbounds SET stream_settings = '$stream_settings_id7' WHERE id = 7;
 	UPDATE inbounds SET stream_settings = '$stream_settings_id8' WHERE id = 8;
-	
+
 	UPDATE settings SET value = '${webPort}' WHERE id = 1;
 	SELECT value FROM settings WHERE id=1;
 	UPDATE settings SET value = '/${webBasePath}/' WHERE id = 2;
@@ -813,13 +796,29 @@ main_script() {
 	SELECT value FROM settings WHERE id=37;
 	UPDATE settings SET value = '${subJsonURI}' WHERE id = 38;
 	SELECT value FROM settings WHERE id=38;
-	EOF
-	
+EOF
+
 	cp x-ui.db /etc/x-ui/
 	sleep 1
 	x-ui start
 	echo ""
- 
+}
+
+
+main_script() {
+	check_root
+	start_installation
+	data_entry
+	installation_of_utilities
+	add_user
+	uattended_upgrade
+	dns_encryption
+	enable_bbr
+	disable_ipv6
+	warp
+	issuance_of_certificates
+	nginx_setup
+	script
 	ssh_setup
 	enabling_security
 	data_output
