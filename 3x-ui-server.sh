@@ -626,17 +626,27 @@ data_output() {
 }
 
 ### Установка 3x-ui ###
-script() {
+panel_installation() {
 	echo -e "${blue}Настройка 3x-ui xray${clear}"
 	wget -q --show-progress https://github.com/cortez24rus/3X-UI-auto-deployment/raw/main/x-ui.db
 	echo -e "n" | bash <(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh)
 	echo ""
 	x-ui stop
 	rm -rf /etc/x-ui/x-ui.db
+
+	stream_settings_id6
+	stream_settings_id7
+	stream_settings_id8
+ 	database_change
+
+	cp x-ui.db /etc/x-ui/
+	sleep 1
+	x-ui start
+	echo ""
 }
 
 ### Изменение базы данных ###
-script1() {
+stream_settings_id6() {
 	stream_settings_id6=$(cat <<EOF
 	{
 	  "network": "kcp",
@@ -667,7 +677,7 @@ EOF
 	)
 }
 
-script2() {
+stream_settings_id7() {
 	stream_settings_id7=$(cat <<EOF
 	{
 	  "network": "tcp",
@@ -720,7 +730,7 @@ EOF
 	)
 }
 
-script3() {
+stream_settings_id8() {
 	stream_settings_id8=$(cat <<EOF
 	{
 	  "network": "tcp",
@@ -771,7 +781,7 @@ EOF
 	)
 }
 
-script4() {
+database_change() {
 	DB_PATH="x-ui.db"
 
 	sqlite3 $DB_PATH <<EOF
@@ -807,13 +817,6 @@ script4() {
 EOF
 }
 
-script5() {
-	cp x-ui.db /etc/x-ui/
-	sleep 1
-	x-ui start
-	echo ""
-}
-
 
 main_script() {
 	check_root
@@ -829,12 +832,7 @@ main_script() {
 	issuance_of_certificates
 	nginx_setup
 
- 	script
-	script1
-	script2
-	script3
-	script4
- 	script5
+ 	panel_installation
 
 	ssh_setup
 	enabling_security
