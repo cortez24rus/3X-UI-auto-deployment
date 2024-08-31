@@ -172,6 +172,7 @@ add_user() {
 	chown ${username}: /home/${username}/.ssh
 	chmod 700 /home/${username}/.ssh
 	chown ${username}:${username} /home/${username}/.ssh/authorized_keys
+	echo ${username}
 	echo ""
 }
 
@@ -238,8 +239,6 @@ enable_bbr() {
 	then
 	    echo "net.ipv4.tcp_congestion_control = bbr" >> /etc/sysctl.conf
 	fi
-	
-	echo ""
 }
 
 
@@ -601,7 +600,7 @@ EOF
 
 ### UFW ###
 enabling_security() {
-	echo -e "${blue}Настройка ufw{clear}"
+	echo -e "${blue}Настройка ufw${clear}"
 	ufw allow 443/tcp
 	ufw allow 80/tcp
 	ufw allow 2091
@@ -613,14 +612,13 @@ enabling_security() {
 ### Окончание ###
 data_output() {
 	echo -e "${blue}Окончание настройки, доступ по ссылке:${clear}"
-	echo ""t
-	echo -e "${red}https://${domain}/${webBasePath}/${clear}"
+	echo -e "${green}https://${domain}/${webBasePath}/${clear}"
 	echo ""
-	echo -e "${blue}Логин: ${username}, Пароль: ${password}${clear}"
+	echo -e "${blue}Логин: ${green}${username}${clear}"
+ 	echo -e "${blue}Пароль: ${green}${password}${clear}"
 	echo ""
 	echo -e "${blue}Подключение по ssh :${clear}"
-	echo ""
-	echo -e "${red}ssh -p 443 ${username}@www.${domain}${clear}"
+	echo -e "${green}ssh -p 443 ${username}@www.${domain}${clear}"
 	echo ""
 	sleep 5
 }
