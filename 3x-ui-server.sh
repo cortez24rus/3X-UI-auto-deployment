@@ -192,7 +192,7 @@ dns_encryption() {
 	echo -e "${blue}Настройка systemd-resolved (DoT)${clear}"
 	echo "DNS=9.9.9.9"
 	
-	cat > /etc/systemd/resolved.conf << EOF
+	cat > /etc/systemd/resolved.conf <<EOF
 	#  This file is part of systemd.
 	#
 	#  systemd is free software; you can redistribute it and/or modify it under the
@@ -220,7 +220,6 @@ dns_encryption() {
 	DNSSEC=yes
 	DNSOverTLS=yes
 EOF
-	
 	systemctl restart systemd-resolved.service
 	echo ""
 }
@@ -309,7 +308,7 @@ nginx_setup() {
 	mkdir -p /etc/nginx/stream-enabled/
 	#touch /etc/nginx/.htpasswd
 	
-	cat > /etc/nginx/stream-enabled/stream.conf << EOF
+	cat > /etc/nginx/stream-enabled/stream.conf <<EOF
 	map \$ssl_preread_protocol \$backend {
 	    default             \$https;
 	    ""                  ssh;
@@ -330,8 +329,7 @@ nginx_setup() {
 	    proxy_pass          \$backend;
 	}
 EOF
-	
-	cat > /etc/nginx/nginx.conf << EOF
+	cat > /etc/nginx/nginx.conf <<EOF
 	user                              www-data;
 	pid                               /run/nginx.pid;
 	worker_processes                  auto;
@@ -391,8 +389,7 @@ EOF
 	    include /etc/nginx/stream-enabled/stream.conf;
 	}
 EOF
-	
-	cat > /etc/nginx/conf.d/local.conf << EOF
+	cat > /etc/nginx/conf.d/local.conf <<EOF
 	# HTTP redirect
 	server {
 	    listen 80 default_server;
@@ -447,7 +444,6 @@ EOF
 	    }
 	}
 EOF
-	
 	nginx -s reload
 	echo ""
 }
@@ -629,9 +625,8 @@ panel_installation() {
 	UPDATE settings SET value = '${subJsonURI}' WHERE id = 38;
 	SELECT value FROM settings WHERE id=38;
 EOF
-	
 	### Изменение json ###
-	cat > /usr/local/x-ui/bin/config.json << EOF
+	cat > /usr/local/x-ui/bin/config.json <<EOF
 	{
 	  "log": {
 	    "access": "./access.log",
@@ -900,7 +895,6 @@ EOF
 	  "burstObservatory": null
 	}
 EOF
-
 	cp x-ui.db /etc/x-ui/
 	sleep 1
 	x-ui start
@@ -926,7 +920,7 @@ ssh_setup() {
 	        exit
 	fi
 	
-	cat > /etc/ssh/sshd_config << EOF
+	cat > /etc/ssh/sshd_config <<EOF
 	# This is the sshd server system-wide configuration file.  See
 	# sshd_config(5) for more information.
 	
@@ -1049,7 +1043,6 @@ ssh_setup() {
 	#       PermitTTY no
 	#       ForceCommand cvs server
 EOF
-	
 	systemctl restart ssh.service
 	echo ""
 }
