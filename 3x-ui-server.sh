@@ -640,185 +640,185 @@ main_script() {
 	issuance_of_certificates
 	nginx_setup
 
-### Установка 3x-ui ###
-echo -e "${blue}Настройка 3x-ui xray${clear}"
-wget q --show-progress https://github.com/cortez24rus/3X-UI-auto-deployment/raw/main/x-ui.db
-echo -e "n" | bash <(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh)
-echo ""
-x-ui stop
-rm -rf /etc/x-ui/x-ui.db
-
-### Изменение базы данных ###
-stream_settings_id6=$(cat <<EOF
-{
-  "network": "kcp",
-  "security": "none",
-  "externalProxy": [
-    {
-      "forceTls": "same",
-      "dest": "www.${domain}",
-      "port": 2091,
-      "remark": ""
-    }
-  ],
-  "kcpSettings": {
-    "mtu": 1350,
-    "tti": 20,
-    "uplinkCapacity": 50,
-    "downlinkCapacity": 100,
-    "congestion": false,
-    "readBufferSize": 1,
-    "writeBufferSize": 1,
-    "header": {
-      "type": "srtp"
-    },
-    "seed": "x2aYTWwqUE"
-  }
-}
-EOF
-)
-
-stream_settings_id7=$(cat <<EOF
-{
-  "network": "tcp",
-  "security": "reality",
-  "externalProxy": [
-    {
-      "forceTls": "same",
-      "dest": "www.${domain}",
-      "port": 443,
-      "remark": ""
-    }
-  ],
-  "realitySettings": {
-    "show": false,
-    "xver": 0,
-    "dest": "${reality}:443",
-    "serverNames": [
-      "${reality}",
-      "www.${reality}"
-    ],
-    "privateKey": "0IQP3faZ4kB-boJg8QQhfAhEmCaveXn9M5Cpc2Ar_Xk",
-    "minClient": "",
-    "maxClient": "",
-    "maxTimediff": 0,
-    "shortIds": [
-      "eee930481a21b35a",
-      "82",
-      "b58f324f09",
-      "641f38df",
-      "e933023c95c4db",
-      "46e7226febe2",
-      "3afc28",
-      "9319"
-    ],
-    "settings": {
-      "publicKey": "GKKuQzfRfJ0Q8IuPcobznJLjzrjagVz2R5krzJGktVg",
-      "fingerprint": "chrome",
-      "serverName": "",
-      "spiderX": "/"
-    }
-  },
-  "tcpSettings": {
-    "acceptProxyProtocol": false,
-    "header": {
-      "type": "none"
-    }
-  }
-}
-EOF
-)
-
-stream_settings_id8=$(cat <<EOF
-{
-  "network": "tcp",
-  "security": "tls",
-  "externalProxy": [
-    {
-      "forceTls": "same",
-      "dest": "www.${domain}",
-      "port": 443,
-      "remark": ""
-    }
-  ],
-  "tlsSettings": {
-    "serverName": "www.${domain}",
-    "minVersion": "1.2",
-    "maxVersion": "1.3",
-    "cipherSuites": "",
-    "rejectUnknownSni": false,
-    "disableSystemRoot": false,
-    "enableSessionResumption": false,
-    "certificates": [
-      {
-	"certificateFile": "/etc/letsencrypt/live/${domain}/fullchain.pem",
-	"keyFile": "/etc/letsencrypt/live/${domain}/privkey.pem",
-	"ocspStapling": 3600,
-	"oneTimeLoading": false,
-	"usage": "encipherment",
-	"buildChain": false
-      }
-    ],
-    "alpn": [
-      "h2",
-      "http/1.1"
-    ],
-    "settings": {
-      "allowInsecure": false,
-      "fingerprint": "chrome"
-    }
-  },
-  "tcpSettings": {
-    "acceptProxyProtocol": false,
-    "header": {
-      "type": "none"
-    }
-  }
-}
-EOF
-)
-
-DB_PATH="x-ui.db"
-# Меняем данные для входа
-# 1 username
-# 2 inbounds
-# 3 settings
-sqlite3 $DB_PATH <<EOF
-UPDATE users SET username = '$username' WHERE id = 1;
-UPDATE users SET password = '$password' WHERE id = 1;
-
-UPDATE inbounds SET stream_settings = '$stream_settings_id6' WHERE id = 6;
-UPDATE inbounds SET stream_settings = '$stream_settings_id7' WHERE id = 7;
-UPDATE inbounds SET stream_settings = '$stream_settings_id8' WHERE id = 8;
-
-UPDATE settings SET value = '${webPort}' WHERE id = 1;
-SELECT value FROM settings WHERE id=1;
-UPDATE settings SET value = '/${webBasePath}/' WHERE id = 2;
-SELECT value FROM settings WHERE id=2;
-UPDATE settings SET value = '${webCertFile}' WHERE id = 8;
-SELECT value FROM settings WHERE id=8;
-UPDATE settings SET value = '${webKeyFile}' WHERE id = 9;
-SELECT value FROM settings WHERE id=9;
-UPDATE settings SET value = '${subPort}' WHERE id = 28;
-SELECT value FROM settings WHERE id=28;
-UPDATE settings SET value = '/${subPath}/' WHERE id = 29;
-SELECT value FROM settings WHERE id=29;
-UPDATE settings SET value = '${webCertFile}' WHERE id = 31;
-SELECT value FROM settings WHERE id=31;
-UPDATE settings SET value = '${webKeyFile}' WHERE id = 32;
-SELECT value FROM settings WHERE id=32;
-UPDATE settings SET value = '${subURI}' WHERE id = 36;
-SELECT value FROM settings WHERE id=36;
-UPDATE settings SET value = '/${subJsonPath}/' WHERE id = 37;
-SELECT value FROM settings WHERE id=37;
-UPDATE settings SET value = '${subJsonURI}' WHERE id = 38;
-SELECT value FROM settings WHERE id=38;
-EOF
-
-cp x-ui.db /etc/x-ui/
-sleep 1
-x-ui start
-echo ""
+	### Установка 3x-ui ###
+	echo -e "${blue}Настройка 3x-ui xray${clear}"
+	wget q --show-progress https://github.com/cortez24rus/3X-UI-auto-deployment/raw/main/x-ui.db
+	echo -e "n" | bash <(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh)
+	echo ""
+	x-ui stop
+	rm -rf /etc/x-ui/x-ui.db
+	
+	### Изменение базы данных ###
+	stream_settings_id6=$(cat <<EOF
+	{
+	  "network": "kcp",
+	  "security": "none",
+	  "externalProxy": [
+	    {
+	      "forceTls": "same",
+	      "dest": "www.${domain}",
+	      "port": 2091,
+	      "remark": ""
+	    }
+	  ],
+	  "kcpSettings": {
+	    "mtu": 1350,
+	    "tti": 20,
+	    "uplinkCapacity": 50,
+	    "downlinkCapacity": 100,
+	    "congestion": false,
+	    "readBufferSize": 1,
+	    "writeBufferSize": 1,
+	    "header": {
+	      "type": "srtp"
+	    },
+	    "seed": "x2aYTWwqUE"
+	  }
+	}
+	EOF
+	)
+	
+	stream_settings_id7=$(cat <<EOF
+	{
+	  "network": "tcp",
+	  "security": "reality",
+	  "externalProxy": [
+	    {
+	      "forceTls": "same",
+	      "dest": "www.${domain}",
+	      "port": 443,
+	      "remark": ""
+	    }
+	  ],
+	  "realitySettings": {
+	    "show": false,
+	    "xver": 0,
+	    "dest": "${reality}:443",
+	    "serverNames": [
+	      "${reality}",
+	      "www.${reality}"
+	    ],
+	    "privateKey": "0IQP3faZ4kB-boJg8QQhfAhEmCaveXn9M5Cpc2Ar_Xk",
+	    "minClient": "",
+	    "maxClient": "",
+	    "maxTimediff": 0,
+	    "shortIds": [
+	      "eee930481a21b35a",
+	      "82",
+	      "b58f324f09",
+	      "641f38df",
+	      "e933023c95c4db",
+	      "46e7226febe2",
+	      "3afc28",
+	      "9319"
+	    ],
+	    "settings": {
+	      "publicKey": "GKKuQzfRfJ0Q8IuPcobznJLjzrjagVz2R5krzJGktVg",
+	      "fingerprint": "chrome",
+	      "serverName": "",
+	      "spiderX": "/"
+	    }
+	  },
+	  "tcpSettings": {
+	    "acceptProxyProtocol": false,
+	    "header": {
+	      "type": "none"
+	    }
+	  }
+	}
+	EOF
+	)
+	
+	stream_settings_id8=$(cat <<EOF
+	{
+	  "network": "tcp",
+	  "security": "tls",
+	  "externalProxy": [
+	    {
+	      "forceTls": "same",
+	      "dest": "www.${domain}",
+	      "port": 443,
+	      "remark": ""
+	    }
+	  ],
+	  "tlsSettings": {
+	    "serverName": "www.${domain}",
+	    "minVersion": "1.2",
+	    "maxVersion": "1.3",
+	    "cipherSuites": "",
+	    "rejectUnknownSni": false,
+	    "disableSystemRoot": false,
+	    "enableSessionResumption": false,
+	    "certificates": [
+	      {
+		"certificateFile": "/etc/letsencrypt/live/${domain}/fullchain.pem",
+		"keyFile": "/etc/letsencrypt/live/${domain}/privkey.pem",
+		"ocspStapling": 3600,
+		"oneTimeLoading": false,
+		"usage": "encipherment",
+		"buildChain": false
+	      }
+	    ],
+	    "alpn": [
+	      "h2",
+	      "http/1.1"
+	    ],
+	    "settings": {
+	      "allowInsecure": false,
+	      "fingerprint": "chrome"
+	    }
+	  },
+	  "tcpSettings": {
+	    "acceptProxyProtocol": false,
+	    "header": {
+	      "type": "none"
+	    }
+	  }
+	}
+	EOF
+	)
+	
+	DB_PATH="x-ui.db"
+	# Меняем данные для входа
+	# 1 username
+	# 2 inbounds
+	# 3 settings
+	sqlite3 $DB_PATH <<EOF
+	UPDATE users SET username = '$username' WHERE id = 1;
+	UPDATE users SET password = '$password' WHERE id = 1;
+	
+	UPDATE inbounds SET stream_settings = '$stream_settings_id6' WHERE id = 6;
+	UPDATE inbounds SET stream_settings = '$stream_settings_id7' WHERE id = 7;
+	UPDATE inbounds SET stream_settings = '$stream_settings_id8' WHERE id = 8;
+	
+	UPDATE settings SET value = '${webPort}' WHERE id = 1;
+	SELECT value FROM settings WHERE id=1;
+	UPDATE settings SET value = '/${webBasePath}/' WHERE id = 2;
+	SELECT value FROM settings WHERE id=2;
+	UPDATE settings SET value = '${webCertFile}' WHERE id = 8;
+	SELECT value FROM settings WHERE id=8;
+	UPDATE settings SET value = '${webKeyFile}' WHERE id = 9;
+	SELECT value FROM settings WHERE id=9;
+	UPDATE settings SET value = '${subPort}' WHERE id = 28;
+	SELECT value FROM settings WHERE id=28;
+	UPDATE settings SET value = '/${subPath}/' WHERE id = 29;
+	SELECT value FROM settings WHERE id=29;
+	UPDATE settings SET value = '${webCertFile}' WHERE id = 31;
+	SELECT value FROM settings WHERE id=31;
+	UPDATE settings SET value = '${webKeyFile}' WHERE id = 32;
+	SELECT value FROM settings WHERE id=32;
+	UPDATE settings SET value = '${subURI}' WHERE id = 36;
+	SELECT value FROM settings WHERE id=36;
+	UPDATE settings SET value = '/${subJsonPath}/' WHERE id = 37;
+	SELECT value FROM settings WHERE id=37;
+	UPDATE settings SET value = '${subJsonURI}' WHERE id = 38;
+	SELECT value FROM settings WHERE id=38;
+	EOF
+	
+	cp x-ui.db /etc/x-ui/
+	sleep 1
+	x-ui start
+	echo ""
  
 	ssh_setup
 	enabling_security
