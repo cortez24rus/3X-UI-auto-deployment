@@ -63,7 +63,7 @@ data_entry() {
 	echo -e "${blue}Введите доменное имя под будете маскировать (Reality):${clear}"
 	read reality
 	echo ""
-	echo -e "${blue}Введите свое доменое имя${clear}"
+	echo -e "${blue}Укажите свой домен:${clear}"
 	read domain
 	if [[ "$domain" == "www."* ]]
 	then
