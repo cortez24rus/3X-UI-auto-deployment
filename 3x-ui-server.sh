@@ -76,6 +76,7 @@ data_entry() {
 	    read webPort
 	    # Проверка порта
 	    if [[ ! $webPort =~ ^[0-9]+$ ]] || ((webPort < 1024 || webPort > 65535)); then
+     		echo ""
 	        echo -e "${red}Порт должен быть от 1024 до 65535${clear}"
 	        echo -e "${blue}Пожалуйста, введите порт заново:${clear}"
 	    else
@@ -88,6 +89,7 @@ data_entry() {
 	    read webBasePath
 	    # Проверка на наличие запрещённых символов
 	    if [[ $webBasePath =~ ['{}\$/'] ]]; then
+     		echo ""
 	        echo -e "${red}Ошибка: путь не должен содержать символы '/', '$', '{}', '\'${clear}"
 	        echo -e "${blue}Пожалуйста, введите путь заново:${clear}"
 	    else
@@ -101,6 +103,7 @@ data_entry() {
 	
 	    # Проверка порта
 	    if [[ ! $subPort =~ ^[0-9]+$ ]] || ((subPort < 1024 || subPort > 65535)); then
+     		echo ""
 	        echo -e "${red}Порт должен быть от 1024 до 65535${clear}"
 	        echo -e "${blue}Пожалуйста, введите порт заново:${clear}"
 	    else
@@ -113,6 +116,7 @@ data_entry() {
 	    read subPath
 	    # Проверка на наличие запрещённых символов
 	    if [[ $subPath =~ ['{}\$/'] ]]; then
+     		echo ""
 	        echo -e "${red}Ошибка: путь не должен содержать символы '/', '$', '{}', '\'${clear}"
 	        echo -e "${blue}Пожалуйста, введите путь заново:${clear}"
 	    else
@@ -126,6 +130,7 @@ data_entry() {
 	    read subJsonPath
 	    # Проверка на наличие запрещённых символов
 	    if [[ $subJsonPath =~ ['{}\$/'] ]]; then
+     		echo ""
 	        echo -e "${red}Ошибка: путь не должен содержать символы '/', '$', '{}', '\'${clear}"
 	        echo -e "${blue}Пожалуйста, введите путь заново:${clear}"
 	    else
