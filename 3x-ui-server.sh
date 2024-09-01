@@ -95,7 +95,7 @@ data_entry() {
 	    fi
 	done
 	echo ""
-	echo -e "${blue}Введите порт панели:${clear}"
+	echo -e "${blue}Введите порт подписки:${clear}"
 	while true; do
 	    read subPort
 	
