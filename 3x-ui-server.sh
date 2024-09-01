@@ -75,19 +75,19 @@ data_entry() {
 	read webPort
 	echo ""
 
-echo -e "${blue}Введите путь до панели (без символов '/', '$', '{}', '()', '\"', и '\''):${clear}"
-while true; do
-    read webBasePath
-
-    # Проверка на наличие запрещённых символов
-    if echo "$webBasePath" | grep -q '[/\$(){}\"\']'; then
-        echo -e "${red}Ошибка: путь не должен содержать символы '/', '$', '{}', '()', '\"', и '\''. Пожалуйста, введите путь заново:${clear}"
-    else
-        break
-    fi
-done
-
-echo ""
+	echo -e "${blue}Введите путь до панели (без символов '/', '$', '{}', '()', '\"', и '\''):${clear}"
+	while true; do
+	    read webBasePath
+	
+	    # Проверка на наличие запрещённых символов
+	    if [[ $webBasePath =~ ['!@#$%^&*()_+/'] ]]; then    
+	    	read webBasePath
+	        echo -e "${red}Ошибка: путь не должен содержать символы '/', '$', '{}', '()', '\"', и '\''. Пожалуйста, введите путь заново:${clear}"
+	    else
+	        break
+	    fi
+	done
+	echo ""
  
 	echo -e "${blue}Введите порт подписки:${clear}"
 	read subPort
