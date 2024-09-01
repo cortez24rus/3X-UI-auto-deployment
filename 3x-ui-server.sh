@@ -853,11 +853,11 @@ main_script() {
 #	disable_ipv6
 #	warp
 #	issuance_of_certificates
-	nginx_setup
- #	panel_installation
+#	nginx_setup
+#	panel_installation
 #	ssh_setup
 #	enabling_security
-	data_output
+#	data_output
 }
 
 main_script
