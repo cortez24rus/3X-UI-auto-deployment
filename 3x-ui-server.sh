@@ -120,6 +120,7 @@ data_entry() {
 	    fi
 	done
 	echo ""
+ 	echo ""
   	echo -e "${blue}Введите путь JSON подписки (без символов '/', '$', '{}', '\'):${clear}"
 	while true; do
 	    read subJsonPath
