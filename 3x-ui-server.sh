@@ -453,178 +453,6 @@ nginx -s reload
 }
 
 
-### SSH ####
-ssh_setup() {
-	echo -e "${blue}Настройка ssh${clear}"
-	echo "Команда для Linux:"
-	echo -e "${blue}ssh-copy-id -p 22 ${username}@${serverip}${clear}"
-	echo "Команда для Windows:"
-	echo -e "${blue}type \$env:USERPROFILE\.ssh\id_rsa.pub | ssh -p 22 ${username}@${serverip} \"cat >> ~/.ssh/authorized_keys\""
-	echo ""
-	echo -e "Закинули ключ SSH на сервер? (если нет, то потеряешь доступ к серверу) [y/N]${clear}"
-	read answer
-	if [[ $answer != "y" ]] && [[ $answer != "Y" ]]
-	then
-	        echo ""
-	        echo -e $cancel
-	        echo ""
-	        exit
-	fi
-	
-cat > /etc/ssh/sshd_config <<EOF
-# This is the sshd server system-wide configuration file.  See
-# sshd_config(5) for more information.
-
-# This sshd was compiled with PATH=/usr/local/bin:/usr/bin:/bin:/usr/games
-
-# The strategy used for options in the default sshd_config shipped with
-# OpenSSH is to specify options with their default value where
-# possible, but leave them commented.  Uncommented options override the
-# default value.
-
-Include /etc/ssh/sshd_config.d/*.conf
-
-Port 22
-#AddressFamily any
-ListenAddress 127.0.0.1
-#ListenAddress ::
-
-#HostKey /etc/ssh/ssh_host_rsa_key
-#HostKey /etc/ssh/ssh_host_ecdsa_key
-#HostKey /etc/ssh/ssh_host_ed25519_key
-
-# Ciphers and keying
-#RekeyLimit default none
-
-# Logging
-#SyslogFacility AUTH
-#LogLevel INFO
-
-# Authentication:
-
-#LoginGraceTime 2m
-PermitRootLogin prohibit-password
-#StrictModes yes
-#MaxAuthTries 6
-#MaxSessions 10
-
-PubkeyAuthentication yes
-
-# Expect .ssh/authorized_keys2 to be disregarded by default in future.
-#AuthorizedKeysFile     .ssh/authorized_keys .ssh/authorized_keys2
-
-#AuthorizedPrincipalsFile none
-
-#AuthorizedKeysCommand none
-#AuthorizedKeysCommandUser nobody
-
-# For this to work you will also need host keys in /etc/ssh/ssh_known_hosts
-#HostbasedAuthentication no
-# Change to yes if you don't trust ~/.ssh/known_hosts for
-# HostbasedAuthentication
-#IgnoreUserKnownHosts no
-# Don't read the user's ~/.rhosts and ~/.shosts files
-#IgnoreRhosts yes
-
-# To disable tunneled clear text passwords, change to no here!
-PasswordAuthentication no
-PermitEmptyPasswords no
-
-# Change to yes to enable challenge-response passwords (beware issues with
-# some PAM modules and threads)
-KbdInteractiveAuthentication no
-
-# Kerberos options
-#KerberosAuthentication no
-#KerberosOrLocalPasswd yes
-#KerberosTicketCleanup yes
-#KerberosGetAFSToken no
-
-# GSSAPI options
-#GSSAPIAuthentication no
-#GSSAPICleanupCredentials yes
-#GSSAPIStrictAcceptorCheck yes
-#GSSAPIKeyExchange no
-
-# Set this to 'yes' to enable PAM authentication, account processing,
-# and session processing. If this is enabled, PAM authentication will
-# be allowed through the KbdInteractiveAuthentication and
-# PasswordAuthentication.  Depending on your PAM configuration,
-# PAM authentication via KbdInteractiveAuthentication may bypass
-# the setting of "PermitRootLogin prohibit-password".
-# If you just want the PAM account and session checks to run without
-# PAM authentication, then enable this but set PasswordAuthentication
-# and KbdInteractiveAuthentication to 'no'.
-UsePAM yes
-
-#AllowAgentForwarding yes
-#AllowTcpForwarding yes
-#GatewayPorts no
-X11Forwarding yes
-#X11DisplayOffset 10
-#X11UseLocalhost yes
-#PermitTTY yes
-PrintMotd no
-#PrintLastLog yes
-#TCPKeepAlive yes
-#PermitUserEnvironment no
-#Compression delayed
-#ClientAliveInterval 0
-#ClientAliveCountMax 3
-#UseDNS no
-#PidFile /run/sshd.pid
-#MaxStartups 10:30:100
-#PermitTunnel no
-#ChrootDirectory none
-#VersionAddendum none
-
-# no default banner path
-#Banner none
-
-# Allow client to pass locale environment variables
-AcceptEnv LANG LC_*
-
-# override default of no subsystems
-Subsystem       sftp    /usr/lib/openssh/sftp-server
-
-# Example of overriding settings on a per-user basis
-#Match User anoncvs
-#       X11Forwarding no
-#       AllowTcpForwarding no
-#       PermitTTY no
-#       ForceCommand cvs server
-EOF
-
-	systemctl restart ssh.service
-	echo ""
-}
-
-
-### UFW ###
-enabling_security() {
-	echo -e "${blue}Настройка ufw${clear}"
-	ufw allow 443/tcp
-	ufw allow 80/tcp
-	ufw allow 2091
-	yes | ufw enable
-	echo ""
-}
-
-
-### Окончание ###
-data_output() {
-	echo -e "${blue}Окончание настройки, доступ по ссылке:${clear}"
-	echo -e "${green}https://${domain}/${webBasePath}/${clear}"
-	echo ""
-	echo -e "${blue}Логин: ${green}${username}${clear}"
- 	echo -e "${blue}Пароль: ${green}${password}${clear}"
-	echo ""
-	echo -e "${blue}Подключение по ssh :${clear}"
-	echo -e "${green}ssh -p 443 ${username}@www.${domain}${clear}"
-	echo ""
-	sleep 5
-}
-
 ### Установка 3x-ui ###
 panel_installation() {
 	echo -e "${blue}Настройка 3x-ui xray${clear}"
@@ -818,6 +646,180 @@ EOF
 }
 
 
+### SSH ####
+ssh_setup() {
+	echo -e "${blue}Настройка ssh${clear}"
+	echo "Команда для Linux:"
+	echo -e "${blue}ssh-copy-id -p 22 ${username}@${serverip}${clear}"
+	echo "Команда для Windows:"
+	echo -e "${blue}type \$env:USERPROFILE\.ssh\id_rsa.pub | ssh -p 22 ${username}@${serverip} \"cat >> ~/.ssh/authorized_keys\""
+	echo ""
+	echo -e "Закинули ключ SSH на сервер? (если нет, то потеряешь доступ к серверу) [y/N]${clear}"
+	read answer
+	if [[ $answer != "y" ]] && [[ $answer != "Y" ]]
+	then
+	        echo ""
+	        echo -e $cancel
+	        echo ""
+	        exit
+	fi
+
+cat > /etc/ssh/sshd_config <<EOF
+# This is the sshd server system-wide configuration file.  See
+# sshd_config(5) for more information.
+
+# This sshd was compiled with PATH=/usr/local/bin:/usr/bin:/bin:/usr/games
+
+# The strategy used for options in the default sshd_config shipped with
+# OpenSSH is to specify options with their default value where
+# possible, but leave them commented.  Uncommented options override the
+# default value.
+
+Include /etc/ssh/sshd_config.d/*.conf
+
+Port 22
+#AddressFamily any
+ListenAddress 127.0.0.1
+#ListenAddress ::
+
+#HostKey /etc/ssh/ssh_host_rsa_key
+#HostKey /etc/ssh/ssh_host_ecdsa_key
+#HostKey /etc/ssh/ssh_host_ed25519_key
+
+# Ciphers and keying
+#RekeyLimit default none
+
+# Logging
+#SyslogFacility AUTH
+#LogLevel INFO
+
+# Authentication:
+
+#LoginGraceTime 2m
+PermitRootLogin prohibit-password
+#StrictModes yes
+#MaxAuthTries 6
+#MaxSessions 10
+
+PubkeyAuthentication yes
+
+# Expect .ssh/authorized_keys2 to be disregarded by default in future.
+#AuthorizedKeysFile     .ssh/authorized_keys .ssh/authorized_keys2
+
+#AuthorizedPrincipalsFile none
+
+#AuthorizedKeysCommand none
+#AuthorizedKeysCommandUser nobody
+
+# For this to work you will also need host keys in /etc/ssh/ssh_known_hosts
+#HostbasedAuthentication no
+# Change to yes if you don't trust ~/.ssh/known_hosts for
+# HostbasedAuthentication
+#IgnoreUserKnownHosts no
+# Don't read the user's ~/.rhosts and ~/.shosts files
+#IgnoreRhosts yes
+
+# To disable tunneled clear text passwords, change to no here!
+PasswordAuthentication no
+PermitEmptyPasswords no
+
+# Change to yes to enable challenge-response passwords (beware issues with
+# some PAM modules and threads)
+KbdInteractiveAuthentication no
+
+# Kerberos options
+#KerberosAuthentication no
+#KerberosOrLocalPasswd yes
+#KerberosTicketCleanup yes
+#KerberosGetAFSToken no
+
+# GSSAPI options
+#GSSAPIAuthentication no
+#GSSAPICleanupCredentials yes
+#GSSAPIStrictAcceptorCheck yes
+#GSSAPIKeyExchange no
+
+# Set this to 'yes' to enable PAM authentication, account processing,
+# and session processing. If this is enabled, PAM authentication will
+# be allowed through the KbdInteractiveAuthentication and
+# PasswordAuthentication.  Depending on your PAM configuration,
+# PAM authentication via KbdInteractiveAuthentication may bypass
+# the setting of "PermitRootLogin prohibit-password".
+# If you just want the PAM account and session checks to run without
+# PAM authentication, then enable this but set PasswordAuthentication
+# and KbdInteractiveAuthentication to 'no'.
+UsePAM yes
+
+#AllowAgentForwarding yes
+#AllowTcpForwarding yes
+#GatewayPorts no
+X11Forwarding yes
+#X11DisplayOffset 10
+#X11UseLocalhost yes
+#PermitTTY yes
+PrintMotd no
+#PrintLastLog yes
+#TCPKeepAlive yes
+#PermitUserEnvironment no
+#Compression delayed
+#ClientAliveInterval 0
+#ClientAliveCountMax 3
+#UseDNS no
+#PidFile /run/sshd.pid
+#MaxStartups 10:30:100
+#PermitTunnel no
+#ChrootDirectory none
+#VersionAddendum none
+
+# no default banner path
+#Banner none
+
+# Allow client to pass locale environment variables
+AcceptEnv LANG LC_*
+
+# override default of no subsystems
+Subsystem       sftp    /usr/lib/openssh/sftp-server
+
+# Example of overriding settings on a per-user basis
+#Match User anoncvs
+#       X11Forwarding no
+#       AllowTcpForwarding no
+#       PermitTTY no
+#       ForceCommand cvs server
+EOF
+
+	systemctl restart ssh.service
+	echo ""
+}
+
+
+### UFW ###
+enabling_security() {
+	echo -e "${blue}Настройка ufw${clear}"
+	ufw allow 443/tcp
+	ufw allow 80/tcp
+	ufw allow 2091
+	yes | ufw enable
+	echo ""
+}
+
+
+### Окончание ###
+data_output() {
+	echo -e "${blue}Окончание настройки, доступ по ссылке:${clear}"
+	echo -e "${green}https://${domain}/${webBasePath}/${clear}"
+	echo ""
+	echo -e "${blue}Логин: ${green}${username}${clear}"
+ 	echo -e "${blue}Пароль: ${green}${password}${clear}"
+	echo ""
+	echo -e "${blue}Подключение по ssh :${clear}"
+	echo -e "${green}ssh -p 443 ${username}@www.${domain}${clear}"
+	echo ""
+	sleep 5
+}
+
+
+### Основная часть ###
 main_script() {
 	check_root
 	start_installation
