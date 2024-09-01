@@ -72,7 +72,16 @@ data_entry() {
 	echo ""
 	
 	echo -e "${blue}Введите порт панели:${clear}"
-	read webPort
+	while true; do
+	    read webPort
+	    # Проверка порта
+	    if [[ ! $webPort =~ ^[0-9]+$ ]] || ((webPort < 1024 || webPort > 65535)); then
+	        echo -e "${red}Порт должен быть от 1024 до 65535${clear}"
+	        echo -e "${blue}Пожалуйста, введите порт заново:${clear}"
+	    else
+	        break
+	    fi
+	done
 	echo ""
 	echo -e "${blue}Введите путь панели (без символов '/', '$', '{}', '\'):${clear}"
 	while true; do
@@ -86,9 +95,19 @@ data_entry() {
 	    fi
 	done
 	echo ""
-	echo -e "${blue}Введите порт подписки:${clear}"
-	read subPort
-	echo ""
+	echo -e "${blue}Введите порт панели:${clear}"
+	while true; do
+	    read subPort
+	
+	    # Проверка порта
+	    if [[ ! $subPort =~ ^[0-9]+$ ]] || ((subPort < 1024 || subPort > 65535)); then
+	        echo -e "${red}Порт должен быть от 1024 до 65535${clear}"
+	        echo -e "${blue}Пожалуйста, введите порт заново:${clear}"
+	    else
+	        break
+	    fi
+	done
+	echo "" 
  	echo -e "${blue}Введите путь подписки (без символов '/', '$', '{}', '\'):${clear}"
 	while true; do
 	    read subPath
@@ -101,7 +120,6 @@ data_entry() {
 	    fi
 	done
 	echo ""
-
   	echo -e "${blue}Введите путь JSON подписки (без символов '/', '$', '{}', '\'):${clear}"
 	while true; do
 	    read subJsonPath
