@@ -308,29 +308,16 @@ nginx_setup() {
 	echo -e "${blue}Настройка NGINX${clear}"
 	mkdir -p /etc/nginx/stream-enabled/
 	#touch /etc/nginx/.htpasswd
-	
-cat > /etc/nginx/stream-enabled/stream.conf <<EOF
-map \$ssl_preread_protocol \$backend {
-    default             \$https;
-    ""                  ssh;
-}
-map \$ssl_preread_server_name \$https {
-    ${reality}          reality;
-    www.${domain}       trojan;
-    ${domain}           web;
-}
-upstream reality        { server 127.0.0.1:7443; }
-upstream trojan         { server 127.0.0.1:9443; }
-upstream web            { server 127.0.0.1:46076; }
-upstream ssh            { server 127.0.0.1:22; }
 
-server {
-    listen 443          reuseport;
-    ssl_preread         on;
-    proxy_pass          \$backend;
+	nginx_conf
+	stream_conf
+	local_conf
+
+	nginx -s reload
+	echo ""
 }
-EOF
-	
+
+nginx_conf() {
 cat > /etc/nginx/nginx.conf <<EOF
 user                              www-data;
 pid                               /run/nginx.pid;
@@ -391,7 +378,33 @@ stream {
     include /etc/nginx/stream-enabled/stream.conf;
 }
 EOF
+}
 
+stream_conf() {
+cat > /etc/nginx/stream-enabled/stream.conf <<EOF
+map \$ssl_preread_protocol \$backend {
+    default             \$https;
+    ""                  ssh;
+}
+map \$ssl_preread_server_name \$https {
+    ${reality}          reality;
+    www.${domain}       trojan;
+    ${domain}           web;
+}
+upstream reality        { server 127.0.0.1:7443; }
+upstream trojan         { server 127.0.0.1:9443; }
+upstream web            { server 127.0.0.1:46076; }
+upstream ssh            { server 127.0.0.1:22; }
+
+server {
+    listen 443          reuseport;
+    ssl_preread         on;
+    proxy_pass          \$backend;
+}
+EOF
+}
+
+local_conf() {
 cat > /etc/nginx/conf.d/local.conf <<EOF
 # HTTP redirect
 server {
@@ -447,9 +460,6 @@ server {
     }
 }
 EOF
-
-nginx -s reload
-	echo ""
 }
 
 
