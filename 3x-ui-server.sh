@@ -824,18 +824,18 @@ main_script() {
 	check_root
 	start_installation
 	data_entry
-	installation_of_utilities
-	add_user
-	uattended_upgrade
-	dns_encryption
-	enable_bbr
-	disable_ipv6
-	warp
-	issuance_of_certificates
+#	installation_of_utilities
+#	add_user
+#	uattended_upgrade
+#	dns_encryption
+#	enable_bbr
+#	disable_ipv6
+#	warp
+#	issuance_of_certificates
 	nginx_setup
- 	panel_installation
-	ssh_setup
-	enabling_security
+ #	panel_installation
+#	ssh_setup
+#	enabling_security
 	data_output
 }
 
