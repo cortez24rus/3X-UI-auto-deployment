@@ -74,29 +74,45 @@ data_entry() {
 	echo -e "${blue}Введите порт панели:${clear}"
 	read webPort
 	echo ""
-
-	echo -e "${blue}Введите путь до панели (без символов '/', '$', '{}', '()', '\"', и '\''):${clear}"
+	echo -e "${blue}Введите путь панели (без символов '/', '$', '{}', '\':${clear}"
 	while true; do
 	    read webBasePath
-	
 	    # Проверка на наличие запрещённых символов
-	    if [[ $webBasePath =~ ['!@#$%^&*()_+/'] ]]; then    
-	    	read webBasePath
-	        echo -e "${red}Ошибка: путь не должен содержать символы '/', '$', '{}', '()', '\"', и '\''. Пожалуйста, введите путь заново:${clear}"
+	    if [[ $webBasePath =~ ['{}\$/'] ]]; then
+	        echo -e "${red}Ошибка: путь не должен содержать символы '/', '$', '{}', '\'${clear}"
+	        echo -e "${blue}Пожалуйста, введите путь заново:${clear}"
 	    else
 	        break
 	    fi
 	done
 	echo ""
- 
 	echo -e "${blue}Введите порт подписки:${clear}"
 	read subPort
 	echo ""
-	echo -e "${blue}Введите путь до подписки:${clear}"
-	read subPath
+ 	echo -e "${blue}Введите путь подписки (без символов '/', '$', '{}', '\':${clear}"
+	while true; do
+	    read subPath
+	    # Проверка на наличие запрещённых символов
+	    if [[ $subPath =~ ['{}\$/'] ]]; then
+	        echo -e "${red}Ошибка: путь не должен содержать символы '/', '$', '{}', '\'${clear}"
+	        echo -e "${blue}Пожалуйста, введите путь заново:${clear}"
+	    else
+	        break
+	    fi
+	done
 	echo ""
-	echo -e "${blue}Введите путь до json подписки:${clear}"
-	read subJsonPath
+
+  	echo -e "${blue}Введите путь JSON подписки (без символов '/', '$', '{}', '\':${clear}"
+	while true; do
+	    read subJsonPath
+	    # Проверка на наличие запрещённых символов
+	    if [[ $subJsonPath =~ ['{}\$/'] ]]; then
+	        echo -e "${red}Ошибка: путь не должен содержать символы '/', '$', '{}', '\'${clear}"
+	        echo -e "${blue}Пожалуйста, введите путь заново:${clear}"
+	    else
+	        break
+	    fi
+	done
 	echo ""
 	
 	echo -e "${blue}Введите вашу почту, зарегистрированную на Cloudflare:${clear}"
