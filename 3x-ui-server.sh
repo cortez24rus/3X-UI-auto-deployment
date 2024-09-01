@@ -74,7 +74,7 @@ data_entry() {
 	echo -e "${blue}Введите порт панели:${clear}"
 	read webPort
 	echo ""
-	echo -e "${blue}Введите путь панели (без символов '/', '$', '{}', '\':${clear}"
+	echo -e "${blue}Введите путь панели (без символов '/', '$', '{}', '\'):${clear}"
 	while true; do
 	    read webBasePath
 	    # Проверка на наличие запрещённых символов
@@ -89,7 +89,7 @@ data_entry() {
 	echo -e "${blue}Введите порт подписки:${clear}"
 	read subPort
 	echo ""
- 	echo -e "${blue}Введите путь подписки (без символов '/', '$', '{}', '\':${clear}"
+ 	echo -e "${blue}Введите путь подписки (без символов '/', '$', '{}', '\'):${clear}"
 	while true; do
 	    read subPath
 	    # Проверка на наличие запрещённых символов
@@ -102,7 +102,7 @@ data_entry() {
 	done
 	echo ""
 
-  	echo -e "${blue}Введите путь JSON подписки (без символов '/', '$', '{}', '\':${clear}"
+  	echo -e "${blue}Введите путь JSON подписки (без символов '/', '$', '{}', '\'):${clear}"
 	while true; do
 	    read subJsonPath
 	    # Проверка на наличие запрещённых символов
