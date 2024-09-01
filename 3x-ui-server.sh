@@ -80,7 +80,7 @@ while true; do
     read webBasePath
 
     # Проверка на наличие запрещённых символов
-    if echo "$webBasePath" | grep -q '[/\$(){}"\'\']'; then
+    if echo "$webBasePath" | grep -q '[/\$(){}\"\']'; then
         echo -e "${red}Ошибка: путь не должен содержать символы '/', '$', '{}', '()', '\"', и '\''. Пожалуйста, введите путь заново:${clear}"
     else
         break
