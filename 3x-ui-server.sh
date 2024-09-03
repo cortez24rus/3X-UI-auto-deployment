@@ -67,7 +67,7 @@ check_ip() {
 check_root() {
 	if [[ $EUID -ne 0 ]]; then
 		echo ""
-		echo -e "${red}Error: this script should be run as root${clear}"
+  		echo -e "${red}Ошибка: скрипт должен быть запущен от root${clear}"
 		echo ""
 		exit 1
 	fi
@@ -92,7 +92,7 @@ data_entry() {
 	dpkg-reconfigure tzdata
 	
 	echo -e "${blue}Введите имя пользователя:${clear}"
-	read username
+	read -r username
 	echo ""
 
 	echo -e "${blue}Введите пароль пользователя:${clear}"
@@ -112,26 +112,25 @@ data_entry() {
 	
 	echo -e "${blue}Введите 1 для установки adguard-home (DoH)${clear}"
 	echo -e "${blue}Введите 2 для установки systemd-resolved (DoT)${clear}"
-	dns_choise() {
-		read choise
-		echo ""
-		case $choise in
-			1)
-				echo -e "${blue}Введите путь до adguard-home (без символов '/', '$', '{}', '\'):${clear}"
-				validate_path adguardPath
-				;;
-			2)
-				echo -e "${green}Выбран systemd-resolved${clear}"
-				echo ""
-				;;
-			*)
-				echo -e "${red}Неверный выбор, попробуйте снова${clear}"
-				echo ""
-				dns_choise
-				;;
-		esac
-	}
-	dns_choise
+	while true; do
+	    read choise
+	    echo ""
+	    case $choise in
+	        1)
+	            echo -e "${blue}Введите путь до adguard-home (без символов '/', '$', '{}', '\'):${clear}"
+	            validate_path adguardPath
+	            break
+	            ;;
+	        2)
+	            echo -e "${green}Выбран systemd-resolved${clear}"
+	            echo ""
+	            break
+	            ;;
+	        *)
+	            echo -e "${red}Неверный выбор, попробуйте снова${clear}"
+	            ;;
+	    esac
+	done
 	
 	echo -e "${blue}Введите порт панели:${clear}"
 	validate_port webPort
@@ -203,7 +202,11 @@ installation_of_utilities() {
 	echo -e "${blue}Установка пакета sqlite3${clear}"
 	apt-get install sqlite3 -y
 	echo ""
-	
+
+	echo -e "${blue}Установка пакета curl${clear}"
+	apt-get install curl -y
+	echo ""
+ 
 	echo -e "${blue}Установка пакета ufw${clear}"
 	apt-get install ufw -y
 	echo ""
