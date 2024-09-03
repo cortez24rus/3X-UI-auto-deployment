@@ -6,7 +6,6 @@ green='\033[0;32m'
 yellow='\033[0;33m'
 clear='\033[0m'
 
-
 ### Проверка ввода ##
 answer_input () {
 	read answer
@@ -59,12 +58,10 @@ validate_path() {
 	echo ""
 }
 
-
 ### IP сервера ###
 check_ip() {
 	serverip=$(curl -s ipinfo.io/ip)
 }
-
 
 ### Проверка рута ###
 check_root() {
@@ -75,7 +72,6 @@ check_root() {
 		exit 1
 	fi
 }
-
 
 ### Начало установки ###
 start_installation() {
@@ -89,7 +85,6 @@ start_installation() {
 	echo -e "${blue}Скрипт установки 3x-ui. Начать установку? Выберите опцию [y/N]${clear}"
 	answer_input
 }
-
 
 ### Ввод данных ###
 data_entry() {
@@ -171,7 +166,6 @@ data_entry() {
 	subJsonURI=https://${domain}/${subJsonPath}/
 }
 
-
 ### Обновление системы и установка пакетов ###
 installation_of_utilities() {
 	echo -e "${blue}___Обновление___${clear}"
@@ -236,7 +230,6 @@ installation_of_utilities() {
 	apt-get install systemd-resolved -y
 	echo ""
 }
-
 
 ### DoH, DoT ###
 dns_encryption() {
@@ -469,7 +462,6 @@ EOF
 	echo ""
 }
 
-
 # systemd-resolved
 dns_systemd_resolved() {
 	echo -e "${blue}Настройка systemd-resolved (DoT)${clear}"
@@ -492,7 +484,6 @@ EOF
 	echo ""
 }
 
-
 ### Добавление пользователя ###
 add_user() {
  	echo -e "${blue}Добавление пользователя${clear}"
@@ -507,7 +498,6 @@ add_user() {
 	echo ""
 }
 
-
 ### Безопасность ###
 uattended_upgrade() {
 	echo -e "${blue}Автоматическое обновление безопасности${clear}"
@@ -517,7 +507,6 @@ uattended_upgrade() {
 	systemctl restart unattended-upgrades
 	echo ""
 }
-
 
 ### BBR ###
 enable_bbr() {
@@ -532,7 +521,6 @@ enable_bbr() {
 	    echo "net.ipv4.tcp_congestion_control = bbr" >> /etc/sysctl.conf
 	fi
 }
-
 
 ### Отключение IPv6 ###
 disable_ipv6() {
@@ -560,7 +548,6 @@ disable_ipv6() {
 	echo ""
 }
 
-
 ### WARP ###
 warp() {
 	echo -e "${blue}Настройка warp${clear}"
@@ -573,7 +560,6 @@ warp() {
 	fi
 	echo ""
 }
-
 
 ### СЕРТИФИКАТЫ ###
 issuance_of_certificates() {
@@ -596,7 +582,6 @@ issuance_of_certificates() {
 	echo "renew_hook = systemctl reload nginx" >> /etc/letsencrypt/renewal/${domain}.conf
 	echo ""
 }
-
 
 ### NGINX ###
 nginx_setup() {
@@ -794,7 +779,6 @@ server {
 EOF
 }
 
-
 ### Установка 3x-ui ###
 panel_installation() {
 	echo -e "${blue}Настройка 3x-ui xray${clear}"
@@ -986,7 +970,6 @@ SELECT value FROM settings WHERE id=38;
 EOF
 }
 
-
 ### SSH ####
 ssh_setup() {
 	echo -e "${blue}Настройка ssh${clear}"
@@ -1009,7 +992,6 @@ ssh_setup() {
 	echo ""
 }
 
-
 ### UFW ###
 enabling_security() {
 	echo -e "${blue}Настройка ufw${clear}"
@@ -1020,21 +1002,23 @@ enabling_security() {
 	echo ""
 }
 
-
 ### Окончание ###
 data_output() {
 	echo -e "${blue}Доступ по ссылке к 3x-ui панели:${clear}"
 	echo -e "${green}https://${domain}/${webBasePath}/${clear}"
 	echo ""
-	echo -e "${blue}Доступ по ссылке к 3x-ui панели:${clear}"
-	echo -e "${green}https://${domain}/${adguardPath}/login.html${clear}"
+	if [[ $choise = "1" ]]; then
+		echo -e "${blue}Доступ по ссылке к adguard-home (если вы его выбирали):${clear}"
+		echo -e "${green}https://${domain}/${adguardPath}/login.html${clear}"
+		echo ""
+	fi
+	echo -e "${blue}Подключение по ssh :${clear}"
+	echo -e "${green}ssh -p 443 ${username}@www.${domain}${clear}"
 	echo ""
 	echo -e "${blue}Логин: ${green}${username}${clear}"
  	echo -e "${blue}Пароль: ${green}${password}${clear}"
 	echo ""
-	echo -e "${blue}Подключение по ssh :${clear}"
-	echo -e "${green}ssh -p 443 ${username}@www.${domain}${clear}"
-	echo ""
+	
 	sleep 5
 }
 
