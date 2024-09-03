@@ -7,48 +7,19 @@ yellow='\033[0;33m'
 clear='\033[0m'
 
 
-### IP сервера ###
-check_ip() {
-	serverip=$(curl -s ipinfo.io/ip)
-}
-
-
-### Проверка рута ###
-check_root() {
-	if [[ $EUID -ne 0 ]]; then
-		echo ""
-		echo -e "${red}Error: this script should be run as root${clear}"
-		echo ""
-		exit 1
-	fi
-}
-
-
-### Начало установки ###
-start_installation() {
-	clear
-	echo ""
-	echo -e "${red}ВНИМАНИЕ!${clear}"
-	echo "Перед запуском скрипта рекомендуется выполнить следующие действия:"
-	echo -e "Обновить систему командой ${yellow}apt update && apt full-upgrade -y${clear}"
-	echo -e "Перезагрузить сервер командой ${yellow}reboot${clear}"
-	echo ""
-	echo -e "${blue}Скрипт установки 3x-ui. Начать установку? Выберите опцию [y/N]${clear}"
+### Проверка ввода ##
+answer_input () {
 	read answer
 	cancel="${red}___Отмена___${clear}"
-	
-	if [[ $answer != "y" ]] && [[ $answer != "Y" ]]
-	then
+	if [[ $answer != "y" ]] && [[ $answer != "Y" ]]; then
 		echo ""
-		echo -e ${cancel}
+		echo -e $cancel
 		echo ""
 		exit
 	fi
 	echo ""
 }
 
-
-### Проверка ввода ##
 validate_port() {
 	local port_variable_name=$1
 	while true; do
@@ -89,6 +60,37 @@ validate_path() {
 }
 
 
+### IP сервера ###
+check_ip() {
+	serverip=$(curl -s ipinfo.io/ip)
+}
+
+
+### Проверка рута ###
+check_root() {
+	if [[ $EUID -ne 0 ]]; then
+		echo ""
+		echo -e "${red}Error: this script should be run as root${clear}"
+		echo ""
+		exit 1
+	fi
+}
+
+
+### Начало установки ###
+start_installation() {
+	clear
+	echo ""
+	echo -e "${red}ВНИМАНИЕ!${clear}"
+	echo "Перед запуском скрипта рекомендуется выполнить следующие действия:"
+	echo -e "Обновить систему командой ${yellow}apt update && apt full-upgrade -y${clear}"
+	echo -e "Перезагрузить сервер командой ${yellow}reboot${clear}"
+	echo ""
+	echo -e "${blue}Скрипт установки 3x-ui. Начать установку? Выберите опцию [y/N]${clear}"
+	answer_input
+}
+
+
 ### Ввод данных ###
 data_entry() {
 	echo -e "${blue}Установка часового пояса${clear}"
@@ -102,7 +104,7 @@ data_entry() {
 	read password
 	echo ""
 	
-	echo -e "${blue}Введите доменное имя под будете маскировать (Reality):${clear}"
+	echo -e "${blue}Введите доменное имя под которое будете маскироваться (Reality):${clear}"
 	read reality
 	echo ""
 
@@ -463,7 +465,7 @@ DNSStubListener=no
 EOF
 
 	systemctl restart systemd-resolved.service
-	AdGuardHome/./AdGuardHome -s restart
+	AdGuardHome/AdGuardHome -s restart
 	echo ""
 }
 
@@ -994,21 +996,14 @@ ssh_setup() {
 	echo -e "${blue}type \$env:USERPROFILE\.ssh\id_rsa.pub | ssh -p 22 ${username}@${serverip} \"cat >> ~/.ssh/authorized_keys\""
 	echo ""
 	echo -e "Закинули ключ SSH на сервер? (если нет, то потеряешь доступ к серверу) [y/N]${clear}"
-	read answer
-	if [[ $answer != "y" ]] && [[ $answer != "Y" ]]
-	then
-		echo ""
-		echo -e $cancel
-		echo ""
-		exit
-	fi
+	answer_input
 
-  sed -i -e "s/#Port/Port/g" /etc/ssh/sshd_config
-  sed -i -e "s/#ListenAddress 0.0.0.0/ListenAddress 127.0.0.1/g" /etc/ssh/sshd_config
-  sed -i -e "s/#PermitRootLogin/PermitRootLogin/g" -e "s/PermitRootLogin yes/PermitRootLogin prohibit-password/g" /etc/ssh/sshd_config
-  sed -i -e "s/#PubkeyAuthentication/PubkeyAuthentication/g" -e "s/PubkeyAuthentication no/PubkeyAuthentication yes/g" /etc/ssh/sshd_config
-  sed -i -e "s/#PasswordAuthentication/PasswordAuthentication/g" -e "s/PasswordAuthentication yes/PasswordAuthentication no/g" /etc/ssh/sshd_config
-  sed -i -e "s/#PermitEmptyPasswords/PermitEmptyPasswords/g" -e "s/PermitEmptyPasswords yes/PermitEmptyPasswords no/g" /etc/ssh/sshd_config
+	sed -i -e "s/#Port/Port/g" /etc/ssh/sshd_config
+	sed -i -e "s/#ListenAddress 0.0.0.0/ListenAddress 127.0.0.1/g" /etc/ssh/sshd_config
+	sed -i -e "s/#PermitRootLogin/PermitRootLogin/g" -e "s/PermitRootLogin yes/PermitRootLogin prohibit-password/g" /etc/ssh/sshd_config
+	sed -i -e "s/#PubkeyAuthentication/PubkeyAuthentication/g" -e "s/PubkeyAuthentication no/PubkeyAuthentication yes/g" /etc/ssh/sshd_config
+	sed -i -e "s/#PasswordAuthentication/PasswordAuthentication/g" -e "s/PasswordAuthentication yes/PasswordAuthentication no/g" /etc/ssh/sshd_config
+	sed -i -e "s/#PermitEmptyPasswords/PermitEmptyPasswords/g" -e "s/PermitEmptyPasswords yes/PermitEmptyPasswords no/g" /etc/ssh/sshd_config
 
 	systemctl restart ssh.service
 	echo ""
