@@ -67,23 +67,28 @@ validate_port() {
 	done
 	echo ""
 }
+
 validate_path() {
 	local path_variable_name=$1
 	while true; do
 		read path_value
+		# Проверка на пустой ввод
+		if [[ -z "$path_value" ]]; then
+			echo ""
+			echo -e "${red}Ошибка: путь не должен быть пустым.${clear}"
+			echo -e "${blue}Пожалуйста, введите путь заново:${clear}"
 		# Проверка на наличие запрещённых символов
-	    if [[ $path_value =~ ['{}\$/'] ]]; then
-     		echo ""
-	        echo -e "${red}Ошибка: путь не должен содержать символы '/', '$', '{}', '\'${clear}"
-	        echo -e "${blue}Пожалуйста, введите путь заново:${clear}"
-	    else
-            eval $path_variable_name=\$path_value
+		elif [[ $path_value =~ ['{}\$/'] ]]; then
+			echo ""
+			echo -e "${red}Ошибка: путь не должен содержать символы '/', '$', '{}', '\'${clear}"
+			echo -e "${blue}Пожалуйста, введите путь заново:${clear}"
+		else
+			eval $path_variable_name=\$path_value
 			break
-	    fi
+		fi
 	done
 	echo ""
 }
-
 
 ### Ввод данных ###
 data_entry() {
