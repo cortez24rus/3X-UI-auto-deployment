@@ -90,6 +90,7 @@ validate_path() {
 	echo ""
 }
 
+
 ### Ввод данных ###
 data_entry() {
 	echo -e "${blue}Установка часового пояса${clear}"
@@ -467,6 +468,7 @@ EOF
 	AdGuardHome/./AdGuardHome -s restart
 	echo ""
 }
+
 
 # systemd-resolved
 dns_systemd_resolved() {
