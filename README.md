@@ -33,7 +33,7 @@
 7) Настройка UFW
 8) Настройка SSH за NGINX
 9) Отключение IPv6
-10) Шифрование DNS запросов (DNS over TLS) 
+10) Шифрование DNS запросов (DNS over TLS или DNS over HTTPS) 
 
 -----
 
