@@ -237,10 +237,9 @@ dns_encryption() {
 	case $choise in
 		1)
 			dns_adguard_home
-comment_agh="location /${adguardPath}/ {
-proxy_redirect /login.html /${adguardPath}/login.html;
-proxy_pass http://127.0.0.1:8080/;
-}"
+			comment_agh="location /${adguardPath}/ {
+		proxy_redirect /login.html /${adguardPath}/login.html;
+		proxy_pass http://127.0.0.1:8080/;}"
 			;;
 		2)
 			dns_systemd_resolved
@@ -675,6 +674,8 @@ map \$ssl_preread_protocol \$backend {
 	""                ssh;
 }
 map \$ssl_preread_server_name \$https {
+	cg.${domain}		  cg;
+	cw.${domain}		  cw;
 	${reality}        reality;
 	www.${domain}     trojan;
 	${domain}         web;
