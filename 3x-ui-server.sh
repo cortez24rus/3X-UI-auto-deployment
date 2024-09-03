@@ -1004,7 +1004,7 @@ ssh_setup() {
 	fi
 
   sed -i -e "s/#Port/Port/g" /etc/ssh/sshd_config
-  sed -i -e "s/#ListenAddress 127.0.0.1/ListenAddress 127.0.0.1/g" /etc/ssh/sshd_config
+  sed -i -e "s/#ListenAddress 0.0.0.0/ListenAddress 127.0.0.1/g" /etc/ssh/sshd_config
   sed -i -e "s/#PermitRootLogin/PermitRootLogin/g" -e "s/PermitRootLogin yes/PermitRootLogin prohibit-password/g" /etc/ssh/sshd_config
   sed -i -e "s/#PubkeyAuthentication/PubkeyAuthentication/g" -e "s/PubkeyAuthentication no/PubkeyAuthentication yes/g" /etc/ssh/sshd_config
   sed -i -e "s/#PasswordAuthentication/PasswordAuthentication/g" -e "s/PasswordAuthentication yes/PasswordAuthentication no/g" /etc/ssh/sshd_config
