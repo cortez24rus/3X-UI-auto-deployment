@@ -674,8 +674,8 @@ map \$ssl_preread_protocol \$backend {
 	""                ssh;
 }
 map \$ssl_preread_server_name \$https {
-	cg.${domain}		  cg;
-	cw.${domain}		  cw;
+	cg.${domain}		cg;
+	cw.${domain}		cw;
 	${reality}        reality;
 	www.${domain}     trojan;
 	${domain}         web;
@@ -1140,8 +1140,11 @@ enabling_security() {
 
 ### Окончание ###
 data_output() {
-	echo -e "${blue}Окончание настройки, доступ по ссылке:${clear}"
+	echo -e "${blue}Доступ по ссылке к 3x-ui панели:${clear}"
 	echo -e "${green}https://${domain}/${webBasePath}/${clear}"
+	echo ""
+	echo -e "${blue}Доступ по ссылке к 3x-ui панели:${clear}"
+	echo -e "${green}https://${domain}/${adguardPath}/login.html${clear}"
 	echo ""
 	echo -e "${blue}Логин: ${green}${username}${clear}"
  	echo -e "${blue}Пароль: ${green}${password}${clear}"
