@@ -960,25 +960,43 @@ data_output() {
 }
 
 
-### Основная часть ###
-main_script() {
-	check_ip
-	check_root
-	start_installation
-	data_entry
-	installation_of_utilities
-	dns_encryption
-	add_user
-	uattended_upgrade
-	enable_bbr
-	disable_ipv6
-	warp
-	issuance_of_certificates
-	nginx_setup
-	panel_installation
-	ssh_setup
-	enabling_security
-	data_output
+### Первый запуск ###
+main_script_first() {
+  check_ip
+  check_root
+  start_installation
+  data_entry
+  installation_of_utilities
+  dns_encryption
+  add_user
+  uattended_upgrade
+  enable_bbr
+  disable_ipv6
+  warp
+  issuance_of_certificates
+  nginx_setup
+  panel_installation
+  ssh_setup
+  enabling_security
+  data_output
 }
 
-main_script
+### Второй запуск ###
+main_script_first() {
+  check_ip
+  check_root
+  start_installation
+  data_entry
+  installation_of_utilities
+  dns_encryption
+  nginx_setup
+  panel_installation
+  data_output
+}
+
+main_choise() {
+  main_script_first
+#  main_script_repeat
+}
+
+main_choise
