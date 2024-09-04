@@ -164,70 +164,12 @@ data_entry() {
 
 ### Обновление системы и установка пакетов ###
 installation_of_utilities() {
-	echo -e "${blue}___Обновление___${clear}"
-	apt-get update && apt-get upgrade -y
-	echo ""
-	
-	echo -e "${blue}Установка пакета git${clear}"
-	apt-get install git -y
-	echo ""
-	
-	echo -e "${blue}Установка пакета wget${clear}"
-	apt-get install wget -y
-	echo ""
-	
-	echo -e "${blue}Установка пакета sudo${clear}"
-	apt-get install sudo -y
-	echo ""
-	
-	echo -e "${blue}Установка пакета nginx-full${clear}"
-	apt-get install nginx-full -y
-	echo ""
-	
-	echo -e "${blue}Установка пакета net-tools${clear}"
-	apt-get install net-tools -y
-	echo ""
-	
-	echo -e "${blue}Установка пакета apache2-utils${clear}"
-	apt-get install apache2-utils -y
-	echo ""
-
-	echo -e "${blue}Установка пакета gnupg2${clear}"
-	apt-get install gnupg2 -y
-	echo ""
-	
-	echo -e "${blue}Установка пакета sqlite3${clear}"
-	apt-get install sqlite3 -y
-	echo ""
-
-	echo -e "${blue}Установка пакета curl${clear}"
-	apt-get install curl -y
-	echo ""
- 
-	echo -e "${blue}Установка пакета ufw${clear}"
-	apt-get install ufw -y
-	echo ""
-	
-	echo -e "${blue}Установка пакета Warp${clear}"
+	echo -e "${blue}Обновление системы и установка необходимых пакетов${clear}"
 	curl -fsSL https://pkg.cloudflareclient.com/pubkey.gpg | gpg --yes --dearmor --output /usr/share/keyrings/cloudflare-warp-archive-keyring.gpg
-	echo "deb [signed-by=/usr/share/keyrings/cloudflare-warp-archive-keyring.gpg] https://pkg.cloudflareclient.com/ $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/cloudflare-client.list
-	apt-get update && apt-get install cloudflare-warp -y
-	echo ""
-	
-	echo -e "${blue}Установка пакета unattended-upgrades${clear}"
-	apt-get install unattended-upgrades -y
-	echo ""
-	
-	echo -e "${blue}Установка пакета certbot${clear}"
-	apt-get install certbot -y
-	echo ""
-	
-	echo -e "${blue}Установка пакета python3-certbot-dns-cloudflare${clear}"
-	apt-get install python3-certbot-dns-cloudflare -y
-	echo ""
-	
-	echo -e "${blue}Установка пакета systemd-resolved${clear}"
-	apt-get install systemd-resolved -y
+	echo "deb [signed-by=/usr/share/keyrings/cloudflare-warp-archive-keyring.gpg] https://pkg.cloudflareclient.com/ $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/cloudflare-client.list	
+ 	apt-get update && apt-get upgrade -y
+	apt-get install -y git wget sudo nginx-full net-tools apache2-utils gnupg2 sqlite3 curl ufw certbot python3-certbot-dns-cloudflare systemd-resolved unattended-upgrades cloudflare-warp
+ 	echo -e "${green}Все пакеты установлены${clear}"
 	echo ""
 }
 
@@ -238,7 +180,8 @@ dns_encryption() {
 			dns_adguard_home
 			comment_agh="location /${adguardPath}/ {
 		proxy_redirect /login.html /${adguardPath}/login.html;
-		proxy_pass http://127.0.0.1:8080/;}"
+		proxy_pass http://127.0.0.1:8080/;
+	}"
 			;;
 		2)
 			dns_systemd_resolved
@@ -696,7 +639,7 @@ server {
 
 	# Disable direct IP access
 	if (\$host = ${serverip}) {
-	return 444;
+		return 444;
 	}
 
 	return 301 https://${domain}\$request_uri;
@@ -732,14 +675,14 @@ server {
 
 	# Disable direct IP access
 	if (\$host = ${serverip}) {
-	return 444;
+		return 444;
 	}
 
 	# Auth
 	location / {
-	auth_basic "Restricted Content";
-	auth_basic_user_file /etc/nginx/.htpasswd;
-	return 301 https://${domain}\$request_uri;
+		auth_basic "Restricted Content";
+		auth_basic_user_file /etc/nginx/.htpasswd;
+		return 301 https://${domain}\$request_uri;
 	}
 
 	# 3X-UI
@@ -1019,7 +962,7 @@ data_output() {
  	echo -e "${blue}Пароль: ${green}${password}${clear}"
 	echo ""
 	
-	sleep 5
+	sleep 3
 }
 
 
