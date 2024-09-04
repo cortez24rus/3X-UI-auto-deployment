@@ -729,6 +729,7 @@ EOF
 
 ### Установка 3x-ui ###
 panel_installation() {
+	touch /usr/local/bin/reinstallation_check
 	echo -e "${blue}Настройка 3x-ui xray${clear}"
 	wget -q --show-progress https://github.com/cortez24rus/3X-UI-auto-deployment/raw/main/x-ui.db
 	echo -e "n" | bash <(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh)
@@ -1003,7 +1004,6 @@ main_choise() {
     echo ""
     exit 1
   else
-    touch /usr/local/bin/reinstallation_check
     main_script_first
   fi
 }
