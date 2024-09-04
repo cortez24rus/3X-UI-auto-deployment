@@ -982,7 +982,7 @@ main_script_first() {
 }
 
 ### Второй запуск ###
-main_script_first() {
+main_script_repeat() {
   check_ip
   check_root
   start_installation
