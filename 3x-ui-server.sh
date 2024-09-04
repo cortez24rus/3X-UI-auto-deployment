@@ -216,7 +216,7 @@ EOF
 	wget https://static.adguard.com/adguardhome/release/AdGuardHome_linux_amd64.tar.gz
 	tar xvf AdGuardHome_linux_amd64.tar.gz
 	AdGuardHome/AdGuardHome -s install
-	hash=$(htpasswd -nb ${username} ${password} | cut -d ":" -f 2)
+	hash=$(htpasswd -B -C 10 -n -b ${username} ${password} | cut -d ":" -f 2)
 
 cat > AdGuardHome/AdGuardHome.yaml <<EOF
 http:
@@ -905,27 +905,16 @@ UPDATE inbounds SET stream_settings = '$stream_settings_id7' WHERE id = 7;
 UPDATE inbounds SET stream_settings = '$stream_settings_id8' WHERE id = 8;
 
 UPDATE settings SET value = '${webPort}' WHERE id = 1;
-SELECT value FROM settings WHERE id=1;
 UPDATE settings SET value = '/${webBasePath}/' WHERE id = 2;
-SELECT value FROM settings WHERE id=2;
 UPDATE settings SET value = '${webCertFile}' WHERE id = 8;
-SELECT value FROM settings WHERE id=8;
 UPDATE settings SET value = '${webKeyFile}' WHERE id = 9;
-SELECT value FROM settings WHERE id=9;
 UPDATE settings SET value = '${subPort}' WHERE id = 28;
-SELECT value FROM settings WHERE id=28;
 UPDATE settings SET value = '/${subPath}/' WHERE id = 29;
-SELECT value FROM settings WHERE id=29;
 UPDATE settings SET value = '${webCertFile}' WHERE id = 31;
-SELECT value FROM settings WHERE id=31;
 UPDATE settings SET value = '${webKeyFile}' WHERE id = 32;
-SELECT value FROM settings WHERE id=32;
 UPDATE settings SET value = '${subURI}' WHERE id = 36;
-SELECT value FROM settings WHERE id=36;
 UPDATE settings SET value = '/${subJsonPath}/' WHERE id = 37;
-SELECT value FROM settings WHERE id=37;
 UPDATE settings SET value = '${subJsonURI}' WHERE id = 38;
-SELECT value FROM settings WHERE id=38;
 EOF
 }
 
