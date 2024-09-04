@@ -409,6 +409,7 @@ EOF
 dns_systemd_resolved() {
 	echo -e "${blue}Настройка systemd-resolved (DoT)${clear}"
 	echo "DNS=9.9.9.9"
+	AdGuardHome/AdGuardHome -s uninstall
 	
 cat > /etc/systemd/resolved.conf <<EOF
 [Resolve]
