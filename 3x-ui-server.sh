@@ -88,9 +88,6 @@ start_installation() {
 
 ### Ввод данных ###
 data_entry() {
-	echo -e "${blue}Установка часового пояса${clear}"
-	dpkg-reconfigure tzdata
-	
 	echo -e "${blue}Введите имя пользователя:${clear}"
 	read -r username
 	echo ""
