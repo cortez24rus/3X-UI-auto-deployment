@@ -196,9 +196,29 @@ dns_encryption() {
 	esac
 }
 
-dns_adguard_home() {
-	echo -e "${blue}Настройка Adguard-home (DoH)${clear}"
-	cat > /etc/systemd/resolved.conf <<EOF
+dns_systemd_resolved_for_adguard() {
+cat > /etc/systemd/resolved.conf <<EOF
+[Resolve]
+# Some examples of DNS servers which may be used for DNS= and FallbackDNS=:
+# Cloudflare: 1.1.1.1#cloudflare-dns.com 1.0.0.1#cloudflare-dns.com 2606:4700:4700::1111#cloudflare-dns.com 2606:4700:4700::1001#cloudflare-dns.com
+# Google:     8.8.8.8#dns.google 8.8.4.4#dns.google 2001:4860:4860::8888#dns.google 2001:4860:4860::8844#dns.google
+# Quad9:      9.9.9.9#dns.quad9.net 149.112.112.112#dns.quad9.net 2620:fe::fe#dns.quad9.net 2620:fe::9#dns.quad9.net
+DNS=127.0.0.1
+#FallbackDNS=
+#Domains=
+#DNSSEC=no
+DNSOverTLS=no
+DNSStubListener=no
+EOF
+
+	systemctl restart systemd-resolved.service
+}
+
+# systemd-resolved
+dns_systemd_resolved() {
+	echo -e "${blue}Настройка systemd-resolved${clear}"
+
+cat > /etc/systemd/resolved.conf <<EOF
 [Resolve]
 # Some examples of DNS servers which may be used for DNS= and FallbackDNS=:
 # Cloudflare: 1.1.1.1#cloudflare-dns.com 1.0.0.1#cloudflare-dns.com 2606:4700:4700::1111#cloudflare-dns.com 2606:4700:4700::1001#cloudflare-dns.com
@@ -212,7 +232,12 @@ DNSOverTLS=yes
 EOF
 
 	systemctl restart systemd-resolved.service
-	
+	echo ""
+}
+
+dns_adguard_home() {
+	dns_systemd_resolved
+	echo -e "${blue}Настройка adguard-home${clear}"
 	wget https://static.adguard.com/adguardhome/release/AdGuardHome_linux_amd64.tar.gz
 	tar xvf AdGuardHome_linux_amd64.tar.gz
 	AdGuardHome/AdGuardHome -s install
@@ -402,44 +427,8 @@ os:
 schema_version: 28
 EOF
 
-cat > /etc/systemd/resolved.conf <<EOF
-[Resolve]
-# Some examples of DNS servers which may be used for DNS= and FallbackDNS=:
-# Cloudflare: 1.1.1.1#cloudflare-dns.com 1.0.0.1#cloudflare-dns.com 2606:4700:4700::1111#cloudflare-dns.com 2606:4700:4700::1001#cloudflare-dns.com
-# Google:     8.8.8.8#dns.google 8.8.4.4#dns.google 2001:4860:4860::8888#dns.google 2001:4860:4860::8844#dns.google
-# Quad9:      9.9.9.9#dns.quad9.net 149.112.112.112#dns.quad9.net 2620:fe::fe#dns.quad9.net 2620:fe::9#dns.quad9.net
-DNS=127.0.0.1
-#FallbackDNS=
-#Domains=
-#DNSSEC=no
-DNSOverTLS=no
-DNSStubListener=no
-EOF
-
-	systemctl restart systemd-resolved.service
+	dns_systemd_resolved_for_adguard
 	AdGuardHome/AdGuardHome -s restart
-	echo ""
-}
-
-# systemd-resolved
-dns_systemd_resolved() {
-	echo -e "${blue}Настройка systemd-resolved (DoT)${clear}"
-	echo "DNS=9.9.9.9"
-	
-cat > /etc/systemd/resolved.conf <<EOF
-[Resolve]
-# Some examples of DNS servers which may be used for DNS= and FallbackDNS=:
-# Cloudflare: 1.1.1.1#cloudflare-dns.com 1.0.0.1#cloudflare-dns.com 2606:4700:4700::1111#cloudflare-dns.com 2606:4700:4700::1001#cloudflare-dns.com
-# Google:     8.8.8.8#dns.google 8.8.4.4#dns.google 2001:4860:4860::8888#dns.google 2001:4860:4860::8844#dns.google
-# Quad9:      9.9.9.9#dns.quad9.net 149.112.112.112#dns.quad9.net 2620:fe::fe#dns.quad9.net 2620:fe::9#dns.quad9.net
-DNS=9.9.9.9
-#FallbackDNS=
-Domains=~.
-DNSSEC=yes
-DNSOverTLS=yes
-EOF
-
-	systemctl restart systemd-resolved.service
 	echo ""
 }
 
