@@ -995,8 +995,16 @@ main_script_first() {
 }
 
 main_choise() {
-  main_script_first
-#  main_script_repeat
+  if [ -f /usr/local/bin/reinstallation_check ]; then
+    echo ""
+    echo -e "${red}Повторная установка скрипта${clear}"
+    main_script_repeat
+    echo ""
+    exit 1
+  else
+    touch /usr/local/bin/reinstallation_check
+    main_script_first
+  fi
 }
 
 main_choise
