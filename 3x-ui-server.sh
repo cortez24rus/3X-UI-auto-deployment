@@ -165,10 +165,12 @@ data_entry() {
 ### Обновление системы и установка пакетов ###
 installation_of_utilities() {
 	echo -e "${blue}Обновление системы и установка необходимых пакетов${clear}"
+	apt-get update && apt-get upgrade -y
+	apt-get install -y git wget sudo nginx-full net-tools apache2-utils gnupg2 sqlite3 curl ufw certbot python3-certbot-dns-cloudflare systemd-resolved unattended-upgrades 
 	curl -fsSL https://pkg.cloudflareclient.com/pubkey.gpg | gpg --yes --dearmor --output /usr/share/keyrings/cloudflare-warp-archive-keyring.gpg
 	echo "deb [signed-by=/usr/share/keyrings/cloudflare-warp-archive-keyring.gpg] https://pkg.cloudflareclient.com/ $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/cloudflare-client.list	
  	apt-get update && apt-get upgrade -y
-	apt-get install -y git wget sudo nginx-full net-tools apache2-utils gnupg2 sqlite3 curl ufw certbot python3-certbot-dns-cloudflare systemd-resolved unattended-upgrades cloudflare-warp
+	apt-get install -y cloudflare-warp
  	echo -e "${green}Все пакеты установлены${clear}"
 	echo ""
 }
