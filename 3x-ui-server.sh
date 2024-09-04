@@ -998,6 +998,7 @@ main_choise() {
   if [ -f /usr/local/bin/reinstallation_check ]; then
     echo ""
     echo -e "${red}Повторная установка скрипта${clear}"
+    sleep 2
     main_script_repeat
     echo ""
     exit 1
