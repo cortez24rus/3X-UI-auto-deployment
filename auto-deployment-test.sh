@@ -100,6 +100,10 @@ data_entry() {
 	read reality
 	echo ""
 
+ 	echo -e "${blue}Введите 2 доменное имя под которое будете маскироваться (Reality):${clear}"
+	read reality2
+	echo ""
+
 	echo -e "${blue}Введите путь к Cloudflare grpc:${clear}"
 	read cdngrpc
 	echo ""
@@ -917,9 +921,9 @@ stream_settings_id4=$(cat <<EOF
   "realitySettings": {
     "show": false,
     "xver": 0,
-    "dest": "${reality}:443",
+    "dest": "${reality1}:443",
     "serverNames": [
-      "${reality}"
+      "${reality1}"
     ],
     "privateKey": "iP8Xy-bot_mKf75yI9DC0nkQjR-qaolU4evrKAud3XE",
     "minClient": "",
