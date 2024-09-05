@@ -752,8 +752,6 @@ panel_installation() {
 	stream_settings_id4
 	stream_settings_id5
 	stream_settings_id6
-	stream_settings_id7
-	stream_settings_id8
 	database_change
 
 	cp x-ui.db /etc/x-ui/
@@ -787,7 +785,7 @@ stream_settings_id1=$(cat <<EOF
     "certificates": [
       {
         "certificateFile": "/etc/letsencrypt/live/${domain}/fullchain.pem",
-		"keyFile": "/etc/letsencrypt/live/${domain}/privkey.pem",
+	"keyFile": "/etc/letsencrypt/live/${domain}/privkey.pem",
         "ocspStapling": 3600,
         "oneTimeLoading": false,
         "usage": "encipherment",
@@ -834,7 +832,7 @@ stream_settings_id2=$(cat <<EOF
     "certificates": [
       {
         "certificateFile": "/etc/letsencrypt/live/${domain}/fullchain.pem",
-		"keyFile": "/etc/letsencrypt/live/${domain}/privkey.pem",
+	"keyFile": "/etc/letsencrypt/live/${domain}/privkey.pem",
         "ocspStapling": 3600,
         "oneTimeLoading": false,
         "usage": "encipherment",
@@ -1003,7 +1001,7 @@ stream_settings_id6=$(cat <<EOF
     "certificates": [
       {
         "certificateFile": "/etc/letsencrypt/live/${domain}/fullchain.pem",
-		"keyFile": "/etc/letsencrypt/live/${domain}/privkey.pem",
+	"keyFile": "/etc/letsencrypt/live/${domain}/privkey.pem",
         "ocspStapling": 3600,
         "oneTimeLoading": false,
         "usage": "encipherment",
@@ -1031,7 +1029,7 @@ EOF
 }
 
 database_change() {
-DB_PATH="x-ui.db"
+DB_PATH="x-ui-test.db"
 
 sqlite3 $DB_PATH <<EOF
 UPDATE users SET username = '$username' WHERE id = 1;
