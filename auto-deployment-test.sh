@@ -745,11 +745,12 @@ EOF
 panel_installation() {
 	touch /usr/local/bin/reinstallation_check
 	echo -e "${blue}Настройка 3x-ui xray${clear}"
-	wget -q --show-progress https://github.com/cortez24rus/3X-UI-auto-deployment/raw/main/x-ui-test.db
+	wget -q --show-progress https://github.com/cortez24rus/3X-UI-auto-deployment/raw/main/x-ui-my.db
 	echo -e "n" | bash <(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh)
 	echo ""
 	x-ui stop
-	rm -rf /etc/x-ui/x-ui-test.db
+	sleep 1
+	rm -rf /etc/x-ui/x-ui-my.db
 
 	stream_settings_id1
 	stream_settings_id2
@@ -759,8 +760,7 @@ panel_installation() {
 	stream_settings_id6
 	database_change
 
-	cp x-ui-test.db /etc/x-ui/x-ui.db
-	sleep 1
+	cp x-ui-my.db /etc/x-ui/x-ui.db
 	x-ui start
 	echo ""
 }
@@ -1034,7 +1034,7 @@ EOF
 }
 
 database_change() {
-DB_PATH="x-ui-test.db"
+DB_PATH="x-ui-my.db"
 
 sqlite3 $DB_PATH <<EOF
 UPDATE users SET username = '$username' WHERE id = 1;
