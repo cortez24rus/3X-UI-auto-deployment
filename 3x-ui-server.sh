@@ -96,7 +96,7 @@ data_entry() {
 	read password
 	echo ""
 	
-	echo -e "${blue}Введите доменное имя под которое будете маскироваться (Reality):${clear}"
+	echo -e "${blue}Введите доменное имя, под которое будете маскироваться (Reality):${clear}"
 	read reality
 	echo ""
 
@@ -138,10 +138,10 @@ data_entry() {
 	echo -e "${blue}Введите порт подписки:${clear}"
 	validate_port subPort
 
- 	echo -e "${blue}Введите путь к подписки (без символов '/', '$', '{}', '\'):${clear}"
+ 	echo -e "${blue}Введите путь к подписке (без символов '/', '$', '{}', '\'):${clear}"
 	validate_path subPath
 
-	echo -e "${blue}Введите путь к JSON подписки (без символов '/', '$', '{}', '\'):${clear}"
+	echo -e "${blue}Введите путь к JSON подписке (без символов '/', '$', '{}', '\'):${clear}"
 	validate_path subJsonPath
 	
 	echo -e "${blue}Введите вашу почту, зарегистрированную на Cloudflare:${clear}"
