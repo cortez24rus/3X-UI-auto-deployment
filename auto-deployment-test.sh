@@ -630,7 +630,7 @@ map \$ssl_preread_server_name \$https {
 	cg.${domain}		cg;
 	cw.${domain}		cw;
 	${reality}        reality;
- 	${realit2}        reality2;
+ 	${reality2}        reality2;
 	www.${domain}     trojan;
 	${domain}         web;
 }
