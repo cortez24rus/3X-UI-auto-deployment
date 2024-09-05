@@ -256,7 +256,7 @@ http:
   pprof:
     port: 6060
     enabled: false
-  address: 0.0.0.0:8080
+  address: 127.0.0.1:8080
   session_ttl: 720h
 users:
   - name: ${username}
@@ -277,6 +277,7 @@ dns:
   ratelimit_whitelist: []
   refuse_any: true
   upstream_dns:
+    - https://cloudflare-dns.com/dns-query
     - https://dns10.quad9.net/dns-query
   upstream_dns_file: ""
   bootstrap_dns:
