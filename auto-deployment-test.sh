@@ -700,7 +700,6 @@ server {
 	location / {
 		auth_basic "Restricted Content";
 		auth_basic_user_file /etc/nginx/.htpasswd;
-		return 301 https://${domain}\$request_uri;
 	}
 
 	# 3X-UI
