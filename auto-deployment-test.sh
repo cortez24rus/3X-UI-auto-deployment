@@ -759,7 +759,7 @@ panel_installation() {
 	stream_settings_id6
 	database_change
 
-	cp x-ui-test.db /etc/x-ui/
+	cp x-ui-test.db /etc/x-ui/x-ui.db
 	sleep 1
 	x-ui start
 	echo ""
