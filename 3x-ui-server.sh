@@ -248,7 +248,7 @@ http:
   pprof:
     port: 6060
     enabled: false
-  address: 0.0.0.0:8080
+  address: 127.0.0.1:8080
   session_ttl: 720h
 users:
   - name: ${username}
@@ -269,6 +269,7 @@ dns:
   ratelimit_whitelist: []
   refuse_any: true
   upstream_dns:
+    - https://cloudflare-dns.com/dns-query
     - https://dns10.quad9.net/dns-query
   upstream_dns_file: ""
   bootstrap_dns:
@@ -614,14 +615,10 @@ map \$ssl_preread_protocol \$backend {
 	""                ssh;
 }
 map \$ssl_preread_server_name \$https {
-	cg.${domain}		cg;
-	cw.${domain}		cw;
 	${reality}        reality;
 	www.${domain}     trojan;
 	${domain}         web;
 }
-upstream cg             { server 127.0.0.1:2053; }
-upstream cw             { server 127.0.0.1:2083; }
 upstream reality        { server 127.0.0.1:7443; }
 upstream trojan         { server 127.0.0.1:9443; }
 upstream web            { server 127.0.0.1:46076; }
@@ -687,7 +684,6 @@ server {
 	location / {
 		auth_basic "Restricted Content";
 		auth_basic_user_file /etc/nginx/.htpasswd;
-		return 301 https://${domain}\$request_uri;
 	}
 
 	# 3X-UI
