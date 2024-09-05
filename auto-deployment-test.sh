@@ -630,12 +630,14 @@ map \$ssl_preread_server_name \$https {
 	cg.${domain}		cg;
 	cw.${domain}		cw;
 	${reality}        reality;
+ 	${realit2}        reality2;
 	www.${domain}     trojan;
 	${domain}         web;
 }
 upstream cg             { server 127.0.0.1:2053; }
 upstream cw             { server 127.0.0.1:2083; }
 upstream reality        { server 127.0.0.1:7443; }
+upstream reality2       { server 127.0.0.1:8443; }
 upstream trojan         { server 127.0.0.1:9443; }
 upstream web            { server 127.0.0.1:46076; }
 upstream ssh            { server 127.0.0.1:22; }
@@ -920,9 +922,9 @@ stream_settings_id4=$(cat <<EOF
   "realitySettings": {
     "show": false,
     "xver": 0,
-    "dest": "${reality1}:443",
+    "dest": "${reality2}:443",
     "serverNames": [
-      "${reality1}"
+      "${reality2}"
     ],
     "privateKey": "iP8Xy-bot_mKf75yI9DC0nkQjR-qaolU4evrKAud3XE",
     "minClient": "",
