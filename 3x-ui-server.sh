@@ -269,8 +269,12 @@ dns:
   ratelimit_whitelist: []
   refuse_any: true
   upstream_dns:
-    - https://cloudflare-dns.com/dns-query
+    - https://dns.cloudflare.com/dns-query
+    - https://dns.google/dns-query
     - https://dns10.quad9.net/dns-query
+    - tls://one.one.one.one
+    - tls://dns.google
+    - tls://dns10.quad9.net
   upstream_dns_file: ""
   bootstrap_dns:
     - 9.9.9.10
@@ -278,7 +282,7 @@ dns:
     - 2620:fe::10
     - 2620:fe::fe:10
   fallback_dns: []
-  upstream_mode: load_balance
+  upstream_mode: parallel
   fastest_timeout: 1s
   allowed_clients: []
   disallowed_clients: []
