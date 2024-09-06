@@ -904,6 +904,26 @@ UPDATE settings SET value = '${subJsonURI}' WHERE id = 38;
 EOF
 }
 
+### Окончание ###
+data_output() {
+	echo -e "${blue}Доступ по ссылке к 3x-ui панели:${clear}"
+	echo -e "${green}https://${domain}/${webBasePath}/${clear}"
+	echo ""
+	if [[ $choise = "1" ]]; then
+		echo -e "${blue}Доступ по ссылке к adguard-home (если вы его выбирали):${clear}"
+		echo -e "${green}https://${domain}/${adguardPath}/login.html${clear}"
+		echo ""
+	fi
+	echo -e "${blue}Подключение по ssh :${clear}"
+	echo -e "${green}ssh -p 443 ${username}@www.${domain}${clear}"
+	echo ""
+	echo -e "${blue}Логин: ${green}${username}${clear}"
+ 	echo -e "${blue}Пароль: ${green}${password}${clear}"
+	echo ""
+	
+	sleep 3
+}
+
 ### SSH ####
 ssh_setup() {
 	echo -e "${blue}Настройка ssh${clear}"
@@ -912,7 +932,8 @@ ssh_setup() {
 	echo "Команда для Windows:"
 	echo -e "${blue}type \$env:USERPROFILE\.ssh\id_rsa.pub | ssh -p 22 ${username}@${serverip} \"cat >> ~/.ssh/authorized_keys\""
 	echo ""
-	echo -e "Закинули ключ SSH на сервер? (если нет, то потеряешь доступ к серверу) [y/N]${clear}"
+	echo -e "Осталось настроить SSH, закинь ключ на сервер или отмени настройку ssh, если тебе это не нужно"
+ 	echo -e "Если не закинул ключ, дальше можешь потерять доступ, сделай выбор [y/N]${clear}"
 	answer_input
 
 	sed -i -e "s/#Port/Port/g" /etc/ssh/sshd_config
@@ -936,26 +957,6 @@ enabling_security() {
 	echo ""
 }
 
-### Окончание ###
-data_output() {
-	echo -e "${blue}Доступ по ссылке к 3x-ui панели:${clear}"
-	echo -e "${green}https://${domain}/${webBasePath}/${clear}"
-	echo ""
-	if [[ $choise = "1" ]]; then
-		echo -e "${blue}Доступ по ссылке к adguard-home (если вы его выбирали):${clear}"
-		echo -e "${green}https://${domain}/${adguardPath}/login.html${clear}"
-		echo ""
-	fi
-	echo -e "${blue}Подключение по ssh :${clear}"
-	echo -e "${green}ssh -p 443 ${username}@www.${domain}${clear}"
-	echo ""
-	echo -e "${blue}Логин: ${green}${username}${clear}"
- 	echo -e "${blue}Пароль: ${green}${password}${clear}"
-	echo ""
-	
-	sleep 3
-}
-
 
 ### Первый запуск ###
 main_script_first() {
@@ -973,9 +974,9 @@ main_script_first() {
   issuance_of_certificates
   nginx_setup
   panel_installation
+  data_output
   ssh_setup
   enabling_security
-  data_output
 }
 
 ### Повторный запуск ###
