@@ -799,7 +799,7 @@ stream_settings_id1=$(cat <<EOF
     "alpn": [],
     "settings": {
       "allowInsecure": false,
-      "fingerprint": "randomized"
+      "fingerprint": "random"
     }
   },
   "grpcSettings": {
