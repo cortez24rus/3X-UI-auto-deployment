@@ -30,12 +30,12 @@
 2) Настройку обратного прокси NGINX на 443 порту
 3) Настройку безопасности, включая автоматические обновления (unattended-upgrades)
 4) SSL сертификаты Cloudflare с автоматическим обновлением
-5) Настройку WARP
+5) WARP
 6) Включение BBR
 7) Настройка UFW
 8) Настройка SSH за NGINX
 9) Отключение IPv6
-10) Шифрование DNS запросов (DNS over TLS или DNS over HTTPS) 
+10) Шифрование DNS запросов systemd-resolved или adguard-home (DNS over TLS или DNS over HTTPS) 
 
 -----
 
