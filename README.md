@@ -12,9 +12,9 @@
 > 
 > Type | Name | Content | Proxy status
 >
-> A | example.com | ip address | Proxied
+> A | domain_name | ip address | Proxied
 > 
-> CNAME | www | example.com | DNS only
+> CNAME | www | domain_name | DNS only
 >
 > SSL/TLS > Overview > Configure > Full
 >
