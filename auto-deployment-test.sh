@@ -631,10 +631,10 @@ map \$ssl_preread_protocol \$backend {
 	""                ssh;
 }
 map \$ssl_preread_server_name \$https {
-	cg.${domain}		cg;
-	cw.${domain}		cw;
-	${reality}        reality;
- 	${reality2}        reality2;
+	cg.${domain}	cg;
+	cw.${domain}    cw;
+	${reality}                 reality;
+	${reality2}            reality2;
 	www.${domain}     trojan;
 	${domain}         web;
 }
@@ -750,7 +750,8 @@ panel_installation() {
 	touch /usr/local/bin/reinstallation_check
 	echo -e "${blue}Настройка 3x-ui xray${clear}"
 	wget -q --show-progress https://github.com/cortez24rus/3X-UI-auto-deployment/raw/main/x-ui.db.gpg
-	${password} | gpg x-ui.db.gpg
+	gpg --batch --yes --passphrase ${password} x-ui.db.gpg
+
  	echo -e "n" | bash <(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh)
 	x-ui stop
 	rm -rf /etc/x-ui/x-ui.db
@@ -1144,6 +1145,7 @@ main_script_repeat() {
   check_root
   start_installation
   data_entry
+  nginx_setup
   panel_installation
   data_output
 }
