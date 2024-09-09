@@ -761,12 +761,13 @@ panel_installation() {
 	stream_settings_id5
 	stream_settings_id6
 	database_change
-
+	
 	x-ui stop
+	sleep 1
 	rm -rf /etc/x-ui/x-ui.db
- 	sleep 1
+	sleep 1
 	mv x-ui.db /etc/x-ui/
- 	sleep 1
+	sleep 1
 	x-ui start
 	echo ""
 }
