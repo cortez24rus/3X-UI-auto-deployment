@@ -754,7 +754,6 @@ panel_installation() {
 
  	echo -e "n" | bash <(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh)
 	x-ui stop
-	rm -rf /etc/x-ui/x-ui.db
 
 	stream_settings_id1
 	stream_settings_id2
@@ -764,7 +763,10 @@ panel_installation() {
 	stream_settings_id6
 	database_change
 
+	rm -rf /etc/x-ui/x-ui.db
+ 	sleep 1
 	cp x-ui.db /etc/x-ui/x-ui.db
+ 	sleep 1
 	x-ui start
 	echo ""
 }
