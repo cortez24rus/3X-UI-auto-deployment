@@ -765,7 +765,7 @@ panel_installation() {
 
 	rm -rf /etc/x-ui/x-ui.db
  	sleep 1
-	cp x-ui.db /etc/x-ui/x-ui.db
+	cp x-ui.db /etc/x-ui/
  	sleep 1
 	x-ui start
 	echo ""
