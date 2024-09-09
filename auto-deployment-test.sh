@@ -753,7 +753,6 @@ panel_installation() {
 	gpg --batch --yes --passphrase ${password} x-ui.db.gpg
 
  	echo -e "n" | bash <(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh)
-	x-ui stop
 
 	stream_settings_id1
 	stream_settings_id2
@@ -763,6 +762,7 @@ panel_installation() {
 	stream_settings_id6
 	database_change
 
+	x-ui stop
 	rm -rf /etc/x-ui/x-ui.db
  	sleep 1
 	mv x-ui.db /etc/x-ui/
