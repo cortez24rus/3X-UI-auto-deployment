@@ -1148,6 +1148,7 @@ main_script_repeat() {
   check_root
   start_installation
   data_entry
+  dns_encryption
   nginx_setup
   panel_installation
   data_output
