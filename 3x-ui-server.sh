@@ -916,8 +916,6 @@ data_output() {
 		echo -e "${green}https://${domain}/${adguardPath}/login.html${clear}"
 		echo ""
 	fi
-	echo -e "${blue}Подключение по ssh :${clear}"
-	echo -e "${green}ssh -p 443 ${username}@www.${domain}${clear}"
 	echo ""
 	echo -e "${blue}Логин: ${green}${username}${clear}"
  	echo -e "${blue}Пароль: ${green}${password}${clear}"
@@ -945,7 +943,9 @@ ssh_setup() {
 	sed -i -e "s/#PasswordAuthentication/PasswordAuthentication/g" -e "s/PasswordAuthentication yes/PasswordAuthentication no/g" /etc/ssh/sshd_config
 	sed -i -e "s/#PermitEmptyPasswords/PermitEmptyPasswords/g" -e "s/PermitEmptyPasswords yes/PermitEmptyPasswords no/g" /etc/ssh/sshd_config
 
-	systemctl restart ssh.service
+	systemctl restart ssh.service	
+	echo -e "${blue}Подключение по ssh :${clear}"
+	echo -e "${green}ssh -p 443 ${username}@www.${domain}${clear}"
 	echo ""
 }
 
