@@ -82,8 +82,8 @@ start_installation() {
 	
  	msg_err ВНИМАНИЕ!
 	msg_inf Перед запуском скрипта рекомендуется выполнить следующие действия:
-	echo -e "Обновить систему командой ${yellow}apt update && apt full-upgrade -y${clear}"
-	echo -e "Перезагрузить сервер командой ${yellow}reboot${clear}"
+	msg_inf  ${yellow}apt update && apt full-upgrade -y${clear}"
+	echo; msg_inf Перезагрузить сервер командой; msg_err reboot; echo
 	echo ""
 	msg_inf Скрипт установки 3x-ui. Начать установку? Выберите опцию [y/N]
 	answer_input
@@ -97,11 +97,9 @@ data_entry() {
 	msg_inf Введите пароль пользователя:
 	read password
 	echo ""
-	
-	echo -e "${blue}Введите доменное имя, под которое будете маскироваться (Reality):${clear}"
+	msg_inf Введите доменное имя, под которое будете маскироваться (Reality):
 	read reality
 	echo ""
-
  	echo -e "${blue}Введите 2 доменное имя, под которое будете маскироваться (Reality):${clear}"
 	read reality2
 	echo ""
