@@ -7,18 +7,17 @@ yellow='\033[0;33m'
 clear='\033[0m'
 
 ### INFO #################################################################################################
-msg_ok() { echo -e "\e[1;42m $1 \e[0m";}	# зеленый
-msg_err() { echo -e "\e[1;41m $1 \e[0m";}	# красный
-msg_inf() { echo -e "\e[1;33m$1\e[0m";}		# жлтый
-msg_blue() { echo -e "\e[1;34m$1\e[0m";}	# Синий
+msg_ok() { echo -e "\e[1;42m $1 \e[0m";}	# green
+msg_err() { echo -e "\e[1;41m $1 \e[0m";}	# red
+msg_inf() { echo -e "\e[1;33m$1\e[0m";}		# yellow
+msg_blue() { echo -e "\e[1;34m$1\e[0m";}	# blue
 
 ### Проверка ввода #######################################################################################
 answer_input () {
 	read answer
-	cancel="${red}___Отмена___${clear}"
 	if [[ $answer != "y" ]] && [[ $answer != "Y" ]]; then
 		echo ""
-		echo -e $cancel
+		msg_err ОТМЕНА
 		echo ""
 		exit
 	fi
@@ -32,8 +31,8 @@ validate_port() {
 		# Проверка порта
 		if [[ ! $port_value =~ ^[0-9]+$ ]] || (( $port_value < 1024 || $port_value > 65535)); then
 			echo ""
-			echo -e "${red}Порт должен быть от 1024 до 65535${clear}"
-			echo -e "${blue}Пожалуйста, введите порт заново:${clear}"
+			msg_err Ошибка: порт должен быть от 1024 до 65535
+			msg_inf Пожалуйста, введите порт заново:
 		else
 			eval $port_variable_name=\$port_value
 			break
@@ -49,13 +48,13 @@ validate_path() {
 		# Проверка на пустой ввод
 		if [[ -z "$path_value" ]]; then
 			echo ""
-			echo -e "${red}Ошибка: путь не должен быть пустым.${clear}"
-			echo -e "${blue}Пожалуйста, введите путь заново:${clear}"
+			msg_err Ошибка: путь не должен быть пустым
+			msg_inf Пожалуйста, введите путь заново:
 		# Проверка на наличие запрещённых символов
 		elif [[ $path_value =~ ['{}\$/'] ]]; then
 			echo ""
-			echo -e "${red}Ошибка: путь не должен содержать символы '/', '$', '{}', '\'${clear}"
-			echo -e "${blue}Пожалуйста, введите путь заново:${clear}"
+			msg_err Ошибка: путь не должен содержать символы /, $, {}, \
+			msg_inf Пожалуйста, введите путь заново:
 		else
 			eval $path_variable_name=\$path_value
 			break
@@ -80,23 +79,22 @@ start_installation() {
  	echo;msg_inf '           ___    _   _   _  '	;
 	msg_inf		 ' \/ __ | |  | __ |_) |_) / \ '	;
 	msg_inf		 ' /\    |_| _|_   |   | \ \_/ '	; echo
-	echo ""
-	echo -e "${red}ВНИМАНИЕ!${clear}"
-	echo "Перед запуском скрипта рекомендуется выполнить следующие действия:"
+	
+ 	msg_err ВНИМАНИЕ!
+	msg_inf Перед запуском скрипта рекомендуется выполнить следующие действия:
 	echo -e "Обновить систему командой ${yellow}apt update && apt full-upgrade -y${clear}"
 	echo -e "Перезагрузить сервер командой ${yellow}reboot${clear}"
 	echo ""
-	echo -e "${blue}Скрипт установки 3x-ui. Начать установку? Выберите опцию [y/N]${clear}"
+	msg_inf Скрипт установки 3x-ui. Начать установку? Выберите опцию [y/N]
 	answer_input
 }
 
 ### Ввод данных ###
 data_entry() {
-	echo -e "${blue}Введите имя пользователя:${clear}"
+	msg_inf Введите имя пользователя:
 	read -r username
 	echo ""
-
-	echo -e "${blue}Введите пароль пользователя:${clear}"
+	msg_inf Введите пароль пользователя:
 	read password
 	echo ""
 	
