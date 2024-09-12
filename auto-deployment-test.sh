@@ -53,7 +53,7 @@ validate_path() {
 		# Проверка на наличие запрещённых символов
 		elif [[ $path_value =~ ['{}\$/'] ]]; then
 			echo ""
-			msg_err Ошибка: путь не должен содержать символы /, $, {}, \
+			msg_err Ошибка: путь не должен содержать символы /, \$, {}, \
 			msg_inf Пожалуйста, введите путь заново:
 		else
 			eval $path_variable_name=\$path_value
@@ -82,7 +82,7 @@ start_installation() {
 	
  	msg_err ВНИМАНИЕ!
 	msg_inf Перед запуском скрипта рекомендуется выполнить следующие действия:
-	msg_inf  ${yellow}apt update && apt full-upgrade -y${clear}"
+	msg_ok apt update && apt full-upgrade -y
 	echo; msg_inf Перезагрузить сервер командой; msg_err reboot; echo
 	echo ""
 	msg_inf Скрипт установки 3x-ui. Начать установку? Выберите опцию [y/N]
@@ -100,71 +100,62 @@ data_entry() {
 	msg_inf Введите доменное имя, под которое будете маскироваться (Reality):
 	read reality
 	echo ""
- 	echo -e "${blue}Введите 2 доменное имя, под которое будете маскироваться (Reality):${clear}"
+ 	msg_inf Введите 2 доменное имя, под которое будете маскироваться (Reality):
 	read reality2
 	echo ""
-
-	echo -e "${blue}Введите путь к Cloudflare grpc:${clear}"
+	msg_inf Введите путь к Cloudflare grpc:
 	read cdngrpc
 	echo ""
-
-	echo -e "${blue}Введите путь к Cloudflare websocket:${clear}"
+	msg_inf Введите путь к Cloudflare websocket:
 	read cdnws
 	echo ""
-
-	echo -e "${blue}Укажите свой домен:${clear}"
+ 
+	msg_inf Укажите свой домен:
 	read domain
 	if [[ "$domain" == "www."* ]]; then
 		domain=${domain#"www."}
 	fi
 	echo ""
-	
-	echo -e "${blue}Введите 1 для установки adguard-home (DoH)${clear}"
-	echo -e "${blue}Введите 2 для установки systemd-resolved (DoT)${clear}"
+ 
+	msg_inf	Введите 1 для установки adguard-home (DoH)
+	msg_inf	Введите 2 для установки systemd-resolved (DoT)
 	while true; do
 	    read choise
 	    echo ""
 	    case $choise in
 	        1)
-	            echo -e "${blue}Введите путь до adguard-home (без символов '/', '$', '{}', '\'):${clear}"
+	            msg_inf Введите путь до adguard-home (без символов /, \$, {}, \):
 	            validate_path adguardPath
 	            break
 	            ;;
 	        2)
-	            echo -e "${green}Выбран systemd-resolved${clear}"
+	            msg_ok Выбран systemd-resolved
 	            echo ""
 	            break
 	            ;;
 	        *)
-	            echo -e "${red}Неверный выбор, попробуйте снова${clear}"
+	            msk_err Неверный выбор, попробуйте снова
 	            ;;
 	    esac
 	done
 	
-	echo -e "${blue}Введите порт панели:${clear}"
+	msg_inf Введите порт панели:
 	validate_port webPort
-
-	echo -e "${blue}Введите путь к панели (без символов '/', '$', '{}', '\'):${clear}"
+	msg_inf Введите путь к панели (без символов /, \$, {}, \):
 	validate_path webBasePath
-
-	echo -e "${blue}Введите порт подписки:${clear}"
+	msg_inf Введите порт подписки:
 	validate_port subPort
-
- 	echo -e "${blue}Введите путь к подписке (без символов '/', '$', '{}', '\'):${clear}"
+ 	msg_inf Введите путь к подписке (без символов /, \$, {}, \):
 	validate_path subPath
-
-	echo -e "${blue}Введите путь к JSON подписке (без символов '/', '$', '{}', '\'):${clear}"
+	msg_inf Введите путь к JSON подписке  (без символов /, \$, {}, \):
 	validate_path subJsonPath
-	
-	echo -e "${blue}Введите вашу почту, зарегистрированную на Cloudflare:${clear}"
+	msg_inf Введите вашу почту, зарегистрированную на Cloudflare:
 	read email
 	echo ""
-
-	echo -e "${blue}Введите ваш API токен Cloudflare (Edit zone DNS) или Cloudflare global API key:${clear}"
+	msg_inf Введите ваш API токен Cloudflare (Edit zone DNS) или Cloudflare global API key:
 	read cftoken
 	echo ""
-
-	echo -e "${blue}Введите ключ для регистрации WARP или нажмите Enter для пропуска:${clear}"
+	msg_inf Введите ключ для регистрации WARP или нажмите Enter для пропуска:
 	read warpkey
 	echo ""
 	
@@ -1157,7 +1148,7 @@ main_script_repeat() {
 main_choise() {
   if [ -f /usr/local/bin/reinstallation_check ]; then
     echo ""
-    echo -e "${red}Повторная установка скрипта${clear}"
+    msg_err Повторная установка скрипта
     sleep 2
     main_script_repeat
     echo ""
