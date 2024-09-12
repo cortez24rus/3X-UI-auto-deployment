@@ -5,14 +5,12 @@ red='\033[0;31m'
 green='\033[0;32m'
 yellow='\033[0;33m'
 clear='\033[0m'
-
-### INFO #################################################################################################
+### INFO ###
 msg_ok() { echo -e "\e[1;42m $1 \e[0m";}	# green
 msg_err() { echo -e "\e[1;41m $1 \e[0m";}	# red
 msg_inf() { echo -e "\e[1;33m$1\e[0m";}		# yellow
 msg_blue() { echo -e "\e[1;34m$1\e[0m";}	# blue
-
-### Проверка ввода #######################################################################################
+### Проверка ввода ###
 answer_input () {
 	read answer
 	if [[ $answer != "y" ]] && [[ $answer != "Y" ]]; then
@@ -62,7 +60,6 @@ validate_path() {
 	done
 	echo ""
 }
-
 ### IP сервера ###
 check_ip() {
 	serverip=$(curl -s ipinfo.io/ip)
@@ -97,7 +94,7 @@ data_entry() {
 	msg_inf Введите доменное имя, под которое будете маскироваться (Reality):
 	read reality
 	echo ""
- 	msg_inf Введите 2 доменное имя, под которое будете маскироваться (Reality):
+	msg_inf Введите 2 доменное имя, под которое будете маскироваться (Reality):
 	read reality2
 	echo ""
 	msg_inf Введите путь к Cloudflare grpc:
