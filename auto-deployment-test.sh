@@ -67,12 +67,10 @@ validate_path() {
 check_ip() {
 	serverip=$(curl -s ipinfo.io/ip)
 }
-
 ### Проверка рута ###
 check_root() {
 	[[ $EUID -ne 0 ]] && echo "not root!" && sudo su -	
 }
-
 ### Начало установки ###
 start_installation() {
 	clear
@@ -88,7 +86,6 @@ start_installation() {
 	msg_inf Скрипт установки 3x-ui. Начать установку? Выберите опцию [y/N]
 	answer_input
 }
-
 ### Ввод данных ###
 data_entry() {
 	msg_inf Введите имя пользователя:
@@ -164,7 +161,6 @@ data_entry() {
 	subURI=https://${domain}/${subPath}/
 	subJsonURI=https://${domain}/${subJsonPath}/
 }
-
 ### Обновление системы и установка пакетов ###
 installation_of_utilities() {
 	echo -e "${blue}Обновление системы и установка необходимых пакетов${clear}"
@@ -177,7 +173,6 @@ installation_of_utilities() {
  	echo -e "${green}Все пакеты установлены${clear}"
 	echo ""
 }
-
 ### DoH, DoT ###
 dns_encryption() {
 	case $choise in
@@ -216,7 +211,6 @@ EOF
 
 	systemctl restart systemd-resolved.service
 }
-
 # systemd-resolved
 dns_systemd_resolved() {
 	echo -e "${blue}Настройка systemd-resolved${clear}"
@@ -439,7 +433,6 @@ EOF
 	AdGuardHome/AdGuardHome -s restart
 	echo ""
 }
-
 ### Добавление пользователя ###
 add_user() {
  	echo -e "${blue}Добавление пользователя${clear}"
@@ -453,7 +446,6 @@ add_user() {
 	echo ${username}
 	echo ""
 }
-
 ### Безопасность ###
 uattended_upgrade() {
 	echo -e "${blue}Автоматическое обновление безопасности${clear}"
@@ -463,7 +455,6 @@ uattended_upgrade() {
 	systemctl restart unattended-upgrades
 	echo ""
 }
-
 ### BBR ###
 enable_bbr() {
 	echo -e "${blue}Включение BBR${clear}"
@@ -477,7 +468,6 @@ enable_bbr() {
 	    echo "net.ipv4.tcp_congestion_control = bbr" >> /etc/sysctl.conf
 	fi
 }
-
 ### Отключение IPv6 ###
 disable_ipv6() {
 	echo -e "${blue}Отключение IPv6${clear}"
@@ -503,7 +493,6 @@ disable_ipv6() {
 	sysctl -p
 	echo ""
 }
-
 ### WARP ###
 warp() {
 	echo -e "${blue}Настройка warp${clear}"
@@ -516,7 +505,6 @@ warp() {
 	fi
 	echo ""
 }
-
 ### СЕРТИФИКАТЫ ###
 issuance_of_certificates() {
 	echo -e "${blue}Выдача сертификатов${clear}"
@@ -538,7 +526,6 @@ issuance_of_certificates() {
 	echo "renew_hook = systemctl reload nginx" >> /etc/letsencrypt/renewal/${domain}.conf
 	echo ""
 }
-
 ### NGINX ###
 nginx_setup() {
 	echo -e "${blue}Настройка NGINX${clear}"
@@ -735,7 +722,6 @@ server {
 }
 EOF
 }
-
 ### Установка 3x-ui ###
 panel_installation() {
 	touch /usr/local/bin/reinstallation_check
@@ -762,7 +748,6 @@ panel_installation() {
 	x-ui start
 	echo ""
 }
-
 ### Изменение базы данных ###
 stream_settings_id1() {
 stream_settings_id1=$(cat <<EOF
@@ -1058,7 +1043,6 @@ UPDATE settings SET value = '/${subJsonPath}/' WHERE id = 37;
 UPDATE settings SET value = '${subJsonURI}' WHERE id = 38;
 EOF
 }
-
 ### SSH ####
 ssh_setup() {
 	echo -e "${blue}Настройка ssh${clear}"
@@ -1080,7 +1064,6 @@ ssh_setup() {
 	systemctl restart ssh.service
 	echo ""
 }
-
 ### UFW ###
 enabling_security() {
 	echo -e "${blue}Настройка ufw${clear}"
@@ -1090,7 +1073,6 @@ enabling_security() {
 	yes | ufw enable
 	echo ""
 }
-
 ### Окончание ###
 data_output() {
 	echo -e "${blue}Доступ по ссылке к 3x-ui панели:${clear}"
@@ -1110,7 +1092,6 @@ data_output() {
 	
 	sleep 3
 }
-
 
 ### Первый запуск ###
 main_script_first() {
@@ -1132,7 +1113,6 @@ main_script_first() {
   enabling_security
   data_output
 }
-
 ### Повторный запуск ###
 main_script_repeat() {
   check_ip
@@ -1144,7 +1124,7 @@ main_script_repeat() {
   panel_installation
   data_output
 }
-
+### Проверка запуска ###
 main_choise() {
   if [ -f /usr/local/bin/reinstallation_check ]; then
     echo ""
