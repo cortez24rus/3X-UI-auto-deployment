@@ -12,12 +12,12 @@ OK="${Green}[OK]${Font}"
 ERROR="${Red}[!]${Font}"
 QUESTION="${Green}[?]${Font}"
 
-function msg_banner()		{ echo -e "${Yellow} $1 ${Font}"; }
+function msg_banner()	{ echo -e "${Yellow} $1 ${Font}"; }
 function msg_ok()		{ echo -e "${OK} ${Blue} $1 ${Font}"; }
 function msg_err()		{ echo -e "${ERROR} ${Orange} $1 ${Font}"; }
 function msg_inf()		{ echo -e "${QUESTION} ${Yellow} $1 ${Font}"; }
 function msg_out()		{ echo -e "${Green} $1 ${Font}"; }
-function msg_tilda()		{ echo -e "${Yellow}$1${Font}"; }
+function msg_tilda()	{ echo -e "${Yellow}$1${Font}"; }
 
 ### Проверка ввода ###
 answer_input () {
@@ -222,7 +222,7 @@ dns_encryption() {
 		proxy_set_header Range \$http_range;
 		proxy_set_header If-Range \$http_if_range;
 		proxy_redirect /login.html /${adguardPath}/login.html;
-		proxy_pass http://127.0.0.1:8080/;
+		proxy_pass http://127.0.0.1:8081/;
 		break;
 	}"
 			;;
@@ -796,7 +796,8 @@ EOF
 panel_installation() {
 	touch /usr/local/bin/reinstallation_check
 	msg_inf "Настройка 3x-ui xray"
-	wget -q --show-progress https://github.com/cortez24rus/3X-UI-auto-deployment/raw/refs/heads/main/x-ui.gpg
+	wget -q --show-progress https://github.com/cortez24rus/3X-UI-auto-deployment/raw/main/x-ui.gpg
+	sleep 0.5
 	echo ${password} | gpg --batch --yes --passphrase-fd 0 -d x-ui.gpg > x-ui.db
  	echo -e "n" | bash <(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh) > /dev/null 2>&1
 
@@ -809,11 +810,8 @@ panel_installation() {
 	database_change
 
 	x-ui stop
-	sleep 1
 	rm -rf /etc/x-ui/x-ui.db
-	sleep 1
 	mv x-ui.db /etc/x-ui/
-	sleep 1
 	x-ui start
 	echo
 }
@@ -1004,7 +1002,7 @@ stream_settings_id5() {
     "certificates": [
       {
         "certificateFile": "/etc/letsencrypt/live/${domain}/fullchain.pem",
-	"keyFile": "/etc/letsencrypt/live/${domain}/privkey.pem",
+		"keyFile": "/etc/letsencrypt/live/${domain}/privkey.pem",
         "ocspStapling": 3600,
         "oneTimeLoading": false,
         "usage": "encipherment",
