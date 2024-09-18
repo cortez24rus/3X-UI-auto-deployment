@@ -797,7 +797,7 @@ panel_installation() {
 	touch /usr/local/bin/reinstallation_check
 	msg_inf "Настройка 3x-ui xray"
 	wget -q --show-progress https://github.com/cortez24rus/3X-UI-auto-deployment/raw/main/x-ui.db.gpg
-	gpg --batch --yes --passphrase ${password} x-ui.db.gpg
+	echo ${password} | gpg --batch --yes --passphrase-fd 0 -d x-ui.gpg > x-ui.db
  	echo -e "n" | bash <(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh) > /dev/null 2>&1
 
 	stream_settings_id1
@@ -1137,6 +1137,7 @@ ssh_setup() {
 enabling_security() {
 	msg_inf "Настройка ufw"
 	ufw allow 443/tcp
+	ufw allow 80/tcp
 	yes | ufw enable
 	echo
 }
