@@ -17,7 +17,7 @@ function msg_ok()		{ echo -e "${OK} ${Blue} $1 ${Font}"; }
 function msg_err()		{ echo -e "${ERROR} ${Orange} $1 ${Font}"; }
 function msg_inf()		{ echo -e "${QUESTION} ${Yellow} $1 ${Font}"; }
 function msg_out()		{ echo -e "${Green} $1 ${Font}"; }
-function msg_tilda()	{ echo -e "${Yellow}$1${Font}"; }
+function msg_tilda()	{ echo -e "${Orange}$1${Font}"; }
 
 ### Проверка ввода ###
 answer_input () {
@@ -106,7 +106,9 @@ domain_input() {
 
 ### IP сервера ###
 check_ip() {
-	serverip=$(curl -s ipinfo.io/ip)
+	IP4_REGEX="^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$"
+	IP4=$(ip route get 8.8.8.8 2>&1 | grep -Po -- 'src \K\S*')
+	[[ $IP4 =~ $IP4_REGEX ]] || IP4=$(curl -s ipinfo.io/ip);
 }
 
 ### Проверка рута ###
@@ -206,14 +208,16 @@ installation_of_utilities() {
 	echo "deb [signed-by=/usr/share/keyrings/cloudflare-warp-archive-keyring.gpg] https://pkg.cloudflareclient.com/ $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/cloudflare-client.list	
 	apt-get update && apt-get upgrade -y
 	apt-get install -y git wget sudo nginx-full net-tools apache2-utils gnupg2 sqlite3 curl ufw certbot python3-certbot-dns-cloudflare unattended-upgrades cloudflare-warp systemd-resolved
+	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	echo
 }
 
 ### DoH, DoT ###
 dns_encryption() {
+	msg_inf "Настройка dns"
+	dns_systemd_resolved
 	case $choise in
 		1)
-			dns_adguard_home
 			comment_agh="location /${adguardPath}/ {
 		proxy_set_header Host \$host;
 		proxy_set_header X-Real-IP \$remote_addr;
@@ -225,16 +229,38 @@ dns_encryption() {
 		proxy_pass http://127.0.0.1:8081/;
 		break;
 	}"
+			dns_adguard_home
+			dns_systemd_resolved_for_adguard
+			msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+			echo
 			;;
 		2)
-			dns_systemd_resolved
 			comment_agh=""
+			msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+			echo
 			;;
 		*)
 			msg_err "Неверный выбор, попробуйте снова"
 			dns_encryption
 			;;
 	esac
+}
+
+# systemd-resolved
+dns_systemd_resolved() {
+	cat > /etc/systemd/resolved.conf <<EOF
+[Resolve]
+# Some examples of DNS servers which may be used for DNS= and FallbackDNS=:
+# Cloudflare: 1.1.1.1#cloudflare-dns.com 1.0.0.1#cloudflare-dns.com 2606:4700:4700::1111#cloudflare-dns.com 2606:4700:4700::1001#cloudflare-dns.com
+# Google:     8.8.8.8#dns.google 8.8.4.4#dns.google 2001:4860:4860::8888#dns.google 2001:4860:4860::8844#dns.google
+# Quad9:      9.9.9.9#dns.quad9.net 149.112.112.112#dns.quad9.net 2620:fe::fe#dns.quad9.net 2620:fe::9#dns.quad9.net
+DNS=1.1.1.1
+#FallbackDNS=
+Domains=~.
+DNSSEC=yes
+DNSOverTLS=yes
+EOF
+	systemctl restart systemd-resolved.service
 }
 
 dns_systemd_resolved_for_adguard() {
@@ -252,31 +278,10 @@ DNSOverTLS=no
 DNSStubListener=no
 EOF
 	systemctl restart systemd-resolved.service
-	echo
-}
-
-# systemd-resolved
-dns_systemd_resolved() {
-	msg_inf "Настройка systemd-resolved"
-	cat > /etc/systemd/resolved.conf <<EOF
-[Resolve]
-# Some examples of DNS servers which may be used for DNS= and FallbackDNS=:
-# Cloudflare: 1.1.1.1#cloudflare-dns.com 1.0.0.1#cloudflare-dns.com 2606:4700:4700::1111#cloudflare-dns.com 2606:4700:4700::1001#cloudflare-dns.com
-# Google:     8.8.8.8#dns.google 8.8.4.4#dns.google 2001:4860:4860::8888#dns.google 2001:4860:4860::8844#dns.google
-# Quad9:      9.9.9.9#dns.quad9.net 149.112.112.112#dns.quad9.net 2620:fe::fe#dns.quad9.net 2620:fe::9#dns.quad9.net
-DNS=1.1.1.1
-#FallbackDNS=
-Domains=~.
-DNSSEC=yes
-DNSOverTLS=yes
-EOF
-	systemctl restart systemd-resolved.service
-	echo
 }
 
 dns_adguard_home() {
-	dns_systemd_resolved
-	msg_inf "Настройка adguard-home"
+	rm -rf AdGuardHome_*
 	wget https://static.adguard.com/adguardhome/release/AdGuardHome_linux_amd64.tar.gz
 	tar xvf AdGuardHome_linux_amd64.tar.gz
 	AdGuardHome/AdGuardHome -s install
@@ -469,9 +474,7 @@ os:
   rlimit_nofile: 0
 schema_version: 28
 EOF
-	dns_systemd_resolved_for_adguard
 	AdGuardHome/AdGuardHome -s restart
-	echo
 }
 
 ### Добавление пользователя ###
@@ -485,6 +488,7 @@ add_user() {
 	chmod 700 /home/${username}/.ssh
 	chown ${username}:${username} /home/${username}/.ssh/authorized_keys
 	echo ${username}
+	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	echo
 }
 
@@ -495,13 +499,13 @@ uattended_upgrade() {
 	echo unattended-upgrades unattended-upgrades/enable_auto_updates boolean true | debconf-set-selections
 	dpkg-reconfigure -f noninteractive unattended-upgrades
 	systemctl restart unattended-upgrades
+	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	echo
 }
 
 ### BBR ###
 enable_bbr() {
 	msg_inf "Включение BBR"
-
 	if [[ ! "$(sysctl net.core.default_qdisc)" == *"= fq" ]]
 	then
 	    echo "net.core.default_qdisc = fq" >> /etc/sysctl.conf
@@ -510,13 +514,13 @@ enable_bbr() {
 	then
 	    echo "net.ipv4.tcp_congestion_control = bbr" >> /etc/sysctl.conf
 	fi
+	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 }
 
 ### Отключение IPv6 ###
 disable_ipv6() {
 	msg_inf "Отключение IPv6"
 	interface_name=$(ifconfig -s | awk 'NR==2 {print $1}')
-
 	if [[ ! "$(sysctl net.ipv6.conf.all.disable_ipv6)" == *"= 1" ]]
 	then
 	        echo "net.ipv6.conf.all.disable_ipv6 = 1" >> /etc/sysctl.conf
@@ -533,8 +537,8 @@ disable_ipv6() {
 	then
 	        echo "net.ipv6.conf.$interface_name.disable_ipv6 = 1" >> /etc/sysctl.conf
 	fi
-
 	sysctl -p
+	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	echo
 }
 
@@ -548,6 +552,7 @@ warp() {
 	then
 		warp-cli registration license ${warpkey}
 	fi
+	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	echo
 }
 
@@ -557,7 +562,6 @@ issuance_of_certificates() {
 	touch cloudflare.credentials
 	chown root:root cloudflare.credentials
 	chmod 600 cloudflare.credentials
-
 	if [[ "$cftoken" =~ [A-Z] ]]
 	then
 	    echo "dns_cloudflare_api_token = ${cftoken}" >> /root/cloudflare.credentials
@@ -565,11 +569,10 @@ issuance_of_certificates() {
 	    echo "dns_cloudflare_email = ${email}" >> /root/cloudflare.credentials
 	    echo "dns_cloudflare_api_key = ${cftoken}" >> /root/cloudflare.credentials
 	fi
-
 	certbot certonly --dns-cloudflare --dns-cloudflare-credentials /root/cloudflare.credentials --dns-cloudflare-propagation-seconds 30 --rsa-key-size 4096 -d ${domain},*.${domain} --agree-tos -m ${email} --no-eff-email --non-interactive
-
 	{ crontab -l; echo "0 0 1 */2 * certbot -q renew"; } | crontab -
 	echo "renew_hook = systemctl reload nginx" >> /etc/letsencrypt/renewal/${domain}.conf
+	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	echo
 }
 
@@ -584,6 +587,7 @@ nginx_setup() {
 	local_conf
 
 	nginx -s reload
+	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	echo
 }
 
@@ -651,11 +655,7 @@ EOF
 
 stream_conf() {
 	cat > /etc/nginx/stream-enabled/stream.conf <<EOF
-map \$ssl_preread_protocol \$backend {
-	default              \$https;
-	""                   ssh;
-}
-map \$ssl_preread_server_name \$https {
+map \$ssl_preread_server_name \$backend {
 	${reality}                reality;
 	${reality2}         reality2;
 	www.${domain}  trojan;
@@ -715,7 +715,7 @@ server {
 	proxy_intercept_errors on;
 
 	# Disable direct IP access
-	if (\$host = ${serverip}) {
+	if (\$host = ${IP4}) {
 		return 444;
 	}
 
@@ -796,10 +796,12 @@ EOF
 panel_installation() {
 	touch /usr/local/bin/reinstallation_check
 	msg_inf "Настройка 3x-ui xray"
-	wget -q --show-progress https://github.com/cortez24rus/3X-UI-auto-deployment/raw/main/x-ui.gpg
-	sleep 0.5
+	while ! wget -q --show-progress --timeout=30 --tries=10 --retry-connrefused https://github.com/cortez24rus/3X-UI-auto-deployment/raw/main/x-ui.gpg; do
+    	msg_err "Скачивание не удалось, пробуем снова..."
+    	sleep 3
+	done
 	echo ${password} | gpg --batch --yes --passphrase-fd 0 -d x-ui.gpg > x-ui.db
- 	echo -e "n" | bash <(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh) > /dev/null 2>&1
+	echo -e "n" | bash <(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh) > /dev/null 2>&1
 
 	stream_settings_id1
 	stream_settings_id2
@@ -810,9 +812,11 @@ panel_installation() {
 	database_change
 
 	x-ui stop
+	rm -rf x-ui.gpg
 	rm -rf /etc/x-ui/x-ui.db
 	mv x-ui.db /etc/x-ui/
 	x-ui start
+	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	echo
 }
 
@@ -1088,10 +1092,21 @@ UPDATE settings SET value = '${subJsonURI}' WHERE id = 38;
 EOF
 }
 
+### UFW ###
+enabling_security() {
+	msg_inf "Настройка ufw"
+	ufw reset
+	ufw allow 22/tcp
+	ufw allow 443/tcp
+	ufw insert 1 deny from $(echo ${IP4} | cut -d '.' -f 1-3).0/22
+	yes | ufw enable
+	echo
+	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+}
+
 ### Окончание ###
 data_output() {
 	echo
-	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	printf '0\n' | x-ui | grep --color=never -i ':'
 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	echo -n "Доступ по ссылке к 3x-ui панели: " && msg_out "https://${domain}/${webBasePath}/"
@@ -1100,44 +1115,34 @@ data_output() {
 		echo -n "Доступ по ссылке к adguard-home: " && msg_out "https://${domain}/${adguardPath}/login.html"
 		msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	fi
-	echo -n "Подключение по ssh: " && msg_out "ssh -p 443 ${username}@${domain}"
+	echo -n "Подключение по ssh: " && msg_out "ssh ${username}@${IP4}"
 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	echo -n "Username: " && msg_out "${username}"
 	echo -n "Password: " && msg_out "${password}"
 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
-	msg_err "Please Save this Screen!!"	
+	echo
+	msg_err "PLEASE SAVE THIS SCREEN!"
+	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	echo
 }
 
 ### SSH ####
 ssh_setup() {
 	msg_inf "Настройка ssh"
-	msg_inf "Команда для Linux:"
-	msg_ok "ssh-copy-id -p 22 ${username}@${serverip}"
-	msg_inf "Команда для Windows:"
-	msg_ok "type \$env:USERPROFILE\.ssh\id_rsa.pub | ssh -p 22 ${username}@${serverip} \"cat >> ~/.ssh/authorized_keys\""
-	echo
+	echo -n "Команда для Linux: " && msg_out "ssh-copy-id -p 22 ${username}@${IP4}"
+	echo -n "Команда для Windows: " && msg_out "type \$env:USERPROFILE\.ssh\id_rsa.pub | ssh -p 22 ${username}@${IP4} \"cat >> ~/.ssh/authorized_keys\""
+	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	msg_inf "Закинули ключ SSH на сервер? (если нет, то потеряешь доступ к серверу) [y/N]"
 	answer_input
 
 	sed -i -e "s/#Port/Port/g" /etc/ssh/sshd_config
-	sed -i -e "s/#ListenAddress 0.0.0.0/ListenAddress 127.0.0.1/g" /etc/ssh/sshd_config
 	sed -i -e "s/#PermitRootLogin/PermitRootLogin/g" -e "s/PermitRootLogin yes/PermitRootLogin prohibit-password/g" /etc/ssh/sshd_config
 	sed -i -e "s/#PubkeyAuthentication/PubkeyAuthentication/g" -e "s/PubkeyAuthentication no/PubkeyAuthentication yes/g" /etc/ssh/sshd_config
 	sed -i -e "s/#PasswordAuthentication/PasswordAuthentication/g" -e "s/PasswordAuthentication yes/PasswordAuthentication no/g" /etc/ssh/sshd_config
 	sed -i -e "s/#PermitEmptyPasswords/PermitEmptyPasswords/g" -e "s/PermitEmptyPasswords yes/PermitEmptyPasswords no/g" /etc/ssh/sshd_config
 
 	systemctl restart ssh.service
-	echo
-}
-
-### UFW ###
-enabling_security() {
-	msg_inf "Настройка ufw"
-	ufw allow 443/tcp
-	ufw allow 80/tcp
-	yes | ufw enable
-	echo
+	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 }
 
 ### Первый запуск ###
@@ -1157,9 +1162,9 @@ main_script_first() {
 	issuance_of_certificates
 	nginx_setup
 	panel_installation
+	enabling_security
 	data_output
 	ssh_setup
-	enabling_security
 }
 
 ### Повторный запуск ###
@@ -1172,7 +1177,9 @@ main_script_repeat() {
 	dns_encryption
 	nginx_setup
 	panel_installation
+	enabling_security
 	data_output
+	ssh_setup
 }
 
 ### Проверка запуска ###
