@@ -1096,7 +1096,7 @@ EOF
 enabling_security() {
 	msg_inf "Настройка ufw"
 	ufw reset
-	ufw allow 22/tcp
+	ufw limit 36079/tcp
 	ufw allow 443/tcp
 	ufw insert 1 deny from $(echo ${IP4} | cut -d '.' -f 1-3).0/22
 	yes | ufw enable
@@ -1136,6 +1136,7 @@ ssh_setup() {
 	answer_input
 
 	sed -i -e "s/#Port/Port/g" /etc/ssh/sshd_config
+	sed -i -e "s/Port 22/Port 36079/g" /etc/ssh/sshd_config
 	sed -i -e "s/#PermitRootLogin/PermitRootLogin/g" -e "s/PermitRootLogin yes/PermitRootLogin prohibit-password/g" /etc/ssh/sshd_config
 	sed -i -e "s/#PubkeyAuthentication/PubkeyAuthentication/g" -e "s/PubkeyAuthentication no/PubkeyAuthentication yes/g" /etc/ssh/sshd_config
 	sed -i -e "s/#PasswordAuthentication/PasswordAuthentication/g" -e "s/PasswordAuthentication yes/PasswordAuthentication no/g" /etc/ssh/sshd_config
