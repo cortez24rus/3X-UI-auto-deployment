@@ -1,39 +1,34 @@
 #!/bin/bash
 
-blue='\033[1;36m'
-red='\033[0;31m'
-green='\033[0;32m'
-yellow='\033[0;33m'
-clear='\033[0m'
+### INFO ###
+Green="\033[32m"
+Red="\033[31m"
+Yellow="\e[1;33m"
+Blue="\033[36m"
+Orange="\033[38;5;214m"
+Font="\e[0m"
 
-### Проверка ввода ##
+OK="${Green}[OK]${Font}"
+ERROR="${Red}[!]${Font}"
+QUESTION="${Green}[?]${Font}"
+
+function msg_banner()	{ echo -e "${Yellow} $1 ${Font}"; }
+function msg_ok()		{ echo -e "${OK} ${Blue} $1 ${Font}"; }
+function msg_err()		{ echo -e "${ERROR} ${Orange} $1 ${Font}"; }
+function msg_inf()		{ echo -e "${QUESTION} ${Yellow} $1 ${Font}"; }
+function msg_out()		{ echo -e "${Green} $1 ${Font}"; }
+function msg_tilda()	{ echo -e "${Orange}$1${Font}"; }
+
+### Проверка ввода ###
 answer_input () {
 	read answer
-	cancel="${red}___Отмена___${clear}"
 	if [[ $answer != "y" ]] && [[ $answer != "Y" ]]; then
-		echo ""
-		echo -e $cancel
-		echo ""
+		echo
+		msg_err "ОТМЕНА"
+		echo
 		exit
 	fi
-	echo ""
-}
-
-validate_port() {
-	local port_variable_name=$1
-	while true; do
-		read port_value
-		# Проверка порта
-		if [[ ! $port_value =~ ^[0-9]+$ ]] || (( $port_value < 1024 || $port_value > 65535)); then
-			echo ""
-			echo -e "${red}Порт должен быть от 1024 до 65535${clear}"
-			echo -e "${blue}Пожалуйста, введите порт заново:${clear}"
-		else
-			eval $port_variable_name=\$port_value
-			break
-		fi
-	done
-	echo ""
+	echo
 }
 
 validate_path() {
@@ -42,120 +37,153 @@ validate_path() {
 		read path_value
 		# Проверка на пустой ввод
 		if [[ -z "$path_value" ]]; then
-			echo ""
-			echo -e "${red}Ошибка: путь не должен быть пустым.${clear}"
-			echo -e "${blue}Пожалуйста, введите путь заново:${clear}"
+			msg_err "Ошибка: путь не должен быть пустым"
+			echo
+			msg_inf "Пожалуйста, введите путь заново:"
 		# Проверка на наличие запрещённых символов
 		elif [[ $path_value =~ ['{}\$/'] ]]; then
-			echo ""
-			echo -e "${red}Ошибка: путь не должен содержать символы '/', '$', '{}', '\'${clear}"
-			echo -e "${blue}Пожалуйста, введите путь заново:${clear}"
+			msg_err "Ошибка: путь не должен содержать символы (/, $, {}, \)"
+			echo
+			msg_inf "Пожалуйста, введите путь заново:"
 		else
 			eval $path_variable_name=\$path_value
 			break
 		fi
 	done
-	echo ""
+}
+
+# Функция для генерации случайного порта
+generate_port() {
+	echo $(( ((RANDOM<<15)|RANDOM) % 49152 + 10000 ))
+}
+# Функция для проверки, занят ли порт
+is_port_free() {
+	local port=$1
+	nc -z 127.0.0.1 $port &>/dev/null
+	return $?
+}
+# Основной цикл для генерации и проверки порта
+port_issuance() {
+	while true; do
+		PORT=$(generate_port)
+		if ! is_port_free $PORT; then  # Если порт свободен, выходим из цикла
+			echo $PORT
+			break
+		fi
+	done
+}
+
+choise_dns () {
+	while true; do
+		read choise
+		case $choise in
+			1)
+				echo
+				msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+				echo
+				msg_inf "Введите путь к adguard-home (без символов /, $, {}, \):"
+				validate_path adguardPath
+				break
+				;;
+			2)
+				msg_ok "Выбран systemd-resolved"
+				break
+				;;
+			*)	
+				msk_err "Неверный выбор, попробуйте снова"
+				;;
+		esac
+	done
+}
+
+domain_input() {
+	read domain
+	domain=$(echo "$domain" 2>&1 | tr -d '[:space:]' )
+	if [[ "$domain" == "www."* ]]; then
+		domain=${domain#"www."}
+	fi
 }
 
 ### IP сервера ###
 check_ip() {
-	serverip=$(curl -s ipinfo.io/ip)
+	IP4_REGEX="^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$"
+	IP4=$(ip route get 8.8.8.8 2>&1 | grep -Po -- 'src \K\S*')
+	[[ $IP4 =~ $IP4_REGEX ]] || IP4=$(curl -s ipinfo.io/ip);
 }
 
 ### Проверка рута ###
 check_root() {
-	if [[ $EUID -ne 0 ]]; then
-		echo ""
-  		echo -e "${red}Ошибка: скрипт должен быть запущен от root${clear}"
-		echo ""
-		exit 1
-	fi
+	[[ $EUID -ne 0 ]] && echo "not root!" && sudo su -
+}
+
+### Баннер ###
+banner_1() {
+	clear
+	echo
+	msg_banner " ╻ ╻┏━┓┏━┓╻ ╻   ┏━┓┏━╸╻ ╻┏━╸┏━┓┏━┓┏━╸   ┏━┓┏━┓┏━┓╻ ╻╻ ╻ "
+	msg_banner " ┏╋┛┣┳┛┣━┫┗┳┛   ┣┳┛┣╸ ┃┏┛┣╸ ┣┳┛┗━┓┣╸    ┣━┛┣┳┛┃ ┃┏╋┛┗┳┛ "
+	msg_banner " ╹ ╹╹┗╸╹ ╹ ╹    ╹┗╸┗━╸┗┛ ┗━╸╹┗╸┗━┛┗━╸   ╹  ╹┗╸┗━┛╹ ╹ ╹  "
+	echo
+	echo
 }
 
 ### Начало установки ###
 start_installation() {
-	clear
-	echo ""
-	echo -e "${red}ВНИМАНИЕ!${clear}"
-	echo "Перед запуском скрипта рекомендуется выполнить следующие действия:"
-	echo -e "Обновить систему командой ${yellow}apt update && apt full-upgrade -y${clear}"
-	echo -e "Перезагрузить сервер командой ${yellow}reboot${clear}"
-	echo ""
-	echo -e "${blue}Скрипт установки 3x-ui. Начать установку? Выберите опцию [y/N]${clear}"
+ 	msg_err "ВНИМАНИЕ!"
+	echo
+	msg_ok "Перед запуском скрипта рекомендуется выполнить следующие действия:"
+	msg_err "apt update && apt full-upgrade -y && reboot"
+	echo
+	msg_inf "Скрипт установки 3x-ui. Начать установку? Выберите опцию [y/N]"
 	answer_input
 }
 
+
 ### Ввод данных ###
 data_entry() {
-	echo -e "${blue}Введите имя пользователя:${clear}"
-	read -r username
-	echo ""
-
-	echo -e "${blue}Введите пароль пользователя:${clear}"
+	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+	echo
+	msg_inf "Введите имя пользователя:"
+	read username
+	msg_inf "Введите пароль пользователя:"
 	read password
-	echo ""
-	
-	echo -e "${blue}Введите доменное имя, под которое будете маскироваться (Reality):${clear}"
+	echo
+	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+	echo
+	msg_inf "Укажите свой домен:"
+	domain_input
+	msg_inf "Введите доменное имя, под которое будете маскироваться Reality:"
 	read reality
-	echo ""
-
-	echo -e "${blue}Укажите свой домен:${clear}"
-	read domain
-	if [[ "$domain" == "www."* ]]; then
-		domain=${domain#"www."}
-	fi
-	echo ""
-	
-	echo -e "${blue}Введите 1 для установки adguard-home (DoH)${clear}"
-	echo -e "${blue}Введите 2 для установки systemd-resolved (DoT)${clear}"
-	while true; do
-	    read choise
-	    echo ""
-	    case $choise in
-	        1)
-	            echo -e "${blue}Введите путь до adguard-home (без символов '/', '$', '{}', '\'):${clear}"
-	            validate_path adguardPath
-	            break
-	            ;;
-	        2)
-	            echo -e "${green}Выбран systemd-resolved${clear}"
-	            echo ""
-	            break
-	            ;;
-	        *)
-	            echo -e "${red}Неверный выбор, попробуйте снова${clear}"
-	            ;;
-	    esac
-	done
-	
-	echo -e "${blue}Введите порт панели:${clear}"
-	validate_port webPort
-
-	echo -e "${blue}Введите путь к панели (без символов '/', '$', '{}', '\'):${clear}"
+	echo
+	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+	echo
+	msg_inf	"Введите 1, для установки adguard-home (DoH-DoT)"
+	msg_inf	"Введите 2, для установки systemd-resolved (DoT)"
+	choise_dns
+	msg_inf "Введите путь к панели (без символов /, $, {}, \):"
 	validate_path webBasePath
-
-	echo -e "${blue}Введите порт подписки:${clear}"
-	validate_port subPort
-
- 	echo -e "${blue}Введите путь к подписке (без символов '/', '$', '{}', '\'):${clear}"
+	msg_inf "Введите путь к подписке (без символов /, $, {}, \):"
 	validate_path subPath
-
-	echo -e "${blue}Введите путь к JSON подписке (без символов '/', '$', '{}', '\'):${clear}"
+	msg_inf "Введите путь к JSON подписке (без символов /, $, {}, \):"
 	validate_path subJsonPath
-	
-	echo -e "${blue}Введите вашу почту, зарегистрированную на Cloudflare:${clear}"
+	echo
+	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+	echo
+	msg_inf "Введите вашу почту, зарегистрированную на Cloudflare:"
 	read email
-	echo ""
-
-	echo -e "${blue}Введите ваш API токен Cloudflare (Edit zone DNS) или Cloudflare global API key:${clear}"
+	msg_inf "Введите ваш API токен Cloudflare (Edit zone DNS) или Cloudflare global API key:"
 	read cftoken
-	echo ""
-
-	echo -e "${blue}Введите ключ для регистрации WARP или нажмите Enter для пропуска:${clear}"
+	echo
+	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+	echo
+	msg_inf "Введите ключ для регистрации WARP или нажмите Enter для пропуска:"
 	read warpkey
-	echo ""
-	
+	echo
+	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+	echo
+	webPort=$(port_issuance)
+	subPort=$(port_issuance)
+
 	webCertFile=/etc/letsencrypt/live/${domain}/fullchain.pem
 	webKeyFile=/etc/letsencrypt/live/${domain}/privkey.pem
 	subURI=https://${domain}/${subPath}/
@@ -164,40 +192,70 @@ data_entry() {
 
 ### Обновление системы и установка пакетов ###
 installation_of_utilities() {
-	echo -e "${blue}Обновление системы и установка необходимых пакетов${clear}"
+	msg_inf "Обновление системы и установка необходимых пакетов"
 	apt-get update && apt-get upgrade -y
 	apt-get install -y gnupg2
 	curl -fsSL https://pkg.cloudflareclient.com/pubkey.gpg | gpg --yes --dearmor --output /usr/share/keyrings/cloudflare-warp-archive-keyring.gpg
 	echo "deb [signed-by=/usr/share/keyrings/cloudflare-warp-archive-keyring.gpg] https://pkg.cloudflareclient.com/ $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/cloudflare-client.list	
 	apt-get update && apt-get upgrade -y
 	apt-get install -y git wget sudo nginx-full net-tools apache2-utils gnupg2 sqlite3 curl ufw certbot python3-certbot-dns-cloudflare unattended-upgrades cloudflare-warp systemd-resolved
- 	echo -e "${green}Все пакеты установлены${clear}"
-	echo ""
+	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+	echo
 }
 
 ### DoH, DoT ###
 dns_encryption() {
+	msg_inf "Настройка dns"
+	dns_systemd_resolved
 	case $choise in
 		1)
-			dns_adguard_home
 			comment_agh="location /${adguardPath}/ {
+		proxy_set_header Host \$host;
+		proxy_set_header X-Real-IP \$remote_addr;
+		proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+		proxy_set_header X-Real-IP \$remote_addr;
+		proxy_set_header Range \$http_range;
+		proxy_set_header If-Range \$http_if_range;
 		proxy_redirect /login.html /${adguardPath}/login.html;
-		proxy_pass http://127.0.0.1:8080/;
+		proxy_pass http://127.0.0.1:8081/;
+		break;
 	}"
+			dns_adguard_home
+			dns_systemd_resolved_for_adguard
+			msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+			echo
 			;;
 		2)
-			dns_systemd_resolved
 			comment_agh=""
+			msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+			echo
 			;;
 		*)
-			echo -e "${red}Неверный выбор, попробуйте снова${clear}"
+			msg_err "Неверный выбор, попробуйте снова"
 			dns_encryption
 			;;
 	esac
 }
 
+# systemd-resolved
+dns_systemd_resolved() {
+	cat > /etc/systemd/resolved.conf <<EOF
+[Resolve]
+# Some examples of DNS servers which may be used for DNS= and FallbackDNS=:
+# Cloudflare: 1.1.1.1#cloudflare-dns.com 1.0.0.1#cloudflare-dns.com 2606:4700:4700::1111#cloudflare-dns.com 2606:4700:4700::1001#cloudflare-dns.com
+# Google:     8.8.8.8#dns.google 8.8.4.4#dns.google 2001:4860:4860::8888#dns.google 2001:4860:4860::8844#dns.google
+# Quad9:      9.9.9.9#dns.quad9.net 149.112.112.112#dns.quad9.net 2620:fe::fe#dns.quad9.net 2620:fe::9#dns.quad9.net
+DNS=1.1.1.1
+#FallbackDNS=
+Domains=~.
+DNSSEC=yes
+DNSOverTLS=yes
+EOF
+	systemctl restart systemd-resolved.service
+}
+
 dns_systemd_resolved_for_adguard() {
-cat > /etc/systemd/resolved.conf <<EOF
+	cat > /etc/systemd/resolved.conf <<EOF
 [Resolve]
 # Some examples of DNS servers which may be used for DNS= and FallbackDNS=:
 # Cloudflare: 1.1.1.1#cloudflare-dns.com 1.0.0.1#cloudflare-dns.com 2606:4700:4700::1111#cloudflare-dns.com 2606:4700:4700::1001#cloudflare-dns.com
@@ -210,45 +268,21 @@ DNS=127.0.0.1
 DNSOverTLS=no
 DNSStubListener=no
 EOF
-
 	systemctl restart systemd-resolved.service
-}
-
-# systemd-resolved
-dns_systemd_resolved() {
-	echo -e "${blue}Настройка systemd-resolved${clear}"
-
-cat > /etc/systemd/resolved.conf <<EOF
-[Resolve]
-# Some examples of DNS servers which may be used for DNS= and FallbackDNS=:
-# Cloudflare: 1.1.1.1#cloudflare-dns.com 1.0.0.1#cloudflare-dns.com 2606:4700:4700::1111#cloudflare-dns.com 2606:4700:4700::1001#cloudflare-dns.com
-# Google:     8.8.8.8#dns.google 8.8.4.4#dns.google 2001:4860:4860::8888#dns.google 2001:4860:4860::8844#dns.google
-# Quad9:      9.9.9.9#dns.quad9.net 149.112.112.112#dns.quad9.net 2620:fe::fe#dns.quad9.net 2620:fe::9#dns.quad9.net
-DNS=9.9.9.9
-#FallbackDNS=
-Domains=~.
-DNSSEC=yes
-DNSOverTLS=yes
-EOF
-
-	systemctl restart systemd-resolved.service
-	echo ""
 }
 
 dns_adguard_home() {
-	dns_systemd_resolved
-	echo -e "${blue}Настройка adguard-home${clear}"
+	rm -rf AdGuardHome_*
 	wget https://static.adguard.com/adguardhome/release/AdGuardHome_linux_amd64.tar.gz
 	tar xvf AdGuardHome_linux_amd64.tar.gz
 	AdGuardHome/AdGuardHome -s install
 	hash=$(htpasswd -B -C 10 -n -b ${username} ${password} | cut -d ":" -f 2)
-
-cat > AdGuardHome/AdGuardHome.yaml <<EOF
+	cat > AdGuardHome/AdGuardHome.yaml <<EOF
 http:
   pprof:
     port: 6060
     enabled: false
-  address: 127.0.0.1:8080
+  address: 127.0.0.1:8081
   session_ttl: 720h
 users:
   - name: ${username}
@@ -431,15 +465,12 @@ os:
   rlimit_nofile: 0
 schema_version: 28
 EOF
-
-	dns_systemd_resolved_for_adguard
 	AdGuardHome/AdGuardHome -s restart
-	echo ""
 }
 
 ### Добавление пользователя ###
 add_user() {
- 	echo -e "${blue}Добавление пользователя${clear}"
+ 	msg_inf "Добавление пользователя"
 	useradd -m -s $(which bash) -G sudo ${username}
 	echo "${username}:${password}" | chpasswd
 	mkdir -p /home/${username}/.ssh/
@@ -448,23 +479,24 @@ add_user() {
 	chmod 700 /home/${username}/.ssh
 	chown ${username}:${username} /home/${username}/.ssh/authorized_keys
 	echo ${username}
-	echo ""
+	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+	echo
 }
 
 ### Безопасность ###
 uattended_upgrade() {
-	echo -e "${blue}Автоматическое обновление безопасности${clear}"
+	msg_inf "Автоматическое обновление безопасности"
 	echo 'Unattended-Upgrade::Mail "root";' >> /etc/apt/apt.conf.d/50unattended-upgrades
 	echo unattended-upgrades unattended-upgrades/enable_auto_updates boolean true | debconf-set-selections
 	dpkg-reconfigure -f noninteractive unattended-upgrades
 	systemctl restart unattended-upgrades
-	echo ""
+	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+	echo
 }
 
 ### BBR ###
 enable_bbr() {
-	echo -e "${blue}Включение BBR${clear}"
-	
+	msg_inf "Включение BBR"
 	if [[ ! "$(sysctl net.core.default_qdisc)" == *"= fq" ]]
 	then
 	    echo "net.core.default_qdisc = fq" >> /etc/sysctl.conf
@@ -473,13 +505,13 @@ enable_bbr() {
 	then
 	    echo "net.ipv4.tcp_congestion_control = bbr" >> /etc/sysctl.conf
 	fi
+	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 }
 
 ### Отключение IPv6 ###
 disable_ipv6() {
-	echo -e "${blue}Отключение IPv6${clear}"
+	msg_inf "Отключение IPv6"
 	interface_name=$(ifconfig -s | awk 'NR==2 {print $1}')
-	
 	if [[ ! "$(sysctl net.ipv6.conf.all.disable_ipv6)" == *"= 1" ]]
 	then
 	        echo "net.ipv6.conf.all.disable_ipv6 = 1" >> /etc/sysctl.conf
@@ -496,14 +528,14 @@ disable_ipv6() {
 	then
 	        echo "net.ipv6.conf.$interface_name.disable_ipv6 = 1" >> /etc/sysctl.conf
 	fi
-	
 	sysctl -p
-	echo ""
+	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+	echo
 }
 
 ### WARP ###
 warp() {
-	echo -e "${blue}Настройка warp${clear}"
+	msg_inf "Настройка warp"
 	yes | warp-cli registration new
 	warp-cli mode proxy
 	warp-cli connect
@@ -511,16 +543,16 @@ warp() {
 	then
 		warp-cli registration license ${warpkey}
 	fi
-	echo ""
+	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+	echo
 }
 
 ### СЕРТИФИКАТЫ ###
 issuance_of_certificates() {
-	echo -e "${blue}Выдача сертификатов${clear}"
+	msg_inf "Выдача сертификатов"
 	touch cloudflare.credentials
 	chown root:root cloudflare.credentials
 	chmod 600 cloudflare.credentials
-	
 	if [[ "$cftoken" =~ [A-Z] ]]
 	then
 	    echo "dns_cloudflare_api_token = ${cftoken}" >> /root/cloudflare.credentials
@@ -528,17 +560,16 @@ issuance_of_certificates() {
 	    echo "dns_cloudflare_email = ${email}" >> /root/cloudflare.credentials
 	    echo "dns_cloudflare_api_key = ${cftoken}" >> /root/cloudflare.credentials
 	fi
-	
 	certbot certonly --dns-cloudflare --dns-cloudflare-credentials /root/cloudflare.credentials --dns-cloudflare-propagation-seconds 30 --rsa-key-size 4096 -d ${domain},*.${domain} --agree-tos -m ${email} --no-eff-email --non-interactive
-	
 	{ crontab -l; echo "0 0 1 */2 * certbot -q renew"; } | crontab -
 	echo "renew_hook = systemctl reload nginx" >> /etc/letsencrypt/renewal/${domain}.conf
-	echo ""
+	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+	echo
 }
 
 ### NGINX ###
 nginx_setup() {
-	echo -e "${blue}Настройка NGINX${clear}"
+	msg_inf "Настройка NGINX"
 	mkdir -p /etc/nginx/stream-enabled/
 	touch /etc/nginx/.htpasswd
 
@@ -547,11 +578,12 @@ nginx_setup() {
 	local_conf
 
 	nginx -s reload
-	echo ""
+	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+	echo
 }
 
 nginx_conf() {
-cat > /etc/nginx/nginx.conf <<EOF
+	cat > /etc/nginx/nginx.conf <<EOF
 user                              www-data;
 pid                               /run/nginx.pid;
 worker_processes                  auto;
@@ -613,20 +645,15 @@ EOF
 }
 
 stream_conf() {
-cat > /etc/nginx/stream-enabled/stream.conf <<EOF
-map \$ssl_preread_protocol \$backend {
-	default           \$https;
-	""                ssh;
-}
-map \$ssl_preread_server_name \$https {
+	cat > /etc/nginx/stream-enabled/stream.conf <<EOF
+map \$ssl_preread_server_name \$backend {
 	${reality}        reality;
 	www.${domain}     trojan;
 	${domain}         web;
 }
 upstream reality        { server 127.0.0.1:7443; }
 upstream trojan         { server 127.0.0.1:9443; }
-upstream web            { server 127.0.0.1:46076; }
-upstream ssh            { server 127.0.0.1:22; }
+upstream web            { server 127.0.0.1:36076; }
 
 server {
 	listen 443          reuseport;
@@ -637,23 +664,10 @@ EOF
 }
 
 local_conf() {
-cat > /etc/nginx/conf.d/local.conf <<EOF
-# HTTP redirect
-server {
-	listen 80 default_server;
-	server_name _;
-
-	# Disable direct IP access
-	if (\$host = ${serverip}) {
-		return 444;
-	}
-
-	return 301 https://${domain}\$request_uri;
-}
-
+	cat > /etc/nginx/conf.d/local.conf <<EOF
 # Main
 server {
-	listen                      46076 ssl default_server;
+	listen                      36076 ssl default_server;
 
 	# SSL
 	ssl_reject_handshake        on;
@@ -661,24 +675,16 @@ server {
 	ssl_session_cache           shared:SSL:10m;
 }
 server {
-	listen                      46076 ssl http2;
+	listen                      36076 ssl http2;
 	server_name                 ${domain} www.${domain};
 
 	# SSL
-	ssl_certificate             /etc/letsencrypt/live/${domain}/fullchain.pem;
-	ssl_certificate_key         /etc/letsencrypt/live/${domain}/privkey.pem;
+	ssl_certificate             ${webCertFile};
+	ssl_certificate_key         ${webKeyFile};
 	ssl_trusted_certificate     /etc/letsencrypt/live/${domain}/chain.pem;
 
-	# Security headers
-        add_header X-XSS-Protection          "1; mode=block" always;
-        add_header X-Content-Type-Options    "nosniff" always;
-        add_header Referrer-Policy           "no-referrer-when-downgrade" always;
-        add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
-        add_header X-Frame-Options           "SAMEORIGIN";
-        proxy_hide_header X-Powered-By;
-
 	# Disable direct IP access
-	if (\$host = ${serverip}) {
+	if (\$host = ${IP4}) {
 		return 444;
 	}
 
@@ -687,37 +693,35 @@ server {
 		auth_basic "Restricted Content";
 		auth_basic_user_file /etc/nginx/.htpasswd;
 	}
-
-	# 3X-UI
+	# X-ui Admin panel
 	location /${webBasePath} {
+		proxy_redirect off;
+		proxy_set_header Host \$host;
+		proxy_set_header X-Real-IP \$remote_addr;
 		proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-		proxy_set_header X-Forwarded-Proto \$scheme;
-		proxy_set_header Host \$http_host;
 		proxy_set_header X-Real-IP \$remote_addr;
 		proxy_set_header Range \$http_range;
 		proxy_set_header If-Range \$http_if_range;
-		proxy_redirect off;
 		proxy_pass https://127.0.0.1:${webPort}/${webBasePath};
+		break;
 	}
+	# Subscription 
 	location /${subPath} {
-		proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-		proxy_set_header X-Forwarded-Proto \$scheme;
-		proxy_set_header Host \$http_host;
-		proxy_set_header X-Real-IP \$remote_addr;
-		proxy_set_header Range \$http_range;
-		proxy_set_header If-Range \$http_if_range;
 		proxy_redirect off;
+		proxy_set_header Host \$host;
+		proxy_set_header X-Real-IP \$remote_addr;
+		proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
 		proxy_pass https://127.0.0.1:${subPort}/${subPath};
+		break;
 	}
+	# Subscription json
 	location /${subJsonPath} {
-		proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-		proxy_set_header X-Forwarded-Proto \$scheme;
-		proxy_set_header Host \$http_host;
-		proxy_set_header X-Real-IP \$remote_addr;
-		proxy_set_header Range \$http_range;
-		proxy_set_header If-Range \$http_if_range;
 		proxy_redirect off;
+		proxy_set_header Host \$host;
+		proxy_set_header X-Real-IP \$remote_addr;
+		proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
 		proxy_pass https://127.0.0.1:${subPort}/${subJsonPath};
+		break;
 	}
 	# Adguard home
 	${comment_agh}
@@ -728,22 +732,24 @@ EOF
 ### Установка 3x-ui ###
 panel_installation() {
 	touch /usr/local/bin/reinstallation_check
-	echo -e "${blue}Настройка 3x-ui xray${clear}"
-	wget -q --show-progress https://github.com/cortez24rus/3X-UI-auto-deployment/raw/main/x-ui.db
-	echo -e "n" | bash <(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh)
-	echo ""
-	x-ui stop
-	sleep 1
-	rm -rf /etc/x-ui/x-ui.db
+	msg_inf "Настройка 3x-ui xray"
+	while ! wget -q --show-progress --timeout=30 --tries=10 --retry-connrefused https://github.com/cortez24rus/3X-UI-auto-deployment/raw/main/x-ui.db; do
+    	msg_err "Скачивание не удалось, пробуем снова..."
+    	sleep 3
+	done
+	echo -e "n" | bash <(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh) > /dev/null 2>&1
 
 	stream_settings_id6
 	stream_settings_id7
 	stream_settings_id8
 	database_change
 
+	x-ui stop
+	rm -rf /etc/x-ui/x-ui.db
 	mv x-ui.db /etc/x-ui/
 	x-ui start
-	echo ""
+	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+	echo
 }
 
 ### Изменение базы данных ###
@@ -882,9 +888,9 @@ EOF
 }
 
 database_change() {
-DB_PATH="x-ui.db"
+	DB_PATH="x-ui.db"
 
-sqlite3 $DB_PATH <<EOF
+	sqlite3 $DB_PATH <<EOF
 UPDATE users SET username = '$username' WHERE id = 1;
 UPDATE users SET password = '$password' WHERE id = 1;
 
@@ -906,105 +912,106 @@ UPDATE settings SET value = '${subJsonURI}' WHERE id = 38;
 EOF
 }
 
+### UFW ###
+enabling_security() {
+	msg_inf "Настройка ufw"
+	ufw reset
+	ufw allow 22/tcp
+	ufw allow 443/tcp
+	yes | ufw enable
+	echo
+	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+}
+
 ### Окончание ###
 data_output() {
-	echo -e "${blue}Доступ по ссылке к 3x-ui панели:${clear}"
-	echo -e "${green}https://${domain}/${webBasePath}/${clear}"
-	echo ""
+	echo
+	printf '0\n' | x-ui | grep --color=never -i ':'
+	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+	echo -n "Доступ по ссылке к 3x-ui панели: " && msg_out "https://${domain}/${webBasePath}/"
+	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	if [[ $choise = "1" ]]; then
-		echo -e "${blue}Доступ по ссылке к adguard-home (если вы его выбирали):${clear}"
-		echo -e "${green}https://${domain}/${adguardPath}/login.html${clear}"
-		echo ""
+		echo -n "Доступ по ссылке к adguard-home: " && msg_out "https://${domain}/${adguardPath}/login.html"
+		msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	fi
-	echo ""
-	echo -e "${blue}Логин: ${green}${username}${clear}"
- 	echo -e "${blue}Пароль: ${green}${password}${clear}"
-	echo ""
-	
-	sleep 3
+	echo -n "Подключение по ssh: " && msg_out "ssh ${username}@${IP4}"
+	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+	echo -n "Username: " && msg_out "${username}"
+	echo -n "Password: " && msg_out "${password}"
+	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+	echo
+	msg_err "PLEASE SAVE THIS SCREEN!"
+	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+	echo
 }
 
 ### SSH ####
 ssh_setup() {
-	echo -e "${blue}Настройка ssh${clear}"
-	echo "Команда для Linux:"
-	echo -e "${blue}ssh-copy-id -p 22 ${username}@${serverip}${clear}"
-	echo "Команда для Windows:"
-	echo -e "${blue}type \$env:USERPROFILE\.ssh\id_rsa.pub | ssh -p 22 ${username}@${serverip} \"cat >> ~/.ssh/authorized_keys\""
-	echo ""
-	echo -e "Осталось настроить SSH, закинь ключ на сервер или отмени настройку ssh, если тебе это не нужно"
- 	echo -e "Если не закинул ключ, дальше можешь потерять доступ, сделай выбор [y/N]${clear}"
+	msg_inf "Настройка ssh"
+	echo -n "Команда для Linux: " && msg_out "ssh-copy-id -p 22 ${username}@${IP4}"
+	echo -n "Команда для Windows: " && msg_out "type \$env:USERPROFILE\.ssh\id_rsa.pub | ssh -p 22 ${username}@${IP4} \"cat >> ~/.ssh/authorized_keys\""
+	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+	msg_inf "Закинули ключ SSH на сервер? (если нет, то потеряешь доступ к серверу) [y/N]"
 	answer_input
 
-	sed -i -e "s/#Port/Port/g" /etc/ssh/sshd_config
-	sed -i -e "s/#ListenAddress 0.0.0.0/ListenAddress 127.0.0.1/g" /etc/ssh/sshd_config
 	sed -i -e "s/#PermitRootLogin/PermitRootLogin/g" -e "s/PermitRootLogin yes/PermitRootLogin prohibit-password/g" /etc/ssh/sshd_config
 	sed -i -e "s/#PubkeyAuthentication/PubkeyAuthentication/g" -e "s/PubkeyAuthentication no/PubkeyAuthentication yes/g" /etc/ssh/sshd_config
 	sed -i -e "s/#PasswordAuthentication/PasswordAuthentication/g" -e "s/PasswordAuthentication yes/PasswordAuthentication no/g" /etc/ssh/sshd_config
 	sed -i -e "s/#PermitEmptyPasswords/PermitEmptyPasswords/g" -e "s/PermitEmptyPasswords yes/PermitEmptyPasswords no/g" /etc/ssh/sshd_config
 
-	systemctl restart ssh.service	
-	echo -e "${blue}Подключение по ssh :${clear}"
-	echo -e "${green}ssh -p 443 ${username}@www.${domain}${clear}"
-	echo ""
+	systemctl restart ssh.service
+	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 }
-
-### UFW ###
-enabling_security() {
-	echo -e "${blue}Настройка ufw${clear}"
-	ufw allow 443/tcp
-	ufw allow 80/tcp
-	ufw allow 2091
-	yes | ufw enable
-	echo ""
-}
-
 
 ### Первый запуск ###
 main_script_first() {
-  check_ip
-  check_root
-  start_installation
-  data_entry
-  installation_of_utilities
-  dns_encryption
-  add_user
-  uattended_upgrade
-  enable_bbr
-  disable_ipv6
-  warp
-  issuance_of_certificates
-  nginx_setup
-  panel_installation
-  data_output
-  ssh_setup
-  enabling_security
+	check_ip
+	check_root
+	banner_1
+	start_installation
+	data_entry
+	installation_of_utilities
+	dns_encryption
+	add_user
+	uattended_upgrade
+	enable_bbr
+	disable_ipv6
+	warp
+	issuance_of_certificates
+	nginx_setup
+	panel_installation
+	enabling_security
+	data_output
+	ssh_setup
 }
 
 ### Повторный запуск ###
 main_script_repeat() {
-  check_ip
-  check_root
-  start_installation
-  data_entry
-  installation_of_utilities
-  dns_encryption
-  nginx_setup
-  panel_installation
-  data_output
+	check_ip
+	check_root
+	banner_1
+	start_installation
+	data_entry
+	dns_encryption
+	nginx_setup
+	panel_installation
+	enabling_security
+	data_output
+	ssh_setup
 }
 
+### Проверка запуска ###
 main_choise() {
-  if [ -f /usr/local/bin/reinstallation_check ]; then
-    echo ""
-    echo -e "${red}Повторная установка скрипта${clear}"
-    sleep 2
-    main_script_repeat
-    echo ""
-    exit 1
-  else
-    main_script_first
-  fi
+	if [ -f /usr/local/bin/reinstallation_check ]; then
+		echo
+		msg_err "Повторная установка скрипта"
+		sleep 2
+		main_script_repeat
+		echo
+		exit 1
+	else
+		main_script_first
+	fi
 }
 
 main_choise
