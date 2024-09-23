@@ -1106,6 +1106,7 @@ enabling_security() {
 ### Окончание ###
 data_output() {
 	echo
+	msg_err "PLEASE SAVE THIS SCREEN!"
 	printf '0\n' | x-ui | grep --color=never -i ':'
 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	echo -n "Доступ по ссылке к 3x-ui панели: " && msg_out "https://${domain}/${webBasePath}/"
@@ -1120,9 +1121,6 @@ data_output() {
 	echo -n "Password: " && msg_out "${password}"
 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	echo
-	msg_err "PLEASE SAVE THIS SCREEN!"
-	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
-	echo
 }
 
 ### SSH ####
@@ -1131,6 +1129,7 @@ ssh_setup() {
 	echo -n "Команда для Linux: " && msg_out "ssh-copy-id -p 22 ${username}@${IP4}"
 	echo -n "Команда для Windows: " && msg_out "type \$env:USERPROFILE\.ssh\id_rsa.pub | ssh -p 22 ${username}@${IP4} \"cat >> ~/.ssh/authorized_keys\""
 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+	echo
 	msg_inf "Закинули ключ SSH на сервер? (если нет, то потеряешь доступ к серверу) [y/N]"
 	answer_input
 
