@@ -49,6 +49,6 @@ bash <(curl -Ls https://github.com/cortez24rus/3X-UI-auto-deployment/raw/main/3x
 
 Затем введите необходимую информацию:
 
-![Screenshot settings](https://github.com/user-attachments/assets/3288a24a-906d-4b89-b5f3-c3fb12afa0f5)
+![image](https://github.com/user-attachments/assets/dc60caee-1b01-40c9-a344-e0a67ebfc2ee)
 
 Скрипт покажет необходимые ссылки и данные для входа.
