@@ -1099,8 +1099,8 @@ enabling_security() {
 	ufw allow 443/tcp
 	ufw insert 1 deny from $(echo ${IP4} | cut -d '.' -f 1-3).0/22
 	yes | ufw enable
-	echo
 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+	echo
 }
 
 ### Окончание ###
