@@ -1105,7 +1105,6 @@ enabling_security() {
 
 ### Окончание ###
 data_output() {
-	echo
 	msg_err "PLEASE SAVE THIS SCREEN!"
 	printf '0\n' | x-ui | grep --color=never -i ':'
 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
@@ -1128,8 +1127,6 @@ ssh_setup() {
 	msg_inf "Настройка ssh"
 	echo -n "Команда для Linux: " && msg_out "ssh-copy-id -p 22 ${username}@${IP4}"
 	echo -n "Команда для Windows: " && msg_out "type \$env:USERPROFILE\.ssh\id_rsa.pub | ssh -p 22 ${username}@${IP4} \"cat >> ~/.ssh/authorized_keys\""
-	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
-	echo
 	msg_inf "Закинули ключ SSH на сервер? (если нет, то потеряешь доступ к серверу) [y/N]"
 	answer_input
 
