@@ -506,6 +506,7 @@ enable_bbr() {
 	    echo "net.ipv4.tcp_congestion_control = bbr" >> /etc/sysctl.conf
 	fi
 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+	echo
 }
 
 ### Отключение IPv6 ###
@@ -961,6 +962,7 @@ ssh_setup() {
 
 	systemctl restart ssh.service
 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+	echo
 }
 
 ### Первый запуск ###
