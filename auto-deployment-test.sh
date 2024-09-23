@@ -1114,7 +1114,7 @@ data_output() {
 		echo -n "Доступ по ссылке к adguard-home: " && msg_out "https://${domain}/${adguardPath}/login.html"
 		msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	fi
-	echo -n "Подключение по ssh: " && msg_out "ssh ${username}@${IP4}"
+	echo -n "Подключение по ssh: " && msg_out "ssh -p 36079 ${username}@${IP4}"
 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	echo -n "Username: " && msg_out "${username}"
 	echo -n "Password: " && msg_out "${password}"
