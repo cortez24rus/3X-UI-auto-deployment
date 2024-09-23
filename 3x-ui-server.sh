@@ -505,8 +505,6 @@ enable_bbr() {
 	then
 	    echo "net.ipv4.tcp_congestion_control = bbr" >> /etc/sysctl.conf
 	fi
-	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
-	echo
 }
 
 ### Отключение IPv6 ###
