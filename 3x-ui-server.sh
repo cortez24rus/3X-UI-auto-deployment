@@ -947,7 +947,10 @@ data_output() {
 ### SSH ####
 ssh_setup() {
 	msg_inf "Настройка ssh"
-	echo -n "Команда для Linux: " && msg_out "ssh-copy-id -p 22 ${username}@${IP4}"
+ 	msg_inf "Сгенерируйте ключ для своей системы, в windows нужно установить пакет openSSH, и ввести команду в командой строке ssh-keygen (предлагаю изучить как генерировать ключ в интернете)"
+	msg_inf "Если у вас linux, то вы сами все умеете С:"
+ 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+ 	echo -n "Команда для Linux: " && msg_out "ssh-copy-id -p 22 ${username}@${IP4}"
 	echo -n "Команда для Windows: " && msg_out "type \$env:USERPROFILE\.ssh\id_rsa.pub | ssh -p 22 ${username}@${IP4} \"cat >> ~/.ssh/authorized_keys\""
 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	msg_inf "Закинули ключ SSH на сервер? (если нет, то потеряешь доступ к серверу) [y/N]"
