@@ -282,7 +282,10 @@ EOF
 
 dns_adguard_home() {
 	rm -rf AdGuardHome_*
-	wget https://static.adguard.com/adguardhome/release/AdGuardHome_linux_amd64.tar.gz
+	while ! wget -q --show-progress --timeout=30 --tries=10 --retry-connrefused https://static.adguard.com/adguardhome/release/AdGuardHome_linux_amd64.tar.gz; do
+    	msg_err "Скачивание не удалось, пробуем снова..."
+    	sleep 3
+	done
 	tar xvf AdGuardHome_linux_amd64.tar.gz
 	AdGuardHome/AdGuardHome -s install
 	hash=$(htpasswd -B -C 10 -n -b ${username} ${password} | cut -d ":" -f 2)
