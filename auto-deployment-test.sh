@@ -1100,6 +1100,7 @@ enabling_security() {
 	ufw reset
 	ufw limit 36079/tcp
 	ufw allow 443/tcp
+ 	ufw limit 22/tcp
 	ufw insert 1 deny from $(echo ${IP4} | cut -d '.' -f 1-3).0/22
 	yes | ufw enable
 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
