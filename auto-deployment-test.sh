@@ -1097,7 +1097,7 @@ EOF
 ### UFW ###
 enabling_security() {
 	msg_inf "Настройка ufw"
-	ufw reset
+	ufw --force reset
 	ufw limit 36079/tcp
 	ufw allow 443/tcp
  	ufw limit 22/tcp
