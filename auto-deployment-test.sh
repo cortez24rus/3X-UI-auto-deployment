@@ -1135,7 +1135,7 @@ ssh_setup() {
  	echo -n "Команда для Linux: " && msg_out "ssh-copy-id -p 22 ${username}@${IP4}"
 	echo -n "Команда для Windows: " && msg_out "type \$env:USERPROFILE\.ssh\id_rsa.pub | ssh -p 22 ${username}@${IP4} \"cat >> ~/.ssh/authorized_keys\""
 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
-	msg_inf "Если не сгенерировал ключ SSH и не закинул его на сервер, то потеряешь доступ, можешшь просто нажать N и потом сам отдельно настроить (шаг не обязательный) [y/N]"
+	msg_inf "Настроить ssh (шаг не обязательный)? [y/N]"
 	answer_input
 
 	sed -i -e "s/#Port/Port/g" /etc/ssh/sshd_config
