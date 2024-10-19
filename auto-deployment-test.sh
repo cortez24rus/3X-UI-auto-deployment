@@ -106,7 +106,6 @@ crop_domain() {
         msg_err "Ошибка: введённый домен '$domain' имеет неверный формат."
         return 1
     fi
-	echo $domain
     return 0
 }
 
@@ -134,8 +133,6 @@ validate_input() {
 }
 
 check_cf_token() {
-    msg_inf "Проверка домена, API токена/ключа и почты..."
-
     while true; do
         while [[ -z $domain ]]; do
             echo
@@ -1190,11 +1187,10 @@ data_output() {
 	printf '0\n' | x-ui | grep --color=never -i ':'
 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	echo -n "Доступ по ссылке к 3x-ui панели: " && msg_out "https://${domain}/${webBasePath}/"
-	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	if [[ $choise = "1" ]]; then
 		echo -n "Доступ по ссылке к adguard-home: " && msg_out "https://${domain}/${adguardPath}/login.html"
-		msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	fi
+ 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	echo -n "Подключение по ssh: " && msg_out "ssh -p 36079 ${username}@${IP4}"
 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	echo -n "Username: " && msg_out "${username}"
@@ -1218,6 +1214,7 @@ ssh_setup() {
   	echo -n "Команда для Linux: " && msg_out "ssh-copy-id -p 22 ${username}@${IP4}"
 	echo
 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+ 	echo
 	msg_inf "Настроить ssh (шаг не обязательный)? [y/N]"
 	answer_input
 
