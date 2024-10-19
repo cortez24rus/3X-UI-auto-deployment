@@ -1221,6 +1221,8 @@ ssh_setup() {
 
 ### Окончание ###
 data_output() {
+	exec > /dev/tty 2>&1
+	echo
 	msg_err "PLEASE SAVE THIS SCREEN!"
 	printf '0\n' | x-ui | grep --color=never -i ':'
 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
@@ -1231,11 +1233,12 @@ data_output() {
  	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	echo -n "Подключение по ssh: " && msg_out "ssh -p 36079 ${username}@${IP4}"
 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -" 	
-	exec > /dev/tty 2>&1
-	echo
  	echo -n "Username: " && msg_out "${username}"
 	echo -n "Password: " && msg_out "${password}"
- 	exec > >(tee -a "$LOGFILE") 2>&1
+	echo
+	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+	echo
+	msg_ok "Путь к лог файлу: $LOGFILE"
 	echo
 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	echo
@@ -1289,7 +1292,7 @@ main_choise() {
 		sleep 2
 		main_script_repeat
 		echo
-		exit 1
+		exit
 	else
 		clear
 		main_script_first
