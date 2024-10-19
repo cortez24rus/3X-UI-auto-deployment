@@ -1244,6 +1244,7 @@ data_output() {
  	exec > /dev/tty 2>&1
 	echo -n "Username: " && msg_out "${username}"
 	echo -n "Password: " && msg_out "${password}"
+ 	exec > >(tee -a "$LOGFILE") 2>&1
 	echo
 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	echo
