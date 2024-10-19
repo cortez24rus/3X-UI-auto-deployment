@@ -1274,7 +1274,10 @@ main_script_repeat() {
 
 ### Проверка запуска ###
 main_choise() {
-	if [ -f /usr/local/bin/reinstallation_check ]; then
+	LOGFILE="/var/log/3X-UI-auto-deployment.log"
+	exec > >(tee -a "$LOGFILE") 2>&1
+	
+ 	if [ -f /usr/local/bin/reinstallation_check ]; then
 		clear
   		echo
 		msg_err "Повторная установка скрипта"
