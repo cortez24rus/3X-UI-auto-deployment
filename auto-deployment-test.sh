@@ -19,16 +19,16 @@ function msg_inf()	{ echo -e "${QUESTION} ${Yellow} $1 ${Font}"; }
 function msg_out()	{ echo -e "${Green} $1 ${Font}"; }
 function msg_tilda()	{ echo -e "${Orange}$1${Font}"; }
 
-### Проверка ввода ###
-answer_input () {
-	read answer
-	if [[ $answer != "y" ]] && [[ $answer != "Y" ]]; then
-		echo
-		msg_err "ОТМЕНА"
-		echo
-		exit
-	fi
+### Продолжение? ###
+answer_input() {
+    read -r answer
+    if [[ "$answer" != "y" && "$answer" != "Y" ]]; then
 	echo
+	msg_err "ОТМЕНА"
+	echo
+        return 1  # Возвращаем 1, если ответ не 'y' или 'Y'
+    fi
+    return 0  # Возвращаем 0, если ответ 'y' или 'Y'
 }
 
 validate_path() {
@@ -1180,25 +1180,6 @@ enabling_security() {
 	echo
 }
 
-### Окончание ###
-data_output() {
-	msg_err "PLEASE SAVE THIS SCREEN!"
-	printf '0\n' | x-ui | grep --color=never -i ':'
-	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
-	echo -n "Доступ по ссылке к 3x-ui панели: " && msg_out "https://${domain}/${webBasePath}/"
-	if [[ $choise = "1" ]]; then
-		echo -n "Доступ по ссылке к adguard-home: " && msg_out "https://${domain}/${adguardPath}/login.html"
-	fi
- 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
-	echo -n "Подключение по ssh: " && msg_out "ssh -p 36079 ${username}@${IP4}"
-	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
-	echo -n "Username: " && msg_out "${username}"
-	echo -n "Password: " && msg_out "${password}"
-	echo
-	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
-	echo
-}
-
 ### SSH ####
 ssh_setup() {
 	msg_inf "Настройка ssh"
@@ -1217,14 +1198,37 @@ ssh_setup() {
 	msg_inf "Настроить ssh (шаг не обязательный)? [y/N]"
 	answer_input
 
-	sed -i -e "s/#Port/Port/g" /etc/ssh/sshd_config
-	sed -i -e "s/Port 22/Port 36079/g" /etc/ssh/sshd_config
-	sed -i -e "s/#PermitRootLogin/PermitRootLogin/g" -e "s/PermitRootLogin yes/PermitRootLogin prohibit-password/g" /etc/ssh/sshd_config
-	sed -i -e "s/#PubkeyAuthentication/PubkeyAuthentication/g" -e "s/PubkeyAuthentication no/PubkeyAuthentication yes/g" /etc/ssh/sshd_config
-	sed -i -e "s/#PasswordAuthentication/PasswordAuthentication/g" -e "s/PasswordAuthentication yes/PasswordAuthentication no/g" /etc/ssh/sshd_config
-	sed -i -e "s/#PermitEmptyPasswords/PermitEmptyPasswords/g" -e "s/PermitEmptyPasswords yes/PermitEmptyPasswords no/g" /etc/ssh/sshd_config
+	if [[ $? -eq 0 ]]; then
+	    sed -i -e "s/#Port/Port/g" /etc/ssh/sshd_config
+	    sed -i -e "s/Port 22/Port 36079/g" /etc/ssh/sshd_config
+	    sed -i -e "s/#PermitRootLogin/PermitRootLogin/g" -e "s/PermitRootLogin yes/PermitRootLogin prohibit-password/g" /etc/ssh/sshd_config
+	    sed -i -e "s/#PubkeyAuthentication/PubkeyAuthentication/g" -e "s/PubkeyAuthentication no/PubkeyAuthentication yes/g" /etc/ssh/sshd_config
+	    sed -i -e "s/#PasswordAuthentication/PasswordAuthentication/g" -e "s/PasswordAuthentication yes/PasswordAuthentication no/g" /etc/ssh/sshd_config
+	    sed -i -e "s/#PermitEmptyPasswords/PermitEmptyPasswords/g" -e "s/PermitEmptyPasswords yes/PermitEmptyPasswords no/g" /etc/ssh/sshd_config
+	
+	    systemctl restart ssh.service
+	    msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+	    echo "Настройка SSH завершена."
+	fi
+	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+	echo
+}
 
-	systemctl restart ssh.service
+### Окончание ###
+data_output() {
+	msg_err "PLEASE SAVE THIS SCREEN!"
+	printf '0\n' | x-ui | grep --color=never -i ':'
+	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+	echo -n "Доступ по ссылке к 3x-ui панели: " && msg_out "https://${domain}/${webBasePath}/"
+	if [[ $choise = "1" ]]; then
+		echo -n "Доступ по ссылке к adguard-home: " && msg_out "https://${domain}/${adguardPath}/login.html"
+	fi
+ 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+	echo -n "Подключение по ssh: " && msg_out "ssh -p 36079 ${username}@${IP4}"
+	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+	echo -n "Username: " && msg_out "${username}"
+	echo -n "Password: " && msg_out "${password}"
+	echo
 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	echo
 }
