@@ -1231,20 +1231,21 @@ data_output() {
 		echo -n "Доступ по ссылке к adguard-home: " && msg_out "https://${domain}/${adguardPath}/login.html"
 	fi
  	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
-	echo -n "Подключение по ssh: " && msg_out "ssh -p 36079 ${username}@${IP4}"
+	echo -n "Подключение по ssh: " && msg_out "		ssh -p 36079 ${username}@${IP4}"
 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -" 	
- 	echo -n "Username: " && msg_out "${username}"
-	echo -n "Password: " && msg_out "${password}"
+ 	echo -n "Username: " && msg_out "			${username}"
+	echo -n "Password: " && msg_out "			${password}"
 	echo
 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	echo
- 	echo -n "Путь к лог файлу: " && msg_out "$LOGFILE"
+ 	echo -n "Путь к лог файлу: " && msg_out "		$LOGFILE"
 	echo
 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	echo
 }
 
 log_clear() {
+	sleep 2
 	sed -i -e '/\^\[\[H\^\[\[2J\^\[\[3J/d' \
        -e '/\^\[\[31m\[\!\]\^\[\[0m \^\[\[38;5;214m/d' \
        -e '/\^\[\[0m/d' \
