@@ -1238,10 +1238,20 @@ data_output() {
 	echo
 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	echo
-	msg_ok "Путь к лог файлу: $LOGFILE"
+ 	echo -n "Путь к лог файлу: " && msg_out "$LOGFILE"
 	echo
 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	echo
+}
+
+log_clear() {
+	sed -i -e '/\^\[\[H\^\[\[2J\^\[\[3J/d' \
+       -e '/\^\[\[31m\[\!\]\^\[\[0m \^\[\[38;5;214m/d' \
+       -e '/\^\[\[0m/d' \
+       -e '/\^\[\[1;33m/d' \
+       -e '/\^\[\[32m\[OK\]\^\[\[36m/d' \
+       -e '/\^\[\[32m\[?\]\^\[\[1;33m/d' \
+       "$LOGFILE"
 }
 
 ### Первый запуск ###
@@ -1265,6 +1275,7 @@ main_script_first() {
 	ssh_setup
 	data_output
 	banner_1
+	log_clear
 }
 
 ### Повторный запуск ###
@@ -1281,6 +1292,7 @@ main_script_repeat() {
 	ssh_setup	
  	data_output
 	banner_1
+ 	log_clear
 }
 
 ### Проверка запуска ###
