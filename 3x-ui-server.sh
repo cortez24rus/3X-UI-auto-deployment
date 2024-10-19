@@ -1,5 +1,7 @@
 #!/bin/bash
 
+LOGFILE="/var/log/3X-UI-auto-deployment.log"
+
 ### INFO ###
 Green="\033[32m"
 Red="\033[31m"
@@ -13,22 +15,24 @@ ERROR="${Red}[!]${Font}"
 QUESTION="${Green}[?]${Font}"
 
 function msg_banner()	{ echo -e "${Yellow} $1 ${Font}"; }
-function msg_ok()		{ echo -e "${OK} ${Blue} $1 ${Font}"; }
-function msg_err()		{ echo -e "${ERROR} ${Orange} $1 ${Font}"; }
-function msg_inf()		{ echo -e "${QUESTION} ${Yellow} $1 ${Font}"; }
-function msg_out()		{ echo -e "${Green} $1 ${Font}"; }
+function msg_ok()	{ echo -e "${OK} ${Blue} $1 ${Font}"; }
+function msg_err()	{ echo -e "${ERROR} ${Orange} $1 ${Font}"; }
+function msg_inf()	{ echo -e "${QUESTION} ${Yellow} $1 ${Font}"; }
+function msg_out()	{ echo -e "${Green} $1 ${Font}"; }
 function msg_tilda()	{ echo -e "${Orange}$1${Font}"; }
 
-### Проверка ввода ###
-answer_input () {
-	read answer
-	if [[ $answer != "y" ]] && [[ $answer != "Y" ]]; then
-		echo
-		msg_err "ОТМЕНА"
-		echo
-		exit
-	fi
+exec > >(tee -a "$LOGFILE") 2>&1
+
+### Продолжение? ###
+answer_input() {
+    read -r answer
+    if [[ "$answer" != "y" && "$answer" != "Y" ]]; then
 	echo
+	msg_err "ОТМЕНА"
+	echo
+        return 1  # Возвращаем 1, если ответ не 'y' или 'Y'
+    fi
+    return 0  # Возвращаем 0, если ответ 'y' или 'Y'
 }
 
 validate_path() {
@@ -96,12 +100,81 @@ choise_dns () {
 	done
 }
 
-domain_input() {
-	read domain
-	domain=$(echo "$domain" 2>&1 | tr -d '[:space:]' )
-	if [[ "$domain" == "www."* ]]; then
-		domain=${domain#"www."}
-	fi
+crop_domain() {
+    domain=${domain//https:\/\//}
+    domain=${domain//http:\/\//}
+    domain=${domain//www./}
+    domain=${domain%%/*}
+
+    if ! [[ "$domain" =~ ^([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$ ]]; then
+        msg_err "Ошибка: введённый домен '$domain' имеет неверный формат."
+        return 1
+    fi
+    return 0
+}
+
+get_test_response() {
+    testdomain=$(echo "${domain}" | rev | cut -d '.' -f 1-2 | rev)
+
+    if [[ "$cftoken" =~ [A-Z] ]]; then
+        test_response=$(curl --silent --request GET --url https://api.cloudflare.com/client/v4/zones --header "Authorization: Bearer ${cftoken}" --header "Content-Type: application/json")
+    else
+        test_response=$(curl --silent --request GET --url https://api.cloudflare.com/client/v4/zones --header "X-Auth-Key: ${cftoken}" --header "X-Auth-Email: ${email}" --header "Content-Type: application/json")
+    fi
+}
+
+validate_input() {
+    get_test_response
+    
+    if [[ -n $(echo "$test_response" | grep "\"${testdomain}\"") ]] && \
+       [[ -n $(echo "$test_response" | grep "\"#dns_records:edit\"") ]] && \
+       [[ -n $(echo "$test_response" | grep "\"#dns_records:read\"") ]] && \
+       [[ -n $(echo "$test_response" | grep "\"#zone:read\"") ]]; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+check_cf_token() {
+    while true; do
+        while [[ -z $domain ]]; do
+            echo
+            msg_inf "Введите ваш домен:"
+            read domain
+            echo
+        done
+
+        crop_domain
+        
+	if [[ $? -ne 0 ]]; then
+            domain=""
+            continue
+        fi
+
+        while [[ -z $email ]]; do
+            msg_inf "Введите вашу почту, зарегистрированную на Cloudflare:"
+            read email
+            echo
+        done
+
+        while [[ -z $cftoken ]]; do
+            msg_inf "Введите ваш API токен Cloudflare (Edit zone DNS) или Cloudflare global API key:"
+            read cftoken
+            echo
+        done
+
+        msg_err "Проверка домена, API токена/ключа и почты..."
+
+        if validate_input; then
+            break
+        else
+            msg_err "Ошибка: неправильно введён домен, API токен/ключ или почта. Попробуйте снова."
+            domain=""
+            email=""
+            cftoken=""
+        fi
+    done
 }
 
 ### IP сервера ###
@@ -118,7 +191,6 @@ check_root() {
 
 ### Баннер ###
 banner_1() {
-	clear
 	echo
 	msg_banner " ╻ ╻┏━┓┏━┓╻ ╻   ┏━┓┏━╸╻ ╻┏━╸┏━┓┏━┓┏━╸   ┏━┓┏━┓┏━┓╻ ╻╻ ╻ "
 	msg_banner " ┏╋┛┣┳┛┣━┫┗┳┛   ┣┳┛┣╸ ┃┏┛┣╸ ┣┳┛┗━┓┣╸    ┣━┛┣┳┛┃ ┃┏╋┛┗┳┛ "
@@ -131,13 +203,12 @@ banner_1() {
 start_installation() {
  	msg_err "ВНИМАНИЕ!"
 	echo
-	msg_ok "Перед запуском скрипта рекомендуется выполнить следующие действия:"
-	msg_err "apt update && apt full-upgrade -y && reboot"
+	msg_err "Перед запуском скрипта рекомендуется выполнить следующие действия:"
+	msg_ok "apt update && apt full-upgrade -y && reboot"
 	echo
-	msg_inf "Скрипт установки 3x-ui. Начать установку? Выберите опцию [y/N]"
+	msg_inf "Начать установку XRAY? Выберите опцию [y/N]"
 	answer_input
 }
-
 
 ### Ввод данных ###
 data_entry() {
@@ -150,8 +221,6 @@ data_entry() {
 	echo
 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	echo
-	msg_inf "Укажите свой домен:"
-	domain_input
 	msg_inf "Введите доменное имя, под которое будете маскироваться Reality:"
 	read reality
 	echo
@@ -169,10 +238,7 @@ data_entry() {
 	echo
 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	echo
-	msg_inf "Введите вашу почту, зарегистрированную на Cloudflare:"
-	read email
-	msg_inf "Введите ваш API токен Cloudflare (Edit zone DNS) или Cloudflare global API key:"
-	read cftoken
+ 	check_cf_token
 	echo
 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	echo
@@ -199,7 +265,8 @@ installation_of_utilities() {
 	echo "deb [signed-by=/usr/share/keyrings/cloudflare-warp-archive-keyring.gpg] https://pkg.cloudflareclient.com/ $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/cloudflare-client.list	
 	apt-get update && apt-get upgrade -y
 	apt-get install -y git wget sudo nginx-full net-tools apache2-utils gnupg2 sqlite3 curl ufw certbot python3-certbot-dns-cloudflare unattended-upgrades cloudflare-warp systemd-resolved
-	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+	echo
+ 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	echo
 }
 
@@ -222,11 +289,13 @@ dns_encryption() {
 	}"
 			dns_adguard_home
 			dns_systemd_resolved_for_adguard
+   			echo
 			msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 			echo
 			;;
 		2)
 			comment_agh=""
+   			echo
 			msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 			echo
 			;;
@@ -482,6 +551,7 @@ add_user() {
 	chmod 700 /home/${username}/.ssh
 	chown ${username}:${username} /home/${username}/.ssh/authorized_keys
 	echo ${username}
+ 	echo
 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	echo
 }
@@ -493,6 +563,7 @@ uattended_upgrade() {
 	echo unattended-upgrades unattended-upgrades/enable_auto_updates boolean true | debconf-set-selections
 	dpkg-reconfigure -f noninteractive unattended-upgrades
 	systemctl restart unattended-upgrades
+ 	echo
 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	echo
 }
@@ -531,6 +602,7 @@ disable_ipv6() {
 	        echo "net.ipv6.conf.$interface_name.disable_ipv6 = 1" >> /etc/sysctl.conf
 	fi
 	sysctl -p
+ 	echo
 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	echo
 }
@@ -541,10 +613,11 @@ warp() {
 	yes | warp-cli registration new
 	warp-cli mode proxy
 	warp-cli connect
-    if [[ -n "$key" ]];
+    if [[ -n "$warpkey" ]];
 	then
 		warp-cli registration license ${warpkey}
 	fi
+ 	echo
 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	echo
 }
@@ -565,6 +638,7 @@ issuance_of_certificates() {
 	certbot certonly --dns-cloudflare --dns-cloudflare-credentials /root/cloudflare.credentials --dns-cloudflare-propagation-seconds 30 --rsa-key-size 4096 -d ${domain},*.${domain} --agree-tos -m ${email} --no-eff-email --non-interactive
 	{ crontab -l; echo "0 0 1 */2 * certbot -q renew"; } | crontab -
 	echo "renew_hook = systemctl reload nginx" >> /etc/letsencrypt/renewal/${domain}.conf
+ 	echo
 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	echo
 }
@@ -580,6 +654,7 @@ nginx_setup() {
 	local_conf
 
 	nginx -s reload
+ 	echo
 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	echo
 }
@@ -750,6 +825,7 @@ panel_installation() {
 	rm -rf /etc/x-ui/x-ui.db
 	mv x-ui.db /etc/x-ui/
 	x-ui start
+ 	echo
 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	echo
 }
@@ -923,49 +999,59 @@ enabling_security() {
 	yes | ufw enable
 	echo
 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
-}
-
-### Окончание ###
-data_output() {
-	echo
-	printf '0\n' | x-ui | grep --color=never -i ':'
-	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
-	echo -n "Доступ по ссылке к 3x-ui панели: " && msg_out "https://${domain}/${webBasePath}/"
-	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
-	if [[ $choise = "1" ]]; then
-		echo -n "Доступ по ссылке к adguard-home: " && msg_out "https://${domain}/${adguardPath}/login.html"
-		msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
-	fi
-	echo -n "Подключение по ssh: " && msg_out "ssh ${username}@${IP4}"
-	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
-	echo -n "Username: " && msg_out "${username}"
-	echo -n "Password: " && msg_out "${password}"
-	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
-	echo
-	msg_err "PLEASE SAVE THIS SCREEN!"
-	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
-	echo
+ 	echo
 }
 
 ### SSH ####
 ssh_setup() {
 	msg_inf "Настройка ssh"
  	msg_inf "Сгенерируйте ключ для своей ОС (ssh-keygen)"
-	msg_inf "В windows нужно установить пакет openSSH, и ввести команду в POWERSHELL (предлагаю изучить как генерировать ключ в интернете)"
+	echo	
+ 	msg_inf "В windows нужно установить пакет openSSH, и ввести команду в POWERSHELL (предлагаю изучить как генерировать ключ в интернете)"
 	msg_inf "Если у вас linux, то вы сами все умеете С:"
- 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
- 	echo -n "Команда для Windows: " && msg_out "type \$env:USERPROFILE\.ssh\id_rsa.pub | ssh -p 22 ${username}@${IP4} \"cat >> ~/.ssh/authorized_keys\""	
+ 	echo
+  	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+	echo
+	echo -n "Команда для Windows: " && msg_out "type \$env:USERPROFILE\.ssh\id_rsa.pub | ssh -p 22 ${username}@${IP4} \"cat >> ~/.ssh/authorized_keys\""	
   	echo -n "Команда для Linux: " && msg_out "ssh-copy-id -p 22 ${username}@${IP4}"
+	echo
 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+ 	echo
 	msg_inf "Настроить ssh (шаг не обязательный)? [y/N]"
 	answer_input
 
-	sed -i -e "s/#PermitRootLogin/PermitRootLogin/g" -e "s/PermitRootLogin yes/PermitRootLogin prohibit-password/g" /etc/ssh/sshd_config
-	sed -i -e "s/#PubkeyAuthentication/PubkeyAuthentication/g" -e "s/PubkeyAuthentication no/PubkeyAuthentication yes/g" /etc/ssh/sshd_config
-	sed -i -e "s/#PasswordAuthentication/PasswordAuthentication/g" -e "s/PasswordAuthentication yes/PasswordAuthentication no/g" /etc/ssh/sshd_config
-	sed -i -e "s/#PermitEmptyPasswords/PermitEmptyPasswords/g" -e "s/PermitEmptyPasswords yes/PermitEmptyPasswords no/g" /etc/ssh/sshd_config
+	if [[ $? -eq 0 ]]; then
+		sed -i -e "s/#PermitRootLogin/PermitRootLogin/g" -e "s/PermitRootLogin yes/PermitRootLogin prohibit-password/g" /etc/ssh/sshd_config
+		sed -i -e "s/#PubkeyAuthentication/PubkeyAuthentication/g" -e "s/PubkeyAuthentication no/PubkeyAuthentication yes/g" /etc/ssh/sshd_config
+		sed -i -e "s/#PasswordAuthentication/PasswordAuthentication/g" -e "s/PasswordAuthentication yes/PasswordAuthentication no/g" /etc/ssh/sshd_config
+		sed -i -e "s/#PermitEmptyPasswords/PermitEmptyPasswords/g" -e "s/PermitEmptyPasswords yes/PermitEmptyPasswords no/g" /etc/ssh/sshd_config
 
-	systemctl restart ssh.service
+		systemctl restart ssh.service
+    		echo "Настройка SSH завершена."
+	fi
+ 	echo
+	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+	echo
+}
+
+### Окончание ###
+data_output() {
+	msg_err "PLEASE SAVE THIS SCREEN!"
+	printf '0\n' | x-ui | grep --color=never -i ':'
+	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+	echo -n "Доступ по ссылке к 3x-ui панели: " && msg_out "https://${domain}/${webBasePath}/"
+	if [[ $choise = "1" ]]; then
+		echo -n "Доступ по ссылке к adguard-home: " && msg_out "https://${domain}/${adguardPath}/login.html"
+	fi
+ 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+	echo -n "Подключение по ssh: " && msg_out "ssh -p 36079 ${username}@${IP4}"
+	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -" 	
+	exec > /dev/tty 2>&1
+	echo
+ 	echo -n "Username: " && msg_out "${username}"
+	echo -n "Password: " && msg_out "${password}"
+ 	exec > >(tee -a "$LOGFILE") 2>&1
+	echo
 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	echo
 }
@@ -988,8 +1074,9 @@ main_script_first() {
 	nginx_setup
 	panel_installation
 	enabling_security
-	data_output
 	ssh_setup
+	data_output
+	banner_1
 }
 
 ### Повторный запуск ###
@@ -1003,20 +1090,23 @@ main_script_repeat() {
 	nginx_setup
 	panel_installation
 	enabling_security
-	data_output
-	ssh_setup
+	ssh_setup	
+ 	data_output
+	banner_1
 }
 
 ### Проверка запуска ###
-main_choise() {
-	if [ -f /usr/local/bin/reinstallation_check ]; then
-		echo
+main_choise() {	
+ 	if [ -f /usr/local/bin/reinstallation_check ]; then
+		clear
+  		echo
 		msg_err "Повторная установка скрипта"
 		sleep 2
 		main_script_repeat
 		echo
 		exit 1
 	else
+		clear
 		main_script_first
 	fi
 }
