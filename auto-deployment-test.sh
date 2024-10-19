@@ -1241,8 +1241,17 @@ data_output() {
  	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	echo -n "Подключение по ssh: " && msg_out "ssh -p 36079 ${username}@${IP4}"
 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+	
  	exec > /dev/tty 2>&1
-	echo -n "Username: " && msg_out "${username}"
+	echo -n "Username: "
+	msg_out "${username}"
+	echo -n "Password: "
+	msg_out "${password}"
+	exec > >(tee -a "$LOGFILE") 2>&1
+	 	
+	exec > /dev/tty 2>&1
+	echo
+ 	echo -n "Username: " && msg_out "${username}"
 	echo -n "Password: " && msg_out "${password}"
  	exec > >(tee -a "$LOGFILE") 2>&1
 	echo
