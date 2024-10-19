@@ -203,10 +203,10 @@ banner_1() {
 start_installation() {
  	msg_err "ВНИМАНИЕ!"
 	echo
-	msg_ok "Перед запуском скрипта рекомендуется выполнить следующие действия:"
-	msg_err "apt update && apt full-upgrade -y && reboot"
+	msg_err "Перед запуском скрипта рекомендуется выполнить следующие действия:"
+	msg_ok "apt update && apt full-upgrade -y && reboot"
 	echo
-	msg_inf "Скрипт установки 3x-ui. Начать установку? Выберите опцию [y/N]"
+	msg_inf "Начать установку XRAY? Выберите опцию [y/N]"
 	answer_input
 }
 
@@ -274,7 +274,8 @@ installation_of_utilities() {
 	echo "deb [signed-by=/usr/share/keyrings/cloudflare-warp-archive-keyring.gpg] https://pkg.cloudflareclient.com/ $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/cloudflare-client.list	
 	apt-get update && apt-get upgrade -y
 	apt-get install -y git wget sudo nginx-full net-tools apache2-utils gnupg2 sqlite3 curl ufw certbot python3-certbot-dns-cloudflare unattended-upgrades cloudflare-warp systemd-resolved
-	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+	echo
+ 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	echo
 }
 
@@ -297,11 +298,13 @@ dns_encryption() {
 	}"
 			dns_adguard_home
 			dns_systemd_resolved_for_adguard
+			echo
 			msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 			echo
 			;;
 		2)
 			comment_agh=""
+   			echo
 			msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 			echo
 			;;
@@ -557,6 +560,7 @@ add_user() {
 	chmod 700 /home/${username}/.ssh
 	chown ${username}:${username} /home/${username}/.ssh/authorized_keys
 	echo ${username}
+ 	echo
 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	echo
 }
@@ -568,6 +572,7 @@ uattended_upgrade() {
 	echo unattended-upgrades unattended-upgrades/enable_auto_updates boolean true | debconf-set-selections
 	dpkg-reconfigure -f noninteractive unattended-upgrades
 	systemctl restart unattended-upgrades
+ 	echo
 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	echo
 }
@@ -606,6 +611,7 @@ disable_ipv6() {
 	        echo "net.ipv6.conf.$interface_name.disable_ipv6 = 1" >> /etc/sysctl.conf
 	fi
 	sysctl -p
+ 	echo
 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	echo
 }
@@ -620,6 +626,7 @@ warp() {
 	then
 		warp-cli registration license ${warpkey}
 	fi
+ 	echo
 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	echo
 }
@@ -640,6 +647,7 @@ issuance_of_certificates() {
 	certbot certonly --dns-cloudflare --dns-cloudflare-credentials /root/cloudflare.credentials --dns-cloudflare-propagation-seconds 30 --rsa-key-size 4096 -d ${domain},*.${domain} --agree-tos -m ${email} --no-eff-email --non-interactive
 	{ crontab -l; echo "0 0 1 */2 * certbot -q renew"; } | crontab -
 	echo "renew_hook = systemctl reload nginx" >> /etc/letsencrypt/renewal/${domain}.conf
+ 	echo
 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	echo
 }
@@ -655,6 +663,7 @@ nginx_setup() {
 	local_conf
 
 	nginx -s reload
+ 	echo
 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	echo
 }
@@ -884,6 +893,7 @@ panel_installation() {
 	rm -rf /etc/x-ui/x-ui.db
 	mv x-ui.db /etc/x-ui/
 	x-ui start
+ 	echo
 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	echo
 }
@@ -1169,6 +1179,7 @@ enabling_security() {
  	ufw limit 22/tcp
 	ufw insert 1 deny from $(echo ${IP4} | cut -d '.' -f 1-3).0/22
 	ufw --force enable
+	echo
 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	echo
 }
@@ -1188,6 +1199,7 @@ data_output() {
 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	echo -n "Username: " && msg_out "${username}"
 	echo -n "Password: " && msg_out "${password}"
+	echo
 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	echo
 }
@@ -1196,11 +1208,15 @@ data_output() {
 ssh_setup() {
 	msg_inf "Настройка ssh"
  	msg_inf "Сгенерируйте ключ для своей ОС (ssh-keygen)"
-	msg_inf "В windows нужно установить пакет openSSH, и ввести команду в POWERSHELL (предлагаю изучить как генерировать ключ в интернете)"
+	echo	
+ 	msg_inf "В windows нужно установить пакет openSSH, и ввести команду в POWERSHELL (предлагаю изучить как генерировать ключ в интернете)"
 	msg_inf "Если у вас linux, то вы сами все умеете С:"
- 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
- 	echo -n "Команда для Windows: " && msg_out "type \$env:USERPROFILE\.ssh\id_rsa.pub | ssh -p 22 ${username}@${IP4} \"cat >> ~/.ssh/authorized_keys\""	
+ 	echo
+  	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+	echo
+	echo -n "Команда для Windows: " && msg_out "type \$env:USERPROFILE\.ssh\id_rsa.pub | ssh -p 22 ${username}@${IP4} \"cat >> ~/.ssh/authorized_keys\""	
   	echo -n "Команда для Linux: " && msg_out "ssh-copy-id -p 22 ${username}@${IP4}"
+	echo
 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	msg_inf "Настроить ssh (шаг не обязательный)? [y/N]"
 	answer_input
@@ -1237,6 +1253,7 @@ main_script_first() {
 	enabling_security
 	data_output
 	ssh_setup
+	banner_1
 }
 
 ### Повторный запуск ###
@@ -1252,6 +1269,7 @@ main_script_repeat() {
 	enabling_security
 	data_output
 	ssh_setup
+	banner_1
 }
 
 ### Проверка запуска ###
