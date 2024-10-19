@@ -187,7 +187,6 @@ check_root() {
 
 ### Баннер ###
 banner_1() {
-	clear
 	echo
 	msg_banner " ╻ ╻┏━┓┏━┓╻ ╻   ┏━┓┏━╸╻ ╻┏━╸┏━┓┏━┓┏━╸   ┏━┓┏━┓┏━┓╻ ╻╻ ╻ "
 	msg_banner " ┏╋┛┣┳┛┣━┫┗┳┛   ┣┳┛┣╸ ┃┏┛┣╸ ┣┳┛┗━┓┣╸    ┣━┛┣┳┛┃ ┃┏╋┛┗┳┛ "
@@ -1272,13 +1271,15 @@ main_script_repeat() {
 ### Проверка запуска ###
 main_choise() {
 	if [ -f /usr/local/bin/reinstallation_check ]; then
-		echo
+		clear
+  		echo
 		msg_err "Повторная установка скрипта"
 		sleep 2
 		main_script_repeat
 		echo
 		exit 1
 	else
+		clear
 		main_script_first
 	fi
 }
