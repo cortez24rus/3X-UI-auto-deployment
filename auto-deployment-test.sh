@@ -1187,6 +1187,7 @@ enabling_security() {
 
 ### SSH ####
 ssh_setup() {
+	exec > /dev/tty 2>&1
 	msg_inf "Настройка ssh"
  	msg_inf "Сгенерируйте ключ для своей ОС (ssh-keygen)"
 	echo	
@@ -1221,7 +1222,6 @@ ssh_setup() {
 
 ### Окончание ###
 data_output() {
-	exec > /dev/tty 2>&1
 	echo
 	msg_err "PLEASE SAVE THIS SCREEN!"
 	printf '0\n' | x-ui | grep --color=never -i ':'
