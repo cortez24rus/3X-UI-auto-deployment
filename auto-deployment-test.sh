@@ -96,12 +96,84 @@ choise_dns () {
 	done
 }
 
-domain_input() {
-	read domain
-	domain=$(echo "$domain" 2>&1 | tr -d '[:space:]' )
-	if [[ "$domain" == "www."* ]]; then
-		domain=${domain#"www."}
-	fi
+crop_domain() {
+    domain=${domain//https:\/\//}
+    domain=${domain//http:\/\//}
+    domain=${domain//www./}
+    domain=${domain%%/*}
+
+    if ! [[ "$domain" =~ ^([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$ ]]; then
+        msg_err "Ошибка: введённый домен '$domain' имеет неверный формат."
+        return 1
+    fi
+	echo $domain
+    return 0
+}
+
+get_test_response() {
+    testdomain=$(echo "${domain}" | rev | cut -d '.' -f 1-2 | rev)
+
+    if [[ "$cftoken" =~ [A-Z] ]]; then
+        test_response=$(curl --silent --request GET --url https://api.cloudflare.com/client/v4/zones --header "Authorization: Bearer ${cftoken}" --header "Content-Type: application/json")
+    else
+        test_response=$(curl --silent --request GET --url https://api.cloudflare.com/client/v4/zones --header "X-Auth-Key: ${cftoken}" --header "X-Auth-Email: ${email}" --header "Content-Type: application/json")
+    fi
+}
+
+validate_input() {
+    get_test_response
+    
+    if [[ -n $(echo "$test_response" | grep "\"${testdomain}\"") ]] && \
+       [[ -n $(echo "$test_response" | grep "\"#dns_records:edit\"") ]] && \
+       [[ -n $(echo "$test_response" | grep "\"#dns_records:read\"") ]] && \
+       [[ -n $(echo "$test_response" | grep "\"#zone:read\"") ]]; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+check_cf_token() {
+    msg_inf "Проверка домена, API токена/ключа и почты..."
+
+    while true; do
+        while [[ -z $domain ]]; do
+            echo
+            msg_inf "Введите ваш домен:"
+            read domain
+            echo
+        done
+
+        crop_domain
+        
+	if [[ $? -ne 0 ]]; then
+            domain=""
+            continue
+        fi
+
+        while [[ -z $email ]]; do
+            msg_inf "Введите вашу почту, зарегистрированную на Cloudflare:"
+            read email
+            echo
+        done
+
+        while [[ -z $cftoken ]]; do
+            msg_inf "Введите ваш API токен Cloudflare (Edit zone DNS) или Cloudflare global API key:"
+            read cftoken
+            echo
+        done
+
+        msg_err "Проверка домена, API токена/ключа и почты..."
+
+        if validate_input; then
+            break
+        else
+            msg_err "Ошибка: неправильно введён домен, API токен/ключ или почта. Попробуйте снова."
+            domain=""
+            email=""
+            cftoken=""
+        fi
+    done
 }
 
 ### IP сервера ###
@@ -138,7 +210,6 @@ start_installation() {
 	answer_input
 }
 
-
 ### Ввод данных ###
 data_entry() {
 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
@@ -150,8 +221,6 @@ data_entry() {
 	echo
 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	echo
-	msg_inf "Укажите свой домен:"
-	domain_input
 	msg_inf "Введите доменное имя, под которое будете маскироваться Reality:"
 	read reality
 	msg_inf "Введите 2 доменное имя, под которое будете маскироваться Reality:"
@@ -178,10 +247,7 @@ data_entry() {
 	echo
 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	echo
-	msg_inf "Введите вашу почту, зарегистрированную на Cloudflare:"
-	read email
-	msg_inf "Введите ваш API токен Cloudflare (Edit zone DNS) или Cloudflare global API key:"
-	read cftoken
+ 	check_cf_token
 	echo
 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	echo
@@ -550,7 +616,7 @@ warp() {
 	yes | warp-cli registration new
 	warp-cli mode proxy
 	warp-cli connect
-    if [[ -n "$key" ]];
+    	if [[ -n "$warpkey" ]];
 	then
 		warp-cli registration license ${warpkey}
 	fi
