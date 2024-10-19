@@ -1,12 +1,25 @@
 #!/bin/bash
 
+LOGFILE="/var/log/3X-UI-auto-deployment.log"
+
 ### INFO ###
-Green="\033[32m"
-Red="\033[31m"
-Yellow="\e[1;33m"
-Blue="\033[36m"
-Orange="\033[38;5;214m"
-Font="\e[0m"
+if [ -t 1 ]; then
+    # Если вывод в терминал, включаем цвета
+    Green="\033[32m"
+    Red="\033[31m"
+    Yellow="\e[1;33m"
+    Blue="\033[36m"
+    Orange="\033[38;5;214m"
+    Font="\e[0m"
+else
+    # Если вывод в лог, отключаем цвета
+    Green=""
+    Red=""
+    Yellow=""
+    Blue=""
+    Orange=""
+    Font=""
+fi
 
 OK="${Green}[OK]${Font}"
 ERROR="${Red}[!]${Font}"
@@ -18,6 +31,8 @@ function msg_err()	{ echo -e "${ERROR} ${Orange} $1 ${Font}"; }
 function msg_inf()	{ echo -e "${QUESTION} ${Yellow} $1 ${Font}"; }
 function msg_out()	{ echo -e "${Green} $1 ${Font}"; }
 function msg_tilda()	{ echo -e "${Orange}$1${Font}"; }
+
+exec > >(tee -a "$LOGFILE") 2>&1
 
 ### Продолжение? ###
 answer_input() {
@@ -1226,6 +1241,7 @@ data_output() {
  	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	echo -n "Подключение по ssh: " && msg_out "ssh -p 36079 ${username}@${IP4}"
 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+ 	exec > /dev/tty 2>&1
 	echo -n "Username: " && msg_out "${username}"
 	echo -n "Password: " && msg_out "${password}"
 	echo
@@ -1273,10 +1289,7 @@ main_script_repeat() {
 }
 
 ### Проверка запуска ###
-main_choise() {
-	LOGFILE="/var/log/3X-UI-auto-deployment.log"
-	exec > >(tee -a "$LOGFILE") 2>&1
-	
+main_choise() {	
  	if [ -f /usr/local/bin/reinstallation_check ]; then
 		clear
   		echo
