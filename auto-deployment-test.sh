@@ -3,23 +3,13 @@
 LOGFILE="/var/log/3X-UI-auto-deployment.log"
 
 ### INFO ###
-if [ -t 1 ]; then
-    # Если вывод в терминал, включаем цвета
-    Green="\033[32m"
-    Red="\033[31m"
-    Yellow="\e[1;33m"
-    Blue="\033[36m"
-    Orange="\033[38;5;214m"
-    Font="\e[0m"
-else
-    # Если вывод в лог, отключаем цвета
-    Green=""
-    Red=""
-    Yellow=""
-    Blue=""
-    Orange=""
-    Font=""
-fi
+Green="\033[32m"
+Red="\033[31m"
+Yellow="\e[1;33m"
+Blue="\033[36m"
+Orange="\033[38;5;214m"
+Font="\e[0m"
+
 
 OK="${Green}[OK]${Font}"
 ERROR="${Red}[!]${Font}"
