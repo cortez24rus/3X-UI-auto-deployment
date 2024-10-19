@@ -25,47 +25,12 @@ OK="${Green}[OK]${Font}"
 ERROR="${Red}[!]${Font}"
 QUESTION="${Green}[?]${Font}"
 
-function msg_banner() {    if [ -t 1 ]; then
-        echo -e "${Yellow} $1 ${Font}"
-    else
-        echo "$1"
-    fi
-}
-
-function msg_ok() {    if [ -t 1 ]; then
-        echo -e "${OK} ${Blue} $1 ${Font}"
-    else
-        echo "$1"
-    fi
-}
-
-function msg_err() {    if [ -t 1 ]; then
-        echo -e "${ERROR} ${Orange} $1 ${Font}"
-    else
-        echo "$1"
-    fi
-}
-
-function msg_inf() {    if [ -t 1 ]; then
-        echo -e "${QUESTION} ${Yellow} $1 ${Font}"
-    else
-        echo "$1"
-    fi
-}
-
-function msg_out() {    if [ -t 1 ]; then
-        echo -e "${Green} $1 ${Font}"
-    else
-        echo "$1"
-    fi
-}
-
-function msg_tilda() {    if [ -t 1 ]; then
-        echo -e "${Orange}$1${Font}"
-    else
-        echo "$1"
-    fi
-}
+function msg_banner()	{ echo -e "${Yellow} $1 ${Font}"; }
+function msg_ok()	{ echo -e "${OK} ${Blue} $1 ${Font}"; }
+function msg_err()	{ echo -e "${ERROR} ${Orange} $1 ${Font}"; }
+function msg_inf()	{ echo -e "${QUESTION} ${Yellow} $1 ${Font}"; }
+function msg_out()	{ echo -e "${Green} $1 ${Font}"; }
+function msg_tilda()	{ echo -e "${Orange}$1${Font}"; }
 
 exec > >(tee -a "$LOGFILE") 2>&1
 
@@ -1275,15 +1240,7 @@ data_output() {
 	fi
  	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	echo -n "Подключение по ssh: " && msg_out "ssh -p 36079 ${username}@${IP4}"
-	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
-	
- 	exec > /dev/tty 2>&1
-	echo -n "Username: "
-	msg_out "${username}"
-	echo -n "Password: "
-	msg_out "${password}"
-	exec > >(tee -a "$LOGFILE") 2>&1
-	 	
+	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -" 	
 	exec > /dev/tty 2>&1
 	echo
  	echo -n "Username: " && msg_out "${username}"
