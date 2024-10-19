@@ -1231,14 +1231,14 @@ data_output() {
 		echo -n "Доступ по ссылке к adguard-home: " && msg_out "https://${domain}/${adguardPath}/login.html"
 	fi
  	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
-	echo -n "Подключение по ssh: " && msg_out "		 ssh -p 36079 ${username}@${IP4}"
+	echo -n "Подключение по ssh: " && msg_out "ssh -p 36079 ${username}@${IP4}"
 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -" 	
- 	echo -n "Username: " && msg_out "			 ${username}"
-	echo -n "Password: " && msg_out "			 ${password}"
+ 	echo -n "Username: " && msg_out "${username}"
+	echo -n "Password: " && msg_out "${password}"
 	echo
 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	echo
- 	echo -n "Путь к лог файлу: " && msg_out "		 $LOGFILE"
+ 	echo -n "Путь к лог файлу: " && msg_out "$LOGFILE"
 	echo
 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	echo
@@ -1246,9 +1246,8 @@ data_output() {
 
 # Удаление всех управляющих последовательностей
 log_clear() {
-    sed -i -e 's/\x1b\[[0-9;]*[a-zA-Z]//g' "$LOGFILE"
+    sed -i -e 's/\x1b\[[0-9;]*[a-zA-Z]//g' ${LOGFILE}
 }
-
 
 ### Первый запуск ###
 main_script_first() {
@@ -1281,10 +1280,10 @@ main_script_repeat() {
 	banner_1
 	start_installation
 	data_entry
-	dns_encryption
-	nginx_setup
-	panel_installation
-	enabling_security
+#	dns_encryption
+#	nginx_setup
+#	panel_installation
+#	enabling_security
 	ssh_setup	
  	data_output
 	banner_1
