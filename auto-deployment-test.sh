@@ -10,7 +10,6 @@ Blue="\033[36m"
 Orange="\033[38;5;214m"
 Font="\e[0m"
 
-
 OK="${Green}[OK]${Font}"
 ERROR="${Red}[!]${Font}"
 QUESTION="${Green}[?]${Font}"
