@@ -1209,6 +1209,7 @@ ssh_setup() {
 	    systemctl restart ssh.service
 	    echo "Настройка SSH завершена."
 	fi
+ 	echo
 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	echo
 }
