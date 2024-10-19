@@ -993,10 +993,10 @@ EOF
 ### UFW ###
 enabling_security() {
 	msg_inf "Настройка ufw"
-	ufw reset
+	ufw --force reset
 	ufw allow 22/tcp
 	ufw allow 443/tcp
-	yes | ufw enable
+	ufw --force enable
 	echo
 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
  	echo
@@ -1036,6 +1036,7 @@ ssh_setup() {
 
 ### Окончание ###
 data_output() {
+	echo
 	msg_err "PLEASE SAVE THIS SCREEN!"
 	printf '0\n' | x-ui | grep --color=never -i ':'
 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
@@ -1046,14 +1047,20 @@ data_output() {
  	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	echo -n "Подключение по ssh: " && msg_out "ssh -p 36079 ${username}@${IP4}"
 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -" 	
-	exec > /dev/tty 2>&1
-	echo
- 	echo -n "Username: " && msg_out "${username}"
-	echo -n "Password: " && msg_out "${password}"
- 	exec > >(tee -a "$LOGFILE") 2>&1
+ 	echo -n "Username: " && msg_out "$username"
+	echo -n "Password: " && msg_out "$password"
 	echo
 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	echo
+ 	echo -n "Путь к лог файлу: " && msg_out "$LOGFILE"
+	echo
+	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+	echo
+}
+
+# Удаление всех управляющих последовательностей
+log_clear() {
+    sed -i -e 's/\x1b\[[0-9;]*[a-zA-Z]//g' "$LOGFILE"
 }
 
 ### Первый запуск ###
@@ -1077,6 +1084,7 @@ main_script_first() {
 	ssh_setup
 	data_output
 	banner_1
+ 	log_clear
 }
 
 ### Повторный запуск ###
@@ -1093,6 +1101,7 @@ main_script_repeat() {
 	ssh_setup	
  	data_output
 	banner_1
+ 	log_clear
 }
 
 ### Проверка запуска ###
