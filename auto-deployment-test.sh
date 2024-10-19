@@ -1207,7 +1207,6 @@ ssh_setup() {
 	    sed -i -e "s/#PermitEmptyPasswords/PermitEmptyPasswords/g" -e "s/PermitEmptyPasswords yes/PermitEmptyPasswords no/g" /etc/ssh/sshd_config
 	
 	    systemctl restart ssh.service
-	    msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	    echo "Настройка SSH завершена."
 	fi
 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
@@ -1251,8 +1250,8 @@ main_script_first() {
 	nginx_setup
 	panel_installation
 	enabling_security
-	data_output
 	ssh_setup
+	data_output
 	banner_1
 }
 
@@ -1267,8 +1266,8 @@ main_script_repeat() {
 	nginx_setup
 	panel_installation
 	enabling_security
-	data_output
-	ssh_setup
+	ssh_setup	
+ 	data_output
 	banner_1
 }
 
