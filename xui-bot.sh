@@ -2,7 +2,7 @@
 
 # Проверка на наличие параметра TOKEN
 TOKEN="$1"
-
+domain="$2"
 # Пример использования токена
 if [[ -z "$TOKEN" ]]; then
     echo "Токен не был передан"
@@ -17,6 +17,11 @@ python3-venv
 # Создание директорий и т.д...
 mkdir -p /usr/local/bot-x-ui/
 python3 -m venv /usr/local/bot-x-ui/xuibotenv
+source /usr/local/bot-x-ui/xuibotenv/bin/activate
+pip install requests
+pip install python-telegram-bot
+deactivate
+
 
 # XUI бот
 cat > /usr/local/bot-x-ui/x-ui-bot.py <<EOF
@@ -197,7 +202,7 @@ async def button_click(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
             [InlineKeyboardButton("🫂User menu", callback_data='user_menu')]
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
-        await query.edit_message_text("🎛Main menu🎛", reply_markup=reply_markup)
+        await query.edit_message_text("🎛$domain🎛", reply_markup=reply_markup)
 
     elif query.data == 'user_menu':
         await show_user_menu(query)
