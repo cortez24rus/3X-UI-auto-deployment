@@ -259,13 +259,28 @@ data_entry() {
 ### Обновление системы и установка пакетов ###
 installation_of_utilities() {
 	msg_inf "Обновление системы и установка необходимых пакетов"
-	apt-get update && apt-get upgrade -y
-	apt-get install -y gnupg2
-	curl -fsSL https://pkg.cloudflareclient.com/pubkey.gpg | gpg --yes --dearmor --output /usr/share/keyrings/cloudflare-warp-archive-keyring.gpg
-	echo "deb [signed-by=/usr/share/keyrings/cloudflare-warp-archive-keyring.gpg] https://pkg.cloudflareclient.com/ $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/cloudflare-client.list	
-	apt-get update && apt-get upgrade -y
-	apt-get install -y git wget sudo nginx-full net-tools apache2-utils gnupg2 sqlite3 curl ufw certbot python3-certbot-dns-cloudflare unattended-upgrades cloudflare-warp systemd-resolved
-	echo
+	apt-get update && apt-get upgrade -y && apt-get install -y gnupg2 \
+ 	wget \
+  	sudo \
+   	nginx-full \
+	net-tools \
+ 	apache2-utils \
+  	gnupg2 \
+   	sqlite3 \
+    	curl \
+     	ufw \
+      	certbot \
+	python3-certbot-dns-cloudflare \
+ 	unattended-upgrades
+ 	
+  	curl -fsSL https://pkg.cloudflareclient.com/pubkey.gpg | gpg --yes --dearmor --output /usr/share/keyrings/cloudflare-warp-archive-keyring.gpg
+	echo "deb [signed-by=/usr/share/keyrings/cloudflare-warp-archive-keyring.gpg] https://pkg.cloudflareclient.com/ $(grep "VERSION_CODENAME=" /etc/os-release | cut -d "=" -f 2) main" | tee /etc/apt/sources.list.d/cloudflare-client.list
+ 	apt-get update && apt-get upgrade -y
+  	wget https://pkg.cloudflareclient.com/pool/$(grep "VERSION_CODENAME=" /etc/os-release | cut -d "=" -f 2)/main/c/cloudflare-warp/cloudflare-warp_2024.6.497-1_amd64.deb
+    	dpkg -i cloudflare-warp_2024.6.497-1_amd64.deb
+
+ 	apt-get install -y systemd-resolved
+ 	echo
  	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	echo
 }
