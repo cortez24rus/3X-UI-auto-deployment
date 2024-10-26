@@ -22,7 +22,6 @@ pip install requests
 pip install python-telegram-bot
 deactivate
 
-
 # XUI бот
 cat > /usr/local/bot-x-ui/x-ui-bot.py <<EOF
 import sqlite3
@@ -35,7 +34,7 @@ from datetime import datetime, timedelta
 
 # Вводные данные
 DB_PATH = '/etc/x-ui/x-ui.db'
-BOT_ID = '7726630807:AAEb7b_g76gkZdTwnU4idwiRlk_OB72McW8'
+BOT_ID = '$TOKEN'
 
 # Функция для подключения к базе данных
 def get_db_connection():
@@ -189,9 +188,9 @@ async def start_menu(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     if update.message:
-        await update.message.reply_text("🎛theleetworld.ru🎛", reply_markup=reply_markup)
+        await update.message.reply_text("🎛$domain🎛", reply_markup=reply_markup)
     else:
-        await update.callback_query.edit_message_text("🎛theleetworld.ru🎛", reply_markup=reply_markup)
+        await update.callback_query.edit_message_text("🎛$domain🎛", reply_markup=reply_markup)
         
 # Функция для обработки нажатия кнопок
 async def button_click(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
