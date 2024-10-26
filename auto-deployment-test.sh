@@ -268,7 +268,6 @@ data_entry() {
 		msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 		echo
 	fi
- 	sleep 10
 	msg_inf "Введите ключ для регистрации WARP или нажмите Enter для пропуска:"
 	read warpkey
 	echo
