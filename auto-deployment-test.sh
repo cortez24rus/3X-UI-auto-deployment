@@ -263,11 +263,12 @@ data_entry() {
 	echo
     	if check_xuibot "$1"; then
         	msg_inf "Введите токен Telegram бота: "
-		read -p BOT_TOKEN
+		read -p BOTTOKEN
     		echo
 		msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 		echo
 	fi
+ 	sleep 10
 	msg_inf "Введите ключ для регистрации WARP или нажмите Enter для пропуска:"
 	read warpkey
 	echo
@@ -1278,7 +1279,7 @@ data_output() {
 # Установока xui бота
 install_xuibot() {
 	if [[ "$1" == "-bot" ]]; then
- 		bash <(curl -Ls https://github.com/cortez24rus/3X-UI-auto-deployment/raw/refs/heads/main/xui-bot.sh) BOT_TOKEN
+ 		bash <(curl -Ls https://github.com/cortez24rus/3X-UI-auto-deployment/raw/refs/heads/main/xui-bot.sh) BOTTOKEN
 	fi
 }
 
