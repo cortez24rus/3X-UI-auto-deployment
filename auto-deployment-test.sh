@@ -23,6 +23,16 @@ function msg_tilda()	{ echo -e "${Orange}$1${Font}"; }
 
 exec > >(tee -a "$LOGFILE") 2>&1
 
+# Функция проверки xuibot
+check_xuibot() {
+    # Если был передан параметр -bot, возвращаем true
+    if [[ "$1" == "-bot" ]]; then
+        return 0
+    else
+        return 1
+    fi
+}
+
 ### Продолжение? ###
 answer_input() {
     read -r answer
@@ -251,6 +261,13 @@ data_entry() {
 	echo
 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	echo
+    	if check_xuibot "$1"; then
+        	msg_inf "Введите токен Telegram бота: "
+		read -p BOT_TOKEN
+    		echo
+		msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+		echo
+	fi
 	msg_inf "Введите ключ для регистрации WARP или нажмите Enter для пропуска:"
 	read warpkey
 	echo
@@ -1258,9 +1275,16 @@ data_output() {
 	echo
 }
 
+# Установока xui бота
+install_xuibot() {
+	if [[ "$1" == "-bot" ]]; then
+ 		bash <(curl -Ls https://github.com/cortez24rus/3X-UI-auto-deployment/raw/refs/heads/main/xui-bot.sh) BOT_TOKEN
+	fi
+}
+
 # Удаление всех управляющих последовательностей
 log_clear() {
-    sed -i -e 's/\x1b\[[0-9;]*[a-zA-Z]//g' "$LOGFILE"
+	sed -i -e 's/\x1b\[[0-9;]*[a-zA-Z]//g' "$LOGFILE"
 }
 
 ### Первый запуск ###
@@ -1269,7 +1293,7 @@ main_script_first() {
 	check_root
 	banner_1
 	start_installation
-	data_entry
+	data_entry "$1"
 	installation_of_utilities
 	dns_encryption
 	add_user
@@ -1283,7 +1307,8 @@ main_script_first() {
 	enabling_security
 	ssh_setup
 	data_output
-	banner_1
+	install_xuibot "$1"
+ 	banner_1
 	log_clear
 }
 
@@ -1293,31 +1318,33 @@ main_script_repeat() {
 	check_root
 	banner_1
 	start_installation
-	data_entry
+	data_entry "$1"
 	dns_encryption
 	nginx_setup
 	panel_installation
 	enabling_security
 	ssh_setup	
  	data_output
+  	install_xuibot "$1"
 	banner_1
  	log_clear
 }
 
 ### Проверка запуска ###
 main_choise() {	
+	check_xuibot
  	if [ -f /usr/local/bin/reinstallation_check ]; then
 		clear
   		echo
 		msg_err "Повторная установка скрипта"
 		sleep 2
-		main_script_repeat
+		main_script_repeat "$1"
 		echo
 		exit
 	else
 		clear
-		main_script_first
+		main_script_first "$1"
 	fi
 }
 
-main_choise
+main_choise "$1"
