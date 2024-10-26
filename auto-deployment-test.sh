@@ -263,7 +263,7 @@ data_entry() {
 	echo
     	if check_xuibot "$1"; then
         	msg_inf "Введите токен Telegram бота: "
-		read -p BOTTOKEN
+		read BOT_TOKEN
     		echo
 		msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 		echo
@@ -1279,7 +1279,7 @@ data_output() {
 # Установока xui бота
 install_xuibot() {
 	if [[ "$1" == "-bot" ]]; then
- 		bash <(curl -Ls https://github.com/cortez24rus/3X-UI-auto-deployment/raw/refs/heads/main/xui-bot.sh) BOTTOKEN
+ 		bash <(curl -Ls https://github.com/cortez24rus/3X-UI-auto-deployment/raw/refs/heads/main/xui-bot.sh) BOT_TOKEN
 	fi
 }
 
