@@ -296,7 +296,7 @@ if __name__ == '__main__':
     application = ApplicationBuilder().token(BOT_ID).build()
 
     # Регистрация обработчиков команд и сообщений
-    application.add_handler(CommandHandler("go", start_menu))
+    application.add_handler(CommandHandler("start", start_menu))
     application.add_handler(CallbackQueryHandler(button_click))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, message_handler))
 
