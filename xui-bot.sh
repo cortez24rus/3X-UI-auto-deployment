@@ -156,27 +156,40 @@ def get_users_info():
     cursor.execute("SELECT settings FROM inbounds")
     inbounds = cursor.fetchall()
 
-    user_lines = set()  # Используем set для удаления дубликатов
+    user_traffic = {}  # Используем словарь для хранения трафика пользователей
 
     # Обработка данных
     for inbound in inbounds:
         settings = json.loads(inbound['settings'])
         for client in settings.get('clients', []):
             sub_id = client.get('subId')
+            email = client.get('email')
             if sub_id:
                 # Запрос для получения трафика пользователя
-                cursor.execute("SELECT up, down FROM client_traffics WHERE email = ?", (client.get('email'),))
+                cursor.execute("SELECT up, down FROM client_traffics WHERE email = ?", (email,))
                 traffic = cursor.fetchone()
                 up_traffic = traffic[0] / (1024 ** 3) if traffic and traffic[0] is not None else 0  # в гигабайтах
                 down_traffic = traffic[1] / (1024 ** 3) if traffic and traffic[1] is not None else 0  # в гигабайтах
 
-                # Форматирование ссылки с использованием suburl
-                subscription_link = f"🔗{suburl}{sub_id}" if suburl else f"/{sub_id}"
-
-                # Форматирование вывода
-                user_lines.add(f"👤{sub_id} - ↘️{up_traffic:.2f} GB / ↗️{down_traffic:.2f} GB\n{subscription_link}")
+                # Если sub_id уже есть в словаре, суммируем трафик
+                if sub_id in user_traffic:
+                    user_traffic[sub_id]['up'] += up_traffic
+                    user_traffic[sub_id]['down'] += down_traffic
+                else:
+                    # Иначе добавляем нового пользователя в словарь
+                    user_traffic[sub_id] = {
+                        'up': up_traffic,
+                        'down': down_traffic,
+                        'subscription_link': f"🔗{suburl}{sub_id}" if suburl else f"/{sub_id}"
+                    }
 
     conn.close()  # Закрываем соединение после завершения всех операций
+
+    # Форматируем вывод
+    user_lines = []
+    for sub_id, traffic_info in user_traffic.items():
+        user_lines.append(f"👤{sub_id} - ↘️{traffic_info['up']:.2f} GB / ↗️{traffic_info['down']:.2f} GB\n{traffic_info['subscription_link']}")
+
     return "\n\n".join(user_lines) if user_lines else "No users"
 
 # Функция для обработки команды /start
