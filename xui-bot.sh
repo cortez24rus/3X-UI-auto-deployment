@@ -35,7 +35,7 @@ from datetime import datetime, timedelta
 
 # Вводные данные
 DB_PATH = '/etc/x-ui/x-ui.db'
-BOT_ID = '${TOKEN}'
+BOT_ID = '7726630807:AAEb7b_g76gkZdTwnU4idwiRlk_OB72McW8'
 
 # Функция для подключения к базе данных
 def get_db_connection():
@@ -181,30 +181,24 @@ def get_users_info():
     return "\n\n".join(user_lines) if user_lines else "No users"
 
 # Функция для обработки команды /start
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+async def start_menu(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    # Сразу открываем основное меню
     keyboard = [
-        [InlineKeyboardButton("START", callback_data='open_menu')]
+        [InlineKeyboardButton("📬Inbounds", callback_data='inbounds')],
+        [InlineKeyboardButton("🫂User menu", callback_data='user_menu')]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     if update.message:
-        await update.message.reply_text("Mini XRAY bot", reply_markup=reply_markup)
+        await update.message.reply_text("🎛theleetworld.ru🎛", reply_markup=reply_markup)
     else:
-        await update.callback_query.edit_message_text("Mini XRAY bot", reply_markup=reply_markup)
-
+        await update.callback_query.edit_message_text("🎛theleetworld.ru🎛", reply_markup=reply_markup)
+        
 # Функция для обработки нажатия кнопок
 async def button_click(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     query = update.callback_query
-   
     await query.answer()
-    if query.data == 'open_menu':
-        keyboard = [
-            [InlineKeyboardButton("📬Inbounds", callback_data='inbounds')],
-            [InlineKeyboardButton("🫂User menu", callback_data='user_menu')]
-        ]
-        reply_markup = InlineKeyboardMarkup(keyboard)
-        await query.edit_message_text("🎛$domain🎛", reply_markup=reply_markup)
 
-    elif query.data == 'user_menu':
+    if query.data == 'user_menu':
         await show_user_menu(query)
 
     elif query.data == 'show_users':
@@ -225,7 +219,7 @@ async def button_click(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
                 )]
                 for remark, up, down, enable in remarks
             ]
-            keyboard.append([InlineKeyboardButton("🔙Return", callback_data='open_menu')])
+            keyboard.append([InlineKeyboardButton("🔙Return", callback_data='start_menu')])
             reply_markup = InlineKeyboardMarkup(keyboard)
             await query.edit_message_text("📬Select inbound📬", reply_markup=reply_markup)
         else:
@@ -262,17 +256,19 @@ async def button_click(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     elif query.data.startswith('remove_'):
         subId = query.data.split('_')[1]  # Извлекаем subId из callback_data
         remove_user_from_all_ids(subId)  # Удаляем пользователя из всех inbounds
-
         # Обновляем список пользователей
         users = get_all_users()
         await show_delete_user_menu(query, users)
+
+    elif query.data == 'start_menu':  # Добавьте эту проверку
+        await start_menu(update, context)  # Вернуться в главное меню
 
 async def show_user_menu(query):
     keyboard = [
         [InlineKeyboardButton("✅Add user", callback_data='add_user')],
         [InlineKeyboardButton("❌Delete user", callback_data='delete_user')],
         [InlineKeyboardButton("💵Subscription/📊traffic used", callback_data='show_users')],
-        [InlineKeyboardButton("🔙Return", callback_data='open_menu')]
+        [InlineKeyboardButton("🔙Return", callback_data='start_menu')]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     await query.edit_message_text("🫂User menu🫂", reply_markup=reply_markup)
@@ -301,7 +297,7 @@ if __name__ == '__main__':
     application = ApplicationBuilder().token(BOT_ID).build()
 
     # Регистрация обработчиков команд и сообщений
-    application.add_handler(CommandHandler("start", start))
+    application.add_handler(CommandHandler("go", start_menu))
     application.add_handler(CallbackQueryHandler(button_click))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, message_handler))
 
