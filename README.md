@@ -44,7 +44,7 @@
 Для настройки сервера запустите эту команду:
 
 ```
-bash <(curl -Ls https://github.com/cortez24rus/3X-UI-auto-deployment/raw/main/3x-ui-server.sh)
+bash <(curl -Ls https://github.com/cortez24rus/3X-UI-auto-deployment/raw/main/install_server.sh)
 ```
 
 Затем введите необходимую информацию:
