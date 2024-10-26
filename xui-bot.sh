@@ -1,14 +1,13 @@
 #!/bin/bash
 
 # Проверка на наличие параметра TOKEN
-if [ -z "$1" ]; then
-    echo "Ошибка: Пожалуйста, передайте TOKEN как параметр."
-    echo "Использование: $0 <TOKEN>"
+TOKEN="$1"
+
+# Пример использования токена
+if [[ -z "$TOKEN" ]]; then
+    echo "Токен не был передан"
     exit 1
 fi
-
-# Установка параметра TOKEN
-TOKEN="$1"
 
 # Установка пакетов
 apt-get update && apt-get install -y python3 \
@@ -335,6 +334,3 @@ EOF
 systemctl daemon-reload
 systemctl start xuibot.service
 systemctl enable xuibot.service
-
-
-
