@@ -2,7 +2,8 @@
 
 # Проверка на наличие параметра TOKEN
 TOKEN="$1"
-domain="$2"
+UID="$2"
+domain="$3"
 # Пример использования токена
 if [[ -z "$TOKEN" ]]; then
     echo "Токен не был передан"
@@ -194,6 +195,12 @@ def get_users_info():
 
 # Функция для обработки команды /start
 async def start_menu(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    user_id = update.message.from_user.id if update.message else update.callback_query.from_user.id
+
+    # Проверяем, является ли пользователь администратором
+    if user_id != $UID:
+        await (update.message.reply_text("Access denied") if update.message else update.callback_query.edit_message_text("Access denied"))
+        return
     # Сразу открываем основное меню
     keyboard = [
         [InlineKeyboardButton("📬Inbounds", callback_data='inbounds')],
@@ -208,7 +215,9 @@ async def start_menu(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
 # Функция для обработки нажатия кнопок
 async def button_click(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     query = update.callback_query
-    await query.answer()
+    if query.from_user.id != $UID:
+        await query.answer("Access denied", show_alert=True)
+        return
 
     if query.data == 'user_menu':
         await show_user_menu(query)
