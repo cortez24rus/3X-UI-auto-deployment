@@ -149,7 +149,6 @@ validate_input() {
 check_cf_token() {
     while true; do
         while [[ -z $domain ]]; do
-            echo
             msg_inf "Введите ваш домен:"
             read domain
             echo
