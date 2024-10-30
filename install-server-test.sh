@@ -268,7 +268,7 @@ data_entry() {
 		msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 		echo
   		msg_inf "Введите ваш Telegram ID:"
-    		read UID
+    		read AID
     		echo
       		msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 		echo
@@ -1282,7 +1282,7 @@ data_output() {
 # Установока xui бота
 install_xuibot() {
 	if [[ "$1" == "-bot" ]]; then
- 		bash <(curl -Ls https://github.com/cortez24rus/3X-UI-auto-deployment/raw/refs/heads/main/xui-bot.sh) "$BOT_TOKEN" "$UID" "$domain"
+ 		bash <(curl -Ls https://github.com/cortez24rus/3X-UI-auto-deployment/raw/refs/heads/main/xui-bot.sh) "$BOT_TOKEN" "$AID" "$domain"
 	fi
 }
 
