@@ -1256,7 +1256,6 @@ ssh_setup() {
 
 ### Окончание ###
 data_output() {
-	echo
 	msg_err "PLEASE SAVE THIS SCREEN!"
 	printf '0\n' | x-ui | grep --color=never -i ':'
 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
