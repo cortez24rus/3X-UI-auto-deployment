@@ -2,7 +2,7 @@
 
 # Проверка на наличие параметра TOKEN
 TOKEN="$1"
-UID="$2"
+AID="$2"
 domain="$3"
 # Пример использования токена
 if [[ -z "$TOKEN" ]]; then
@@ -198,7 +198,7 @@ async def start_menu(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
     user_id = update.message.from_user.id if update.message else update.callback_query.from_user.id
 
     # Проверяем, является ли пользователь администратором
-    if user_id != $UID:
+    if user_id != ${AID}:
         await (update.message.reply_text("Access denied") if update.message else update.callback_query.edit_message_text("Access denied"))
         return
     # Сразу открываем основное меню
@@ -215,7 +215,7 @@ async def start_menu(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
 # Функция для обработки нажатия кнопок
 async def button_click(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     query = update.callback_query
-    if query.from_user.id != $UID:
+    if query.from_user.id != ${AID}:
         await query.answer("Access denied", show_alert=True)
         return
 
