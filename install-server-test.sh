@@ -654,7 +654,6 @@ disable_ipv6() {
 ### WARP ###
 warp() {
 	msg_inf "Настройка warp"
- 	echo
   	yes | warp-cli registration new
 	warp-cli mode proxy
 	warp-cli connect
@@ -720,6 +719,11 @@ events {
 }
 
 http {
+#        log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                          '$status $body_bytes_sent "$http_referer" '
+                          '"$http_user_agent" "$http_x_forwarded_for"';
+
+#        access_log  /var/log/nginx/access.log  main;
 	sendfile                      on;
 	tcp_nopush                    on;
 	tcp_nodelay                   on;
@@ -754,7 +758,6 @@ http {
 	resolver                      1.1.1.1 valid=60s;
 	resolver_timeout              2s;
 
-	# access_log /var/log/nginx/access.log;
 	gzip                          on;
 
 	include /etc/nginx/conf.d/*.conf;
@@ -768,17 +771,23 @@ EOF
 
 stream_conf() {
 	cat > /etc/nginx/stream-enabled/stream.conf <<EOF
+map $ssl_preread_protocol $backend {
+        default $https;
+        "" ssh;
+}
 map \$ssl_preread_server_name \$backend {
-	${reality}                reality;
-	${reality2}         reality2;
-	www.${domain}  trojan;
+	cg.${domain}   cg;
+ 	${reality}     reality;
+	${reality2}    reality2;
+	www.${domain}  xtls;
 	${domain}      web;
 }
+upstream cg              { server 127.0.0.1:2053; }
 upstream reality         { server 127.0.0.1:7443; }
 upstream reality2        { server 127.0.0.1:8443; }
-upstream trojan          { server 127.0.0.1:9443; }
+upstream xtls            { server 127.0.0.1:9443; }
+upstream ssh             { server 127.0.0.1:36079; }
 upstream web             { server 127.0.0.1:46076; }
-upstream ssh             { server 127.0.0.1:22; }
 
 server {
 	listen 443           reuseport;
@@ -790,6 +799,15 @@ EOF
 
 local_conf() {
 	cat > /etc/nginx/conf.d/local.conf <<EOF
+ server {
+        listen 9090 default_server;
+        root /var/www/html;
+        index index.html index.htm index.nginx-debian.html;
+        server_name _;
+        location / {
+                try_files $uri $uri/ =404;
+        }
+}
 # Main
 server {
 	listen                      46076 ssl default_server;
@@ -812,9 +830,10 @@ server {
 	add_header X-XSS-Protection          "1; mode=block" always;
 	add_header X-Content-Type-Options    "nosniff" always;
 	add_header Referrer-Policy           "no-referrer-when-downgrade" always;
-	add_header Content-Security-Policy   "default-src https:; script-src https: 'unsafe-inline' 'unsafe-eval'; style-src https: 'unsafe-inline';" always;
+#	add_header Content-Security-Policy   "default-src https:; script-src https: 'unsafe-inline' 'unsafe-eval'; style-src https: 'unsafe-inline';" always;
 	add_header Permissions-Policy        "interest-cohort=()" always;
-	add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+#	add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+ 	add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;
 	add_header X-Frame-Options           "SAMEORIGIN";
 	proxy_hide_header X-Powered-By;
 
