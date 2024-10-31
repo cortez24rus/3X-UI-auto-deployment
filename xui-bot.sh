@@ -8,8 +8,8 @@ fi
 
 rm -rf /usr/local/xui-rp/
 rm -rf /etc/systemd/systemd/xui-rp-bot.service
-systemctl start xui-rp-bot.service
-systemctl enable xui-rp-bot.service
+systemctl disable xui-rp-bot.service 
+systemctl stop xui-rp-bot.service
 systemctl daemon-reload
 
 # Установка пакетов
