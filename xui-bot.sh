@@ -215,7 +215,7 @@ def get_users_info():
     # Форматируем вывод
     user_lines = []
     for sub_id, traffic_info in user_traffic.items():
-        user_lines.append(f"👤 {sub_id} - ↘️ {traffic_info['up']:.2f} GB / ↗️ {traffic_info['down']:.2f} GB\n{traffic_info['subscription_link']}")
+        user_lines.append(f"👤 {sub_id} - 🔼 Upload: {traffic_info['up']:.2f} GB / 🔽 Download {traffic_info['down']:.2f} GB\n{traffic_info['subscription_link']}")
 
     return "\n\n".join(user_lines) if user_lines else "No users"
 
