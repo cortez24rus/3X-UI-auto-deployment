@@ -305,7 +305,7 @@ installation_of_utilities() {
 	curl -fsSL https://pkg.cloudflareclient.com/pubkey.gpg | gpg --yes --dearmor --output /usr/share/keyrings/cloudflare-warp-archive-keyring.gpg
 	echo "deb [signed-by=/usr/share/keyrings/cloudflare-warp-archive-keyring.gpg] https://pkg.cloudflareclient.com/ $(grep "VERSION_CODENAME=" /etc/os-release | cut -d "=" -f 2) main" | tee /etc/apt/sources.list.d/cloudflare-client.list
  	apt-get update && apt-get install cloudflare-warp -y
-  	wget https://pkg.cloudflareclient.com/pool/$(grep "VERSION_CODENAME=" /etc/os-release | cut -d "=" -f 2)/main/c/cloudflare-warp/cloudflare-warp_2024.6.497-1_amd64.deb
+  	wget https://pkg.cloudflareclient.com/pool/$(grep "VERSION_CODENAME=" /etc/os-release | cut -d "=" -f 2)/main/c/cloudflare-warp/cloudflare-warp_2024.6.497-1_amd64.deb > /dev/null 2>&1
     	dpkg -i cloudflare-warp_2024.6.497-1_amd64.deb
 
  	apt-get install -y systemd-resolved
@@ -354,26 +354,19 @@ dns_encryption() {
 dns_systemd_resolved() {
 	cat > /etc/systemd/resolved.conf <<EOF
 [Resolve]
-# Some examples of DNS servers which may be used for DNS= and FallbackDNS=:
-# Cloudflare: 1.1.1.1#cloudflare-dns.com 1.0.0.1#cloudflare-dns.com 2606:4700:4700::1111#cloudflare-dns.com 2606:4700:4700::1001#cloudflare-dns.com
-# Google:     8.8.8.8#dns.google 8.8.4.4#dns.google 2001:4860:4860::8888#dns.google 2001:4860:4860::8844#dns.google
-# Quad9:      9.9.9.9#dns.quad9.net 149.112.112.112#dns.quad9.net 2620:fe::fe#dns.quad9.net 2620:fe::9#dns.quad9.net
-DNS=1.1.1.1
+DNS=1.1.1.1 8.8.8.8 8.8.4.4
 #FallbackDNS=
 Domains=~.
 DNSSEC=yes
 DNSOverTLS=yes
 EOF
+	msg_inf "DNS=1.1.1.1 8.8.8.8 8.8.4.4"
 	systemctl restart systemd-resolved.service
 }
 
 dns_systemd_resolved_for_adguard() {
 	cat > /etc/systemd/resolved.conf <<EOF
 [Resolve]
-# Some examples of DNS servers which may be used for DNS= and FallbackDNS=:
-# Cloudflare: 1.1.1.1#cloudflare-dns.com 1.0.0.1#cloudflare-dns.com 2606:4700:4700::1111#cloudflare-dns.com 2606:4700:4700::1001#cloudflare-dns.com
-# Google:     8.8.8.8#dns.google 8.8.4.4#dns.google 2001:4860:4860::8888#dns.google 2001:4860:4860::8844#dns.google
-# Quad9:      9.9.9.9#dns.quad9.net 149.112.112.112#dns.quad9.net 2620:fe::fe#dns.quad9.net 2620:fe::9#dns.quad9.net
 DNS=127.0.0.1
 #FallbackDNS=
 #Domains=
@@ -720,8 +713,8 @@ events {
 
 http {
 #        log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
-                          '$status $body_bytes_sent "$http_referer" '
-                          '"$http_user_agent" "$http_x_forwarded_for"';
+#                          '$status $body_bytes_sent "$http_referer" '
+#                          '"$http_user_agent" "$http_x_forwarded_for"';
 
 #        access_log  /var/log/nginx/access.log  main;
 	sendfile                      on;
@@ -801,11 +794,9 @@ local_conf() {
 	cat > /etc/nginx/conf.d/local.conf <<EOF
  server {
         listen 9090 default_server;
-        root /var/www/html;
-        index index.html index.htm index.nginx-debian.html;
         server_name _;
         location / {
-                try_files $uri $uri/ =404;
+		return 301  https://${domain}\$request_uri;
         }
 }
 # Main
@@ -832,7 +823,6 @@ server {
 	add_header Referrer-Policy           "no-referrer-when-downgrade" always;
 #	add_header Content-Security-Policy   "default-src https:; script-src https: 'unsafe-inline' 'unsafe-eval'; style-src https: 'unsafe-inline';" always;
 	add_header Permissions-Policy        "interest-cohort=()" always;
-#	add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
  	add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;
 	add_header X-Frame-Options           "SAMEORIGIN";
 	proxy_hide_header X-Powered-By;
@@ -948,6 +938,7 @@ panel_installation() {
 	rm -rf /etc/x-ui/x-ui.db
 	mv x-ui.db /etc/x-ui/
 	x-ui start
+ 	echo -e "20\n1" | x-ui > /dev/null 2>&1
  	echo
 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	echo
@@ -1231,6 +1222,7 @@ enabling_security() {
 	ufw --force reset
 	ufw limit 36079/tcp
 	ufw allow 443/tcp
+ 	ufw allow 80/tcp
  	ufw limit 22/tcp
 	ufw insert 1 deny from $(echo ${IP4} | cut -d '.' -f 1-3).0/22
 	ufw --force enable
