@@ -352,27 +352,17 @@ if __name__ == '__main__':
     application.run_polling()
 EOF
 
-# Запуск xui бота
-cat > /usr/local/xui-rp/start-xui-rp-bot.sh <<EOF
-#!/bin/bash
-source /usr/local/xui-rp/xui-rp-botenv/bin/activate
-python /usr/local/xui-rp/xui-rp-bot.py
-EOF
-
-# Даем права на выполнение скрипта
-chmod +x /usr/local/xui-rp/start-xui-rp-bot.sh
-
 # Демон xui бота
 cat > /etc/systemd/system/xui-rp-bot.service <<EOF
 [Unit]
-Description=XRay Telegram Bot
+Description=Xui Telegram Bot
 After=network.target
 
 [Service]
 Type=simple
 User=root
 WorkingDirectory=/usr/local/xui-rp/
-ExecStart=/usr/local/xui-rp/start-xui-rp-bot.sh
+ExecStart=/usr/local/xui-rp/xui-rp-botenv/bin/python /usr/local/xui-rp/xui-rp-bot.py
 Restart=on-failure
 
 [Install]
