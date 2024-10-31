@@ -215,9 +215,27 @@ def get_users_info():
     # Форматируем вывод
     user_lines = []
     for sub_id, traffic_info in user_traffic.items():
-        user_lines.append(f"👤 {sub_id} - 🔼 Up: {traffic_info['up']:.2f} GB / 🔽 Down {traffic_info['down']:.2f} GB\n{traffic_info['subscription_link']}")
+        user_lines.append(f"👤 {sub_id} - 🔼 Upload: {traffic_info['up']:.2f} GB / 🔽 Download {traffic_info['down']:.2f} GB\n{traffic_info['subscription_link']}")
 
     return "\n\n".join(user_lines) if user_lines else "No users"
+
+def calculate_total_traffic():
+    connection = sqlite3.connect(DB_PATH)
+    cursor = connection.cursor()
+
+    cursor.execute("SELECT up, down FROM inbounds")
+    total_up = total_down = 0
+
+    for up, down in cursor.fetchall():
+        total_up += up
+        total_down += down
+
+    connection.close()
+    # Переводим значения в гигабайты
+    total_up_gb = total_up / (1024 ** 3)
+    total_down_gb = total_down / (1024 ** 3)
+
+    return total_up_gb, total_down_gb
 
 # Функция для обработки команды /start
 async def start_menu(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -254,11 +272,13 @@ async def button_click(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
             [InlineKeyboardButton("🔙 Return", callback_data='user_menu')]
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
-        await query.edit_message_text(text=users_info, reply_markup=reply_markup)
+        await query.edit_message_text(text=f"🚦 Traffic / 💵 Subscription\n\n{users_info}", reply_markup=reply_markup)
 
     elif query.data == 'inbounds':
+        total_up, total_down = calculate_total_traffic()
         remarks = get_inbounds_remarks()
         if remarks:
+            header = f"📬 Inbounds 📬\n🔼 Total Upload: {total_up:.2f} GB / 🔽 Total Download: {total_down:.2f} GB\n"
             keyboard = [
                 [InlineKeyboardButton(
                     f"{remark} - {up / (1024 ** 3):.2f} GB / {down / (1024 ** 3):.2f} GB - {'🟢' if enable == 1 else '🔴'}",
@@ -268,7 +288,7 @@ async def button_click(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
             ]
             keyboard.append([InlineKeyboardButton("🔙 Return", callback_data='start_menu')])
             reply_markup = InlineKeyboardMarkup(keyboard)
-            await query.edit_message_text("📬 Select inbound 📬", reply_markup=reply_markup)
+            await query.edit_message_text(header, reply_markup=reply_markup)
         else:
             await query.edit_message_text("No inbounds available")
 
@@ -285,6 +305,7 @@ async def button_click(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         keyboard.append([InlineKeyboardButton("🔙 Return", callback_data='inbounds')])
         reply_markup = InlineKeyboardMarkup(keyboard)
         await query.edit_message_text("Select inbound", reply_markup=reply_markup)
+
     elif query.data in (remark for remark, _, _, _ in get_inbounds_remarks()):
         new_enable_value = toggle_enable(query.data)
         await button_click(update, context)  # Обновляем интерфейс, повторно вызывая функцию
@@ -314,7 +335,7 @@ async def show_user_menu(query):
     keyboard = [
         [InlineKeyboardButton("✅ Add user", callback_data='add_user')],
         [InlineKeyboardButton("❌ Delete user", callback_data='delete_user')],
-        [InlineKeyboardButton("💵 Subscription / 🚦 Traffic", callback_data='show_users')],
+        [InlineKeyboardButton("🚦 Traffic / 💵 Subscription", callback_data='show_users')],
         [InlineKeyboardButton("🔙 Return", callback_data='start_menu')]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
