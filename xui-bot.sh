@@ -78,7 +78,7 @@ def get_all_users():
 
 # Функция для добавления пользователя
 def add_user_to_all_ids(name):
-    all_ids = get_all_ids()
+    all_ids = get_all_ids()  # Предполагается, что эта функция возвращает все id и соответствующие настройки
 
     for id, settings in all_ids:
         # Получаем remark для текущего id
@@ -94,8 +94,11 @@ def add_user_to_all_ids(name):
         # Генерируем уникальный UUID для id
         new_id = str(uuid.uuid4())
 
-        # Получаем текущее время и добавляем два дня
-        expiry_time = int((datetime.now() + timedelta(days=2)).timestamp() * 1000)
+        # Округляем до следующего часа
+        next_hour = (datetime.now() + timedelta(hours=1)).replace(minute=0, second=0, microsecond=0)
+
+        # Добавляем два дня к следующему часу
+        expiry_time = int((next_hour + timedelta(days=2)).timestamp() * 1000)
 
         new_client = {
             "id": new_id,  # Генерируем уникальный id
@@ -111,9 +114,19 @@ def add_user_to_all_ids(name):
         }
 
         settings['clients'].append(new_client)
+
+        # Обновляем настройки в таблице inbounds
         conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
         cursor.execute("UPDATE inbounds SET settings = ? WHERE id = ?", (json.dumps(settings), id))
+        conn.commit()
+
+        # Добавляем нового клиента в таблицу client_traffics
+        cursor.execute('''
+            INSERT INTO client_traffics (inbound_id, enable, email, up, down, expiry_time, total, reset)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        ''', (id, 1, email, 0, 0, expiry_time, 0, 30))  # Замените значения по необходимости
+
         conn.commit()
         conn.close()
 
@@ -136,13 +149,22 @@ def toggle_enable(remark):
 # Функция для удаления пользователя по subId
 def remove_user_from_all_ids(subId):
     all_ids = get_all_ids()
+    
     for id, settings in all_ids:
         # Фильтруем клиентов, исключая удаляемого
+        clients_to_remove = [client for client in settings['clients'] if client['subId'] == subId]
         settings['clients'] = [client for client in settings['clients'] if client['subId'] != subId]
 
-        # Обновление базы данных
+        # Удаляем пользователей из client_traffics
         conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
+
+        # Удаляем записи из client_traffics по email
+        for client in clients_to_remove:
+            email = client['email']
+            cursor.execute("DELETE FROM client_traffics WHERE email = ?", (email,))
+        
+        # Обновляем inbounds
         cursor.execute("UPDATE inbounds SET settings = ? WHERE id = ?", (json.dumps(settings), id))
         conn.commit()
         conn.close()
