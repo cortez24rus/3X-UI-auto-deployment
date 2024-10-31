@@ -6,21 +6,27 @@ if [[ -z "$1" ]]; then
     exit 1
 fi
 
+rm -rf /usr/local/xui-rp/
+rm -rf /etc/systemd/systemd/xui-rp-bot.service
+systemctl start xui-rp-bot.service
+systemctl enable xui-rp-bot.service
+systemctl daemon-reload
+
 # Установка пакетов
 apt-get update && apt-get install -y python3 \
 python3-pip \
 python3-venv
 
 # Создание директорий и т.д...
-mkdir -p /usr/local/bot-x-ui/
-python3 -m venv /usr/local/bot-x-ui/xuibotenv
-source /usr/local/bot-x-ui/xuibotenv/bin/activate
+mkdir -p /usr/local/xui-rp/
+python3 -m venv /usr/local/xui-rp/xui-rp-botenv
+source /usr/local/xui-rp/xui-rp-botenv/bin/activate
 pip install requests
 pip install python-telegram-bot
 deactivate
 
 # XUI бот
-cat > /usr/local/bot-x-ui/x-ui-bot.py <<EOF
+cat > /usr/local/xui-rp/xui-rp-bot.py <<EOF
 import sqlite3
 import json
 import uuid
@@ -325,17 +331,17 @@ if __name__ == '__main__':
 EOF
 
 # Запуск xui бота
-cat > /usr/local/bot-x-ui/start-x-ui-bot.sh <<EOF
+cat > /usr/local/xui-rp/start-xui-rp-bot.sh <<EOF
 #!/bin/bash
-source /usr/local/bot-x-ui/xuibotenv/bin/activate
-python /usr/local/bot-x-ui/x-ui-bot.py
+source /usr/local/xui-rp/xui-rp-botenv/bin/activate
+python /usr/local/xui-rp/xui-rp-bot.py
 EOF
 
 # Даем права на выполнение скрипта
-chmod +x /usr/local/bot-x-ui/start-x-ui-bot.sh
+chmod +x /usr/local/xui-rp/start-xui-rp-bot.sh
 
 # Демон xui бота
-cat > /etc/systemd/system/xuibot.service <<EOF
+cat > /etc/systemd/system/xui-rp-bot.service <<EOF
 [Unit]
 Description=XRay Telegram Bot
 After=network.target
@@ -343,8 +349,8 @@ After=network.target
 [Service]
 Type=simple
 User=root
-WorkingDirectory=/usr/local/bot-x-ui/
-ExecStart=/usr/local/bot-x-ui/start-x-ui-bot.sh
+WorkingDirectory=/usr/local/xui-rp/
+ExecStart=/usr/local/xui-rp/start-xui-rp-bot.sh
 Restart=on-failure
 
 [Install]
@@ -352,5 +358,5 @@ WantedBy=multi-user.target
 EOF
 
 systemctl daemon-reload
-systemctl start xuibot.service
-systemctl enable xuibot.service
+systemctl start xui-rp-bot.service
+systemctl enable xui-rp-bot.service
