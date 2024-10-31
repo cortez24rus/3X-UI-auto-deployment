@@ -1,11 +1,7 @@
 #!/bin/bash
 
-# Проверка на наличие параметра TOKEN
-TOKEN="$1"
-AID="$2"
-domain="$3"
 # Пример использования токена
-if [[ -z "$TOKEN" ]]; then
+if [[ -z "$1" ]]; then
     echo "Токен не был передан"
     exit 1
 fi
@@ -35,7 +31,9 @@ from datetime import datetime, timedelta
 
 # Вводные данные
 DB_PATH = '/etc/x-ui/x-ui.db'
-BOT_ID = '$TOKEN'
+BOT_TOKEN = '$1'
+BOT_AID = '$2'
+NAME_MENU = '$3'
 
 # Функция для подключения к базе данных
 def get_db_connection():
@@ -198,7 +196,7 @@ async def start_menu(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
     user_id = update.message.from_user.id if update.message else update.callback_query.from_user.id
 
     # Проверяем, является ли пользователь администратором
-    if user_id != ${AID}:
+    if user_id != BOT_AID:
         await (update.message.reply_text("Access denied") if update.message else update.callback_query.edit_message_text("Access denied"))
         return
     # Сразу открываем основное меню
@@ -208,14 +206,14 @@ async def start_menu(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     if update.message:
-        await update.message.reply_text("🎛$domain🎛", reply_markup=reply_markup)
+        await update.message.reply_text("🎛$NAME_MENU🎛", reply_markup=reply_markup)
     else:
-        await update.callback_query.edit_message_text("🎛$domain🎛", reply_markup=reply_markup)
+        await update.callback_query.edit_message_text("🎛$NAME_MENU🎛", reply_markup=reply_markup)
         
 # Функция для обработки нажатия кнопок
 async def button_click(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     query = update.callback_query
-    if query.from_user.id != ${AID}:
+    if query.from_user.id != BOT_AID:
         await query.answer("Access denied", show_alert=True)
         return
 
@@ -315,7 +313,7 @@ async def message_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         context.user_data['action'] = None
 
 if __name__ == '__main__':
-    application = ApplicationBuilder().token(BOT_ID).build()
+    application = ApplicationBuilder().token(BOT_TOKEN).build()
 
     # Регистрация обработчиков команд и сообщений
     application.add_handler(CommandHandler("start", start_menu))
