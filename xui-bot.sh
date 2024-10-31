@@ -8,9 +8,9 @@ fi
 
 rm -rf /usr/local/xui-rp/
 rm -rf /etc/systemd/systemd/xui-rp-bot.service
-systemctl disable xui-rp-bot.service 
-systemctl stop xui-rp-bot.service
-systemctl daemon-reload
+systemctl disable xui-rp-bot.service >/dev/null
+systemctl stop xui-rp-bot.service >/dev/null
+systemctl daemon-reload >/dev/null
 
 # Установка пакетов
 apt-get update && apt-get install -y python3 \
@@ -38,8 +38,8 @@ from datetime import datetime, timedelta
 # Вводные данные
 DB_PATH = '/etc/x-ui/x-ui.db'
 BOT_TOKEN = '$1'
-BOT_AID = '$2'
-NAME_MENU = '$3'
+BOT_AID = $2
+NAME_MENU = "🎛 $3 🎛"
 
 # Функция для подключения к базе данных
 def get_db_connection():
@@ -212,9 +212,9 @@ async def start_menu(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     if update.message:
-        await update.message.reply_text("🎛$NAME_MENU🎛", reply_markup=reply_markup)
+        await update.message.reply_text(NAME_MENU, reply_markup=reply_markup)
     else:
-        await update.callback_query.edit_message_text("🎛$NAME_MENU🎛", reply_markup=reply_markup)
+        await update.callback_query.edit_message_text(NAME_MENU, reply_markup=reply_markup)
         
 # Функция для обработки нажатия кнопок
 async def button_click(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
