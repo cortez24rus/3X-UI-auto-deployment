@@ -207,7 +207,7 @@ def get_users_info():
                     user_traffic[sub_id] = {
                         'up': up_traffic,
                         'down': down_traffic,
-                        'subscription_link': f"🔗{suburl}{sub_id}" if suburl else f"/{sub_id}"
+                        'subscription_link': f"🔗 {suburl}{sub_id}" if suburl else f"/{sub_id}"
                     }
 
     conn.close()  # Закрываем соединение после завершения всех операций
@@ -215,7 +215,7 @@ def get_users_info():
     # Форматируем вывод
     user_lines = []
     for sub_id, traffic_info in user_traffic.items():
-        user_lines.append(f"👤{sub_id} - ↘️{traffic_info['up']:.2f} GB / ↗️{traffic_info['down']:.2f} GB\n{traffic_info['subscription_link']}")
+        user_lines.append(f"👤 {sub_id} - ↘️ {traffic_info['up']:.2f} GB / ↗️ {traffic_info['down']:.2f} GB\n{traffic_info['subscription_link']}")
 
     return "\n\n".join(user_lines) if user_lines else "No users"
 
@@ -229,8 +229,8 @@ async def start_menu(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
         return
     # Сразу открываем основное меню
     keyboard = [
-        [InlineKeyboardButton("📬Inbounds", callback_data='inbounds')],
-        [InlineKeyboardButton("🫂User menu", callback_data='user_menu')]
+        [InlineKeyboardButton("📬 Inbounds", callback_data='inbounds')],
+        [InlineKeyboardButton("🫂 User menu", callback_data='user_menu')]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     if update.message:
@@ -251,7 +251,7 @@ async def button_click(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     elif query.data == 'show_users':
         users_info = get_users_info()
         keyboard = [
-            [InlineKeyboardButton("🔙Return", callback_data='user_menu')]
+            [InlineKeyboardButton("🔙 Return", callback_data='user_menu')]
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
         await query.edit_message_text(text=users_info, reply_markup=reply_markup)
@@ -266,9 +266,9 @@ async def button_click(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
                 )]
                 for remark, up, down, enable in remarks
             ]
-            keyboard.append([InlineKeyboardButton("🔙Return", callback_data='start_menu')])
+            keyboard.append([InlineKeyboardButton("🔙 Return", callback_data='start_menu')])
             reply_markup = InlineKeyboardMarkup(keyboard)
-            await query.edit_message_text("📬Select inbound📬", reply_markup=reply_markup)
+            await query.edit_message_text("📬 Select inbound 📬", reply_markup=reply_markup)
         else:
             await query.edit_message_text("No inbounds available")
 
@@ -282,7 +282,7 @@ async def button_click(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
             )]
             for remark, up, down, enable in remarks
         ]
-        keyboard.append([InlineKeyboardButton("🔙Return", callback_data='inbounds')])
+        keyboard.append([InlineKeyboardButton("🔙 Return", callback_data='inbounds')])
         reply_markup = InlineKeyboardMarkup(keyboard)
         await query.edit_message_text("Select inbound", reply_markup=reply_markup)
     elif query.data in (remark for remark, _, _, _ in get_inbounds_remarks()):
@@ -312,13 +312,13 @@ async def button_click(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
 
 async def show_user_menu(query):
     keyboard = [
-        [InlineKeyboardButton("✅Add user", callback_data='add_user')],
-        [InlineKeyboardButton("❌Delete user", callback_data='delete_user')],
-        [InlineKeyboardButton("💵Subscription/📊traffic used", callback_data='show_users')],
-        [InlineKeyboardButton("🔙Return", callback_data='start_menu')]
+        [InlineKeyboardButton("✅ Add user", callback_data='add_user')],
+        [InlineKeyboardButton("❌ Delete user", callback_data='delete_user')],
+        [InlineKeyboardButton("💵 Subscription / 🚦 Traffic", callback_data='show_users')],
+        [InlineKeyboardButton("🔙 Return", callback_data='start_menu')]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
-    await query.edit_message_text("🫂User menu🫂", reply_markup=reply_markup)
+    await query.edit_message_text("🫂 User menu 🫂", reply_markup=reply_markup)
 
 async def show_delete_user_menu(query, users):
     keyboard = []
@@ -328,9 +328,9 @@ async def show_delete_user_menu(query, users):
             keyboard.append([InlineKeyboardButton(user, callback_data=f'remove_{user}')])
         else:
             keyboard[-1].append(InlineKeyboardButton(user, callback_data=f'remove_{user}'))
-    keyboard.append([InlineKeyboardButton("🔙Return", callback_data='user_menu')])
+    keyboard.append([InlineKeyboardButton("🔙 Return", callback_data='user_menu')])
     reply_markup = InlineKeyboardMarkup(keyboard)
-    await query.edit_message_text("❌Select the user to delete❌", reply_markup=reply_markup)
+    await query.edit_message_text("❌ Select the user to delete ❌", reply_markup=reply_markup)
 
 async def message_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     action = context.user_data.get('action')
