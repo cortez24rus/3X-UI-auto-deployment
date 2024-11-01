@@ -6,14 +6,14 @@ if [[ -z "$1" ]]; then
     exit 1
 fi
 
+# Установка пакетов
+apt-get update && apt-get install -y python3 python3-pip python3-venv
+
 rm -rf /usr/local/xui-rp/
 rm -rf /etc/systemd/systemd/xui-rp-bot.service
 systemctl disable xui-rp-bot.service >/dev/null
 systemctl stop xui-rp-bot.service >/dev/null
 systemctl daemon-reload >/dev/null
-
-# Установка пакетов
-apt-get update && apt-get install -y python3 python3-pip python3-venv
 
 # Создание директорий и т.д...
 mkdir -p /usr/local/xui-rp/
