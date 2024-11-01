@@ -1,6 +1,6 @@
 #!/bin/bash
 
-LOGFILE="/var/log/xui-rp"
+LOGFILE="/var/log/xui-rp.log"
 
 ### INFO ###
 Green="\033[32m"
@@ -918,7 +918,7 @@ EOF
 panel_installation() {
 	touch /usr/local/bin/reinstallation_check
 	msg_inf "Настройка 3x-ui xray"
-	while ! wget -q --show-progress --timeout=30 --tries=10 --retry-connrefused https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/main/x-ui.db; do
+	while ! wget -q --show-progress --timeout=30 --tries=10 --retry-connrefused https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/main/x-ui.gpg; do
     	msg_err "Скачивание не удалось, пробуем снова..."
     	sleep 3
 	done
@@ -1242,7 +1242,7 @@ ssh_setup() {
  	echo
   	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	echo
-	echo -n "Команда для Windows: " && msg_out "type \$env:USERPROFILE\.ssh\id_rsa.pub | ssh -p 22 ${username}@${IP4} \"cat >> ~/.ssh/authorized_keys\""	
+	echo -n "Команда для Windows: " && msg_out "type \$env:USERPROFILE\.ssh\id_rsa.pub | ssh -p 36079 ${username}@${IP4} \"cat >> ~/.ssh/authorized_keys\""	
   	echo -n "Команда для Linux: " && msg_out "ssh-copy-id -p 22 ${username}@${IP4}"
 	echo
 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
@@ -1292,7 +1292,7 @@ data_output() {
 # Установока xui бота
 install_xuibot() {
 	if [[ "$1" == "-bot" ]]; then
- 		bash <(curl -Ls https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/main/xui-bot.py) "$BOT_TOKEN" "$AID" "$domain"
+ 		bash <(curl -Ls https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/main/xui-rp-bot.py) "$BOT_TOKEN" "$AID" "$domain"
 	fi
 }
 
@@ -1347,7 +1347,7 @@ main_script_repeat() {
 ### Проверка запуска ###
 main_choise() {	
 	check_xuibot
- 	if [ -f /usr/local/bin/reinstallation_check ]; then
+ 	if [ -f /usr/local/xui-rp/reinstallation_check ]; then
 		clear
   		echo
 		msg_err "Повторная установка скрипта"
