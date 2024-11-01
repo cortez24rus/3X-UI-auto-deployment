@@ -42,7 +42,7 @@
 Для настройки сервера запустите эту команду:
 
 ```
-bash <(curl -Ls https://github.com/cortez24rus/3X-UI-auto-deployment/raw/refs/heads/main/install-server.sh)
+bash <(curl -Ls https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/main/xui-rp-install.sh)
 ```
 
 Затем введите необходимую информацию:
