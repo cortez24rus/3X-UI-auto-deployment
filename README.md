@@ -1,4 +1,4 @@
-# 3X-UI-XRAY-NGINX
+# XUI-REVERSE-PROXY
 
 -----
 
