@@ -1,6 +1,6 @@
 #!/bin/bash
 
-LOGFILE="/var/log/3X-UI-auto-deployment.log"
+LOGFILE="/var/log/xui-rp"
 
 ### INFO ###
 Green="\033[32m"
@@ -918,7 +918,7 @@ EOF
 panel_installation() {
 	touch /usr/local/bin/reinstallation_check
 	msg_inf "Настройка 3x-ui xray"
-	while ! wget -q --show-progress --timeout=30 --tries=10 --retry-connrefused https://github.com/cortez24rus/3X-UI-auto-deployment/raw/main/x-ui.gpg; do
+	while ! wget -q --show-progress --timeout=30 --tries=10 --retry-connrefused https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/main/x-ui.db; do
     	msg_err "Скачивание не удалось, пробуем снова..."
     	sleep 3
 	done
@@ -1292,7 +1292,7 @@ data_output() {
 # Установока xui бота
 install_xuibot() {
 	if [[ "$1" == "-bot" ]]; then
- 		bash <(curl -Ls https://github.com/cortez24rus/3X-UI-auto-deployment/raw/refs/heads/main/xui-bot.sh) "$BOT_TOKEN" "$AID" "$domain"
+ 		bash <(curl -Ls https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/main/xui-bot.py) "$BOT_TOKEN" "$AID" "$domain"
 	fi
 }
 
