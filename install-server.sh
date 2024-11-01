@@ -1074,7 +1074,7 @@ ssh_setup() {
 # Установока xui бота
 install_xuibot() {
 	if [[ "$1" == "-bot" ]]; then
-		bash <(curl -Ls https://github.com/cortez24rus/3X-UI-auto-deployment/raw/refs/heads/main/xui-bot.sh) "$BOT_TOKEN" "$AID" "$domain"
+		bash <(curl -Ls https://github.com/cortez24rus/3X-UI-auto-deployment/raw/refs/heads/main/xui-bot.py) "$BOT_TOKEN" "$AID" "$domain"
 	fi
 }
 
