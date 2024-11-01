@@ -13,9 +13,7 @@ systemctl stop xui-rp-bot.service >/dev/null
 systemctl daemon-reload >/dev/null
 
 # Установка пакетов
-apt-get update && apt-get install -y python3 \
-python3-pip \
-python3-venv
+apt-get update && apt-get install -y python3 python3-pip python3-venv
 
 # Создание директорий и т.д...
 mkdir -p /usr/local/xui-rp/
