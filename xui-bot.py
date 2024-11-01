@@ -38,7 +38,6 @@ DB_PATH = '/etc/x-ui/x-ui.db'
 BOT_TOKEN = '$1'
 BOT_AID = $2
 NAME_MENU = "🎛 $3 🎛"
-
 # Функция для подключения к базе данных
 def get_db_connection():
     conn = sqlite3.connect(DB_PATH)
@@ -261,7 +260,7 @@ async def show_inbounds_menu(query):
         header = f"📬 Inbounds 📬\n🔼 Total Up {total_up:.2f} GB / 🔽 Total Down {total_down:.2f} GB\n"
         keyboard = [
             [InlineKeyboardButton(
-                f"{remark} - {up / (1024 ** 3):.2f} GB / {down / (1024 ** 3):.2f} GB {'🟢' if enable == 1 else '🔴'}",
+                f"{remark} - {up / (1024 ** 3):.2f} GB / {down / (1024 ** 3):.2f} GB {'🟢' if enable == 1 else '⭕️'}",
                 callback_data=f"select_{remark}"
             )]
             for remark, up, down, enable in remarks
@@ -317,10 +316,114 @@ async def button_click(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         users = get_all_users()
         await show_delete_user_menu(query, users)
 
+    elif query.data == 'list_users':
+        await list_users(update, context)
+
+    elif query.data.startswith("toggle_"):
+        await toggle_user_enable(update, context)    
+
+async def list_users(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    all_ids = get_all_ids()
+    users_keyboard = []
+    seen_sub_ids = set()  # Множество для отслеживания уже добавленных subId
+
+    for id, settings in all_ids:
+        for client in settings.get('clients', []):
+            sub_id = client.get('subId')
+            enable_status = client.get('enable', False)
+            emoji = "🟢" if enable_status else "⭕️"
+
+            # Проверяем, был ли sub_id уже добавлен
+            if sub_id not in seen_sub_ids:
+                seen_sub_ids.add(sub_id)  # Добавляем sub_id в множество
+                users_keyboard.append([  # Добавляем кнопку только если sub_id уникальный
+                    InlineKeyboardButton(f"{sub_id} {emoji}", callback_data=f"toggle_{sub_id}")
+                ])
+
+    users_keyboard.append([InlineKeyboardButton("🔙 Return", callback_data='user_menu')])
+
+    reply_markup = InlineKeyboardMarkup(users_keyboard)
+    await update.callback_query.edit_message_text("🔄 Switch User Status", reply_markup=reply_markup)
+
+# Изменение состояния enable при нажатии на кнопку
+async def toggle_user_enable(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    sub_id = update.callback_query.data.split("toggle_")[1]
+    
+    # Выводим subId для отладки
+    print(f"Toggle request for subId: {sub_id}")
+
+    connection = sqlite3.connect(DB_PATH)
+    cursor = connection.cursor()
+
+    # Получаем текущие настройки для subId
+    cursor.execute("SELECT settings FROM inbounds WHERE id = ?", (sub_id,))
+    result = cursor.fetchone()
+
+    if result:
+        settings = json.loads(result[0])
+        found = False
+        
+        for client in settings['clients']:
+            # Сравниваем subId для поиска
+            if client['subId'] == sub_id:
+                client['enable'] = not client['enable']  # Переключаем состояние enable
+                found = True
+                break
+        
+        if found:
+            # Обновляем настройки в базе данных
+            cursor.execute("UPDATE inbounds SET settings = ? WHERE id = ?", (json.dumps(settings), sub_id))
+            connection.commit()
+            await update.callback_query.answer(f"Статус пользователя {sub_id} изменен на {'включен' if client['enable'] else 'выключен'}")
+        else:
+            await update.callback_query.answer("Пользователь не найден в списке клиентов.")
+    else:
+        await update.callback_query.answer("Пользователь не найден в базе данных.")
+
+    connection.close()
+    
+    # Обновляем список пользователей
+    await list_users(update, context)
+
+# Изменение состояния enable при нажатии на кнопку
+async def toggle_user_enable(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    sub_id = update.callback_query.data.split("toggle_")[1]
+    
+    # Выводим subId для отладки
+    print(f"Toggle request for subId: {sub_id}")
+
+    connection = sqlite3.connect(DB_PATH)
+    cursor = connection.cursor()
+
+    # Получаем текущие настройки для subId
+    cursor.execute("SELECT id, settings FROM inbounds")
+    all_ids = cursor.fetchall()
+
+    for id, settings_json in all_ids:
+        settings = json.loads(settings_json)
+
+        # Находим клиента с соответствующим subId
+        for client in settings.get('clients', []):
+            if client.get('subId') == sub_id:
+                # Переключаем состояние enable
+                client['enable'] = not client.get('enable', False)
+                print(f"Toggling enable for subId: {sub_id} to {client['enable']}")
+
+                # Обновляем настройки в базе данных
+                cursor.execute("UPDATE inbounds SET settings = ? WHERE id = ?", (json.dumps(settings), id))
+                connection.commit()
+                break  # Выходим из цикла после изменения
+
+    connection.close()
+
+    # Обновляем меню пользователей
+    await list_users(update, context)
+
 async def show_user_menu(query):
     keyboard = [
         [InlineKeyboardButton("✅ Add user", callback_data='add_user')],
         [InlineKeyboardButton("❌ Delete user", callback_data='delete_user')],
+        [InlineKeyboardButton("🔄 Switch User Status", callback_data='list_users')],
         [InlineKeyboardButton("🚦 Traffic / 💵 Subscription", callback_data='show_users')],
         [InlineKeyboardButton("🔙 Return", callback_data='start_menu')]
     ]
