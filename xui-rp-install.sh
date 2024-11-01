@@ -1,6 +1,6 @@
 #!/bin/bash
 
-LOGFILE="/var/log/3X-UI-auto-deployment.log"
+LOGFILE="/var/log/xui-rp.log"
 
 ### INFO ###
 Green="\033[32m"
@@ -299,7 +299,6 @@ installation_of_utilities() {
  	apt-get update && apt-get install cloudflare-warp -y
   	wget https://pkg.cloudflareclient.com/pool/$(grep "VERSION_CODENAME=" /etc/os-release | cut -d "=" -f 2)/main/c/cloudflare-warp/cloudflare-warp_2024.6.497-1_amd64.deb
     	dpkg -i cloudflare-warp_2024.6.497-1_amd64.deb
-
  	apt-get install -y systemd-resolved
  	echo
  	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
@@ -847,7 +846,7 @@ EOF
 panel_installation() {
 	touch /usr/local/bin/reinstallation_check
 	msg_inf "Настройка 3x-ui xray"
-	while ! wget -q --show-progress --timeout=30 --tries=10 --retry-connrefused https://github.com/cortez24rus/3X-UI-auto-deployment/raw/main/x-ui.db; do
+	while ! wget -q --show-progress --timeout=30 --tries=10 --retry-connrefused https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/main/x-ui.db; do
     	msg_err "Скачивание не удалось, пробуем снова..."
     	sleep 3
 	done
@@ -1074,7 +1073,7 @@ ssh_setup() {
 # Установока xui бота
 install_xuibot() {
 	if [[ "$1" == "-bot" ]]; then
-		bash <(curl -Ls https://github.com/cortez24rus/3X-UI-auto-deployment/raw/refs/heads/main/xui-bot.py) "$BOT_TOKEN" "$AID" "$domain"
+		bash <(curl -Ls https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/main/xui-rp-bot.py) "$BOT_TOKEN" "$AID" "$domain"
 	fi
 }
 
@@ -1152,7 +1151,7 @@ main_script_repeat() {
 ### Проверка запуска ###
 main_choise() {	
 	check_xuibot
- 	if [ -f /usr/local/bin/reinstallation_check ]; then
+ 	if [ -f /usr/local/xui-rp/reinstallation_check ]; then
 		clear
   		echo
 		msg_err "Повторная установка скрипта"
