@@ -209,13 +209,12 @@ def get_users_info():
                         'down': down_traffic,
                         'subscription_link': f"🔗 {suburl}{sub_id}" if suburl else f"/{sub_id}"
                     }
-
     conn.close()  # Закрываем соединение после завершения всех операций
 
     # Форматируем вывод
     user_lines = []
     for sub_id, traffic_info in user_traffic.items():
-        user_lines.append(f"👤 {sub_id} - 🔼 Upload: {traffic_info['up']:.2f} GB / 🔽 Download {traffic_info['down']:.2f} GB\n{traffic_info['subscription_link']}")
+        user_lines.append(f"👤 {sub_id} - 🔼 Up {traffic_info['up']:.2f} GB / 🔽 Down {traffic_info['down']:.2f} GB\n{traffic_info['subscription_link']}")
 
     return "\n\n".join(user_lines) if user_lines else "No users"
 
@@ -257,6 +256,24 @@ async def start_menu(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
         await update.callback_query.edit_message_text(NAME_MENU, reply_markup=reply_markup)
         
 # Функция для обработки нажатия кнопок
+async def show_inbounds_menu(query):
+    total_up, total_down = calculate_total_traffic()
+    remarks = get_inbounds_remarks()
+    if remarks:
+        header = f"📬 Inbounds 📬\n🔼 Total Up {total_up:.2f} GB / 🔽 Total Down {total_down:.2f} GB\n"
+        keyboard = [
+            [InlineKeyboardButton(
+                f"{remark} - {up / (1024 ** 3):.2f} GB / {down / (1024 ** 3):.2f} GB {'🟢' if enable == 1 else '🔴'}",
+                callback_data=f"select_{remark}"
+            )]
+            for remark, up, down, enable in remarks
+        ]
+        keyboard.append([InlineKeyboardButton("🔙 Return", callback_data='start_menu')])
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        await query.edit_message_text(header, reply_markup=reply_markup)
+    else:
+        await query.edit_message_text("No inbounds available")
+
 async def button_click(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     query = update.callback_query
     if query.from_user.id != BOT_AID:
@@ -275,40 +292,15 @@ async def button_click(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         await query.edit_message_text(text=f"🚦 Traffic / 💵 Subscription\n\n{users_info}", reply_markup=reply_markup)
 
     elif query.data == 'inbounds':
-        total_up, total_down = calculate_total_traffic()
-        remarks = get_inbounds_remarks()
-        if remarks:
-            header = f"📬 Inbounds 📬\n🔼 Total Upload: {total_up:.2f} GB / 🔽 Total Download: {total_down:.2f} GB\n"
-            keyboard = [
-                [InlineKeyboardButton(
-                    f"{remark} - {up / (1024 ** 3):.2f} GB / {down / (1024 ** 3):.2f} GB - {'🟢' if enable == 1 else '🔴'}",
-                    callback_data=remark
-                )]
-                for remark, up, down, enable in remarks
-            ]
-            keyboard.append([InlineKeyboardButton("🔙 Return", callback_data='start_menu')])
-            reply_markup = InlineKeyboardMarkup(keyboard)
-            await query.edit_message_text(header, reply_markup=reply_markup)
-        else:
-            await query.edit_message_text("No inbounds available")
+        await show_inbounds_menu(query)
 
-    elif query.data in (remark for remark, _, _, _ in get_inbounds_remarks()):
-        new_enable_value = toggle_enable(query.data)
-        remarks = get_inbounds_remarks()
-        keyboard = [
-            [InlineKeyboardButton(
-                f"{remark} - {up / (1024 ** 3):.2f} GB / {down / (1024 ** 3):.2f} GB - {'🟢' if enable == 1 else '🔴'}",
-                callback_data=remark
-            )]
-            for remark, up, down, enable in remarks
-        ]
-        keyboard.append([InlineKeyboardButton("🔙 Return", callback_data='inbounds')])
-        reply_markup = InlineKeyboardMarkup(keyboard)
-        await query.edit_message_text("Select inbound", reply_markup=reply_markup)
+    elif query.data.startswith("select_"):
+        remark = query.data.split("select_")[1]
+        toggle_enable(remark)
+        await show_inbounds_menu(query)
 
-    elif query.data in (remark for remark, _, _, _ in get_inbounds_remarks()):
-        new_enable_value = toggle_enable(query.data)
-        await button_click(update, context)  # Обновляем интерфейс, повторно вызывая функцию
+    elif query.data == 'start_menu':
+        await start_menu(update, context)
 
     elif query.data == 'add_user':
         await query.message.reply_text("Please enter a username to add")
@@ -322,14 +314,10 @@ async def button_click(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
             await query.edit_message_text("No users available")
 
     elif query.data.startswith('remove_'):
-        subId = query.data.split('_')[1]  # Извлекаем subId из callback_data
-        remove_user_from_all_ids(subId)  # Удаляем пользователя из всех inbounds
-        # Обновляем список пользователей
+        subId = query.data.split('_')[1]
+        remove_user_from_all_ids(subId)
         users = get_all_users()
         await show_delete_user_menu(query, users)
-
-    elif query.data == 'start_menu':  # Добавьте эту проверку
-        await start_menu(update, context)  # Вернуться в главное меню
 
 async def show_user_menu(query):
     keyboard = [
