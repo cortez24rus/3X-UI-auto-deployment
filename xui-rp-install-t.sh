@@ -772,7 +772,7 @@ map \$ssl_preread_protocol \$backend {
         default \$https;
         "" ssh;
 }
-map \$ssl_preread_server_name \$backend {
+map \$ssl_preread_server_name \$https {
 	cg.${domain}   cg;
  	${reality}     reality;
 	${reality2}    reality2;
