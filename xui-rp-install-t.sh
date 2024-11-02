@@ -651,8 +651,7 @@ disable_ipv6() {
 ### WARP ###
 warp() {
 	msg_inf "Настройка warp"
- 	warp-cli --accept-tos registration new 	
-#   	echo -e "yes" | warp-cli registration new
+ 	cho -e "yes" | warp-cli --accept-tos registration new 	
 	warp-cli mode proxy
 	warp-cli connect
     	if [[ -n "$warpkey" ]];
