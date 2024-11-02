@@ -1,6 +1,6 @@
 #!/bin/bash
 
-LOGFILE="/var/log/xui-rp.log"
+LOGFILE="/usr/local/xui-rp/xui-rp.log"
 
 ### INFO ###
 Green="\033[32m"
@@ -1012,17 +1012,17 @@ UPDATE inbounds SET stream_settings = '$stream_settings_id6' WHERE id = 6;
 UPDATE inbounds SET stream_settings = '$stream_settings_id7' WHERE id = 7;
 UPDATE inbounds SET stream_settings = '$stream_settings_id8' WHERE id = 8;
 
-UPDATE settings SET value = '${webPort}' WHERE id = 1;
-UPDATE settings SET value = '/${webBasePath}/' WHERE id = 2;
-UPDATE settings SET value = '${webCertFile}' WHERE id = 8;
-UPDATE settings SET value = '${webKeyFile}' WHERE id = 9;
-UPDATE settings SET value = '${subPort}' WHERE id = 28;
-UPDATE settings SET value = '/${subPath}/' WHERE id = 29;
-UPDATE settings SET value = '${webCertFile}' WHERE id = 31;
-UPDATE settings SET value = '${webKeyFile}' WHERE id = 32;
-UPDATE settings SET value = '${subURI}' WHERE id = 36;
-UPDATE settings SET value = '/${subJsonPath}/' WHERE id = 37;
-UPDATE settings SET value = '${subJsonURI}' WHERE id = 38;
+UPDATE settings SET value = '${webPort}' WHERE key = webPort;
+UPDATE settings SET value = '/${webBasePath}/' WHERE key = webBasePath;
+UPDATE settings SET value = '${webCertFile}' WHERE key = webCertFile;
+UPDATE settings SET value = '${webKeyFile}' WHERE key = webKeyFile;
+UPDATE settings SET value = '${subPort}' WHERE key = subPort;
+UPDATE settings SET value = '/${subPath}/' WHERE key = subPath;
+UPDATE settings SET value = '${webCertFile}' WHERE key = webCertFile;
+UPDATE settings SET value = '${webKeyFile}' WHERE key = webKeyFile;
+UPDATE settings SET value = '${subURI}' WHERE key = subURI;
+UPDATE settings SET value = '/${subJsonPath}/' WHERE key = subJsonPath;
+UPDATE settings SET value = '${subJsonURI}' WHERE key = subJsonURI;
 EOF
 }
 
@@ -1073,7 +1073,7 @@ ssh_setup() {
 # Установока xui бота
 install_xuibot() {
 	if [[ "$1" == "-bot" ]]; then
-		bash <(curl -Ls https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/main/xui-rp-bot.py) "$BOT_TOKEN" "$AID" "$domain"
+		bash <(curl -Ls https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/main/xui-rp-bot.sh) "$BOT_TOKEN" "$AID" "$domain"
 	fi
 }
 
