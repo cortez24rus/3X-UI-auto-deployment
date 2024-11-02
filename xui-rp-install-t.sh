@@ -653,6 +653,7 @@ warp() {
 	msg_inf "Настройка warp"
  	echo -e "yes" | warp-cli --accept-tos registration new 	
 	warp-cli --accept-tos mode proxy
+	warp-cli --accept-tos proxy port 40000
 	warp-cli --accept-tos connect
     	if [[ -n "$warpkey" ]];
 	then
