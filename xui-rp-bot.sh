@@ -38,6 +38,8 @@ DB_PATH = '/etc/x-ui/x-ui.db'
 BOT_TOKEN = '$1'
 BOT_AID = $2
 NAME_MENU = "🎛 $3 🎛"
+
+
 # Функция для подключения к базе данных
 def get_db_connection():
     conn = sqlite3.connect(DB_PATH)
