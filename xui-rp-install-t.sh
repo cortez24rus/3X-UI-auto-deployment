@@ -652,11 +652,11 @@ disable_ipv6() {
 warp() {
 	msg_inf "Настройка warp"
  	echo -e "yes" | warp-cli --accept-tos registration new 	
-	warp-cli mode proxy
-	warp-cli connect
+	warp-cli --accept-tos mode proxy
+	warp-cli --accept-tos connect
     	if [[ -n "$warpkey" ]];
 	then
-		warp-cli registration license ${warpkey}
+		warp-cli --accept-tos registration license ${warpkey}
 	fi
  	echo
 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
