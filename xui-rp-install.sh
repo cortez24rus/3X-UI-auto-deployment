@@ -852,9 +852,9 @@ panel_installation() {
 	done
 	echo -e "n" | bash <(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh) > /dev/null 2>&1
 
-	stream_settings_id6
-	stream_settings_id7
-	stream_settings_id8
+	stream_settings_id1
+	stream_settings_id2
+	stream_settings_id3
 	database_change
 
 	x-ui stop
@@ -867,8 +867,8 @@ panel_installation() {
 }
 
 ### Изменение базы данных ###
-stream_settings_id6() {
-stream_settings_id6=$(cat <<EOF
+stream_settings_id1() {
+stream_settings_id1=$(cat <<EOF
 {
   "network": "kcp",
   "security": "none",
@@ -898,8 +898,8 @@ EOF
 )
 }
 
-stream_settings_id7() {
-stream_settings_id7=$(cat <<EOF
+stream_settings_id2() {
+stream_settings_id2=$(cat <<EOF
 {
   "network": "tcp",
   "security": "reality",
@@ -950,8 +950,8 @@ EOF
 )
 }
 
-stream_settings_id8() {
-stream_settings_id8=$(cat <<EOF
+stream_settings_id3() {
+stream_settings_id3=$(cat <<EOF
 {
   "network": "tcp",
   "security": "tls",
@@ -1008,9 +1008,9 @@ database_change() {
 UPDATE users SET username = '$username' WHERE id = 1;
 UPDATE users SET password = '$password' WHERE id = 1;
 
-UPDATE inbounds SET stream_settings = '$stream_settings_id6' WHERE id = 6;
-UPDATE inbounds SET stream_settings = '$stream_settings_id7' WHERE id = 7;
-UPDATE inbounds SET stream_settings = '$stream_settings_id8' WHERE id = 8;
+UPDATE inbounds SET stream_settings = '$stream_settings_id1' WHERE remark = 📲MKCP📲;
+UPDATE inbounds SET stream_settings = '$stream_settings_id2' WHERE remark = 🥷🏻REALITY🥷;
+UPDATE inbounds SET stream_settings = '$stream_settings_id3' WHERE remark = 🦠TROJAN🦠;
 
 UPDATE settings SET value = '${webPort}' WHERE key = webPort;
 UPDATE settings SET value = '/${webBasePath}/' WHERE key = webBasePath;
