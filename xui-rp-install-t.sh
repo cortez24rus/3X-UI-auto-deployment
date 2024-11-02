@@ -1161,8 +1161,8 @@ EOF
 )
 }
 
-stream_settings_id7() {
-	stream_settings_id7=$(cat <<EOF
+stream_settings_id6() {
+	stream_settings_id6=$(cat <<EOF
 {
   "network": "kcp",
   "security": "none",
