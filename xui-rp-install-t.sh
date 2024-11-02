@@ -1199,12 +1199,12 @@ database_change() {
 UPDATE users SET username = '$username' WHERE id = 1;
 UPDATE users SET password = '$password' WHERE id = 1;
 
-UPDATE inbounds SET stream_settings = '$stream_settings_id1' WHERE key = '☁CDN_gRPC☁';
-UPDATE inbounds SET stream_settings = '$stream_settings_id2' WHERE key = '☁CDN_WS☁';
-UPDATE inbounds SET stream_settings = '$stream_settings_id3' WHERE key = '🥷🏻REALITY_TG🥷';
-UPDATE inbounds SET stream_settings = '$stream_settings_id4' WHERE key = '🥷🏻REALITY_WA🥷';
-UPDATE inbounds SET stream_settings = '$stream_settings_id5' WHERE key = '🦠TROJAN🦠';
-UPDATE inbounds SET stream_settings = '$stream_settings_id6' WHERE key = '📲MKCP📲';
+UPDATE inbounds SET stream_settings = '$stream_settings_id1' WHERE "key" = '☁CDN_gRPC☁';
+UPDATE inbounds SET stream_settings = '$stream_settings_id2' WHERE "key" = '☁CDN_WS☁';
+UPDATE inbounds SET stream_settings = '$stream_settings_id3' WHERE "key" = '🥷🏻REALITY_TG🥷';
+UPDATE inbounds SET stream_settings = '$stream_settings_id4' WHERE "key" = '🥷🏻REALITY_WA🥷';
+UPDATE inbounds SET stream_settings = '$stream_settings_id5' WHERE "key" = '🦠TROJAN🦠';
+UPDATE inbounds SET stream_settings = '$stream_settings_id6' WHERE "key" = '📲MKCP📲';
 
 UPDATE settings SET value = '${webPort}' WHERE key = 'webPort';
 UPDATE settings SET value = '/${webBasePath}/' WHERE key = 'webBasePath';
