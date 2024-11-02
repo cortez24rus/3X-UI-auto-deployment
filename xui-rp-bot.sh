@@ -9,7 +9,7 @@ fi
 # Установка пакетов
 apt-get update && apt-get install -y python3 python3-pip python3-venv
 
-find /usr/local/xui-rp/ -mindepth 1 ! -name 'xui-rp.lg' -exec rm -rf {} +
+rm -rf /usr/local/xui-rp/
 rm -rf /etc/systemd/systemd/xui-rp-bot.service
 systemctl disable xui-rp-bot.service >/dev/null
 systemctl stop xui-rp-bot.service >/dev/null
