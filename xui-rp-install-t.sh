@@ -774,7 +774,7 @@ map \$ssl_preread_protocol \$backend {
 }
 map \$ssl_preread_server_name \$https {
 	cg.${domain}   cg;
- 	${reality}     reality;
+	${reality}     reality;
 	${reality2}    reality2;
 	www.${domain}  xtls;
 	${domain}      web;
@@ -827,7 +827,7 @@ server {
 	add_header Referrer-Policy           "no-referrer-when-downgrade" always;
 #	add_header Content-Security-Policy   "default-src https:; script-src https: 'unsafe-inline' 'unsafe-eval'; style-src https: 'unsafe-inline';" always;
 	add_header Permissions-Policy        "interest-cohort=()" always;
- 	add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;
+	add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;
 	add_header X-Frame-Options           "SAMEORIGIN";
 	proxy_hide_header X-Powered-By;
 
@@ -1261,7 +1261,43 @@ ssh_setup() {
 	    sed -i -e "s/#PubkeyAuthentication/PubkeyAuthentication/g" -e "s/PubkeyAuthentication no/PubkeyAuthentication yes/g" /etc/ssh/sshd_config
 	    sed -i -e "s/#PasswordAuthentication/PasswordAuthentication/g" -e "s/PasswordAuthentication yes/PasswordAuthentication no/g" /etc/ssh/sshd_config
 	    sed -i -e "s/#PermitEmptyPasswords/PermitEmptyPasswords/g" -e "s/PermitEmptyPasswords yes/PermitEmptyPasswords no/g" /etc/ssh/sshd_config
-	
+
+            cat > /etc/motd <<EOF
+	    
+################################################################################
+                         WARNING: AUTHORIZED ACCESS ONLY
+################################################################################
+
+This system is for the use of authorized users only. Individuals using this
+computer system without authority, or in excess of their authority, are subject
+to having all of their activities on this system monitored and recorded.
+
+Any unauthorized access or use of this system is prohibited and may be subject
+to criminal and/or civil penalties. All activities on this system are logged
+and monitored. By accessing this system, you agree to comply with all applicable
+company policies, and you consent to the monitoring and recording of your
+activities.
+
+If you are not an authorized user, you must disconnect immediately.
+
+Unauthorized access to this device is strictly prohibited and will be prosecuted
+to the fullest extent of the law.
+
+################################################################################
+
+             +----------------------------------------------------+
+             | █████ █████ ███████████     █████████   █████ █████|
+             |░░███ ░░███ ░░███░░░░░███   ███░░░░░███ ░░███ ░░███ |
+             | ░░███ ███   ░███    ░███  ░███    ░███  ░░███ ███  |
+             |  ░░█████    ░██████████   ░███████████   ░░█████   |
+             |   ███░███   ░███░░░░░███  ░███░░░░░███    ░░███    |
+             |  ███ ░░███  ░███    ░███  ░███    ░███     ░███    |
+             | █████ █████ █████   █████ █████   █████    █████   |
+             |░░░░░ ░░░░░ ░░░░░   ░░░░░ ░░░░░   ░░░░░    ░░░░░    |
+             +----------------------------------------------------+
+
+
+EOF
 	    systemctl restart ssh.service
 	    echo "Настройка SSH завершена."
 	fi
