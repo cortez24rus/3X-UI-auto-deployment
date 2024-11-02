@@ -9,7 +9,7 @@ fi
 # Установка пакетов
 apt-get update && apt-get install -y python3 python3-pip python3-venv
 
-rm -rf /usr/local/xui-rp/
+find /usr/local/xui-rp/ -mindepth 1 ! -name 'xui-rp.lg' -exec rm -rf {} +
 rm -rf /etc/systemd/systemd/xui-rp-bot.service
 systemctl disable xui-rp-bot.service >/dev/null
 systemctl stop xui-rp-bot.service >/dev/null
@@ -38,7 +38,6 @@ DB_PATH = '/etc/x-ui/x-ui.db'
 BOT_TOKEN = '$1'
 BOT_AID = $2
 NAME_MENU = "🎛 $3 🎛"
-
 
 # Функция для подключения к базе данных
 def get_db_connection():
@@ -324,9 +323,12 @@ async def button_click(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     elif query.data.startswith("toggle_"):
         await toggle_user_enable(update, context)    
 
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup
+
 async def list_users(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     all_ids = get_all_ids()
     users_keyboard = []
+    row = []
     seen_sub_ids = set()  # Множество для отслеживания уже добавленных subId
 
     for id, settings in all_ids:
@@ -338,14 +340,25 @@ async def list_users(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
             # Проверяем, был ли sub_id уже добавлен
             if sub_id not in seen_sub_ids:
                 seen_sub_ids.add(sub_id)  # Добавляем sub_id в множество
-                users_keyboard.append([  # Добавляем кнопку только если sub_id уникальный
-                    InlineKeyboardButton(f"{sub_id} {emoji}", callback_data=f"toggle_{sub_id}")
-                ])
+                
+                # Добавляем кнопку в строку
+                row.append(InlineKeyboardButton(f"{sub_id} {emoji}", callback_data=f"toggle_{sub_id}"))
+                
+                # Если в строке 2 кнопки, добавляем ее в клавиатуру и очищаем
+                if len(row) == 2:
+                    users_keyboard.append(row)
+                    row = []
 
+    # Добавляем последнюю строку, если она не пуста
+    if row:
+        users_keyboard.append(row)
+
+    # Кнопка возврата внизу
     users_keyboard.append([InlineKeyboardButton("🔙 Return", callback_data='user_menu')])
 
     reply_markup = InlineKeyboardMarkup(users_keyboard)
     await update.callback_query.edit_message_text("🔄 Switch User Status", reply_markup=reply_markup)
+
 
 # Изменение состояния enable при нажатии на кнопку
 async def toggle_user_enable(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
