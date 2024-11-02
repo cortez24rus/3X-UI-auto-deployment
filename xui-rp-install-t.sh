@@ -1,7 +1,6 @@
 #!/bin/bash
 
-mkdir -p /usr/local/xui-rp/
-LOGFILE="/usr/local/xui-rp/xui-rp.log"
+LOGFILE="/var/log/xui-rp.log"
 
 ### INFO ###
 Green="\033[32m"
@@ -1200,24 +1199,24 @@ database_change() {
 UPDATE users SET username = '$username' WHERE id = 1;
 UPDATE users SET password = '$password' WHERE id = 1;
 
-UPDATE inbounds SET stream_settings = '$stream_settings_id1' WHERE id = 1;
-UPDATE inbounds SET stream_settings = '$stream_settings_id2' WHERE id = 2;
-UPDATE inbounds SET stream_settings = '$stream_settings_id3' WHERE id = 3;
-UPDATE inbounds SET stream_settings = '$stream_settings_id4' WHERE id = 4;
-UPDATE inbounds SET stream_settings = '$stream_settings_id5' WHERE id = 5;
-UPDATE inbounds SET stream_settings = '$stream_settings_id6' WHERE id = 6;
+UPDATE inbounds SET stream_settings = '$stream_settings_id1' WHERE key = '☁CDN_gRPC☁';
+UPDATE inbounds SET stream_settings = '$stream_settings_id2' WHERE key = '☁CDN_WS☁';
+UPDATE inbounds SET stream_settings = '$stream_settings_id3' WHERE key = '🥷🏻REALITY_TG🥷';
+UPDATE inbounds SET stream_settings = '$stream_settings_id4' WHERE key = '🥷🏻REALITY_WA🥷';
+UPDATE inbounds SET stream_settings = '$stream_settings_id5' WHERE key = '🦠TROJAN🦠';
+UPDATE inbounds SET stream_settings = '$stream_settings_id6' WHERE key = '📲MKCP📲';
 
-UPDATE settings SET value = '${webPort}' WHERE key = webPort;
-UPDATE settings SET value = '/${webBasePath}/' WHERE key = webBasePath;
-UPDATE settings SET value = '${webCertFile}' WHERE key = webCertFile;
-UPDATE settings SET value = '${webKeyFile}' WHERE key = webKeyFile;
-UPDATE settings SET value = '${subPort}' WHERE key = subPort;
-UPDATE settings SET value = '/${subPath}/' WHERE key = subPath;
-UPDATE settings SET value = '${webCertFile}' WHERE key = webCertFile;
-UPDATE settings SET value = '${webKeyFile}' WHERE key = webKeyFile;
-UPDATE settings SET value = '${subURI}' WHERE key = subURI;
-UPDATE settings SET value = '/${subJsonPath}/' WHERE key = subJsonPath;
-UPDATE settings SET value = '${subJsonURI}' WHERE key = subJsonURI;
+UPDATE settings SET value = '${webPort}' WHERE key = 'webPort';
+UPDATE settings SET value = '/${webBasePath}/' WHERE key = 'webBasePath';
+UPDATE settings SET value = '${webCertFile}' WHERE key = 'webCertFile';
+UPDATE settings SET value = '${webKeyFile}' WHERE key = 'webKeyFile';
+UPDATE settings SET value = '${subPort}' WHERE key = 'subPort';
+UPDATE settings SET value = '/${subPath}/' WHERE key = 'subPath';
+UPDATE settings SET value = '${webCertFile}' WHERE key = 'webCertFile';
+UPDATE settings SET value = '${webKeyFile}' WHERE key = 'webKeyFile';
+UPDATE settings SET value = '${subURI}' WHERE key = 'subURI';
+UPDATE settings SET value = '/${subJsonPath}/' WHERE key = 'subJsonPath';
+UPDATE settings SET value = '${subJsonURI}' WHERE key = 'subJsonURI';
 EOF
 }
 
