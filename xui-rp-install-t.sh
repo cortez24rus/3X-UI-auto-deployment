@@ -240,10 +240,13 @@ data_entry() {
 	echo
 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	echo
-	msg_inf "Введите путь к Cloudflare grpc:"
- 	echo
+	msg_inf "Введите путь к grpc:"
 	validate_path cdngrpc
-	msg_inf "Введите путь к Cloudflare websocket:"
+  	echo
+   	msg_inf "Введите путь к httpupgrade:"
+	validate_path cdnhttpupgrade
+  	echo
+	msg_inf "Введите путь к websocket:"
 	validate_path cdnws
 	echo
 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
@@ -936,6 +939,7 @@ panel_installation() {
 	stream_settings_id4
 	stream_settings_id5
 	stream_settings_id6
+	stream_settings_id7
 	database_change
 
 	x-ui stop
@@ -954,18 +958,42 @@ stream_settings_id1() {
 	stream_settings_id1=$(cat <<EOF
 {
   "network": "grpc",
-  "security": "none",
+  "security": "tls",
   "externalProxy": [
     {
       "forceTls": "same",
-      "dest": "${domain}",
+      "dest": "cg.${domain}",
       "port": 443,
       "remark": ""
     }
   ],
+  "tlsSettings": {
+    "serverName": "",
+    "minVersion": "1.2",
+    "maxVersion": "1.3",
+    "cipherSuites": "",
+    "rejectUnknownSni": false,
+    "disableSystemRoot": false,
+    "enableSessionResumption": false,
+    "certificates": [
+      {
+        "certificateFile": "${webCertFile}",
+        "keyFile": "${webKeyFile}",
+        "ocspStapling": 3600,
+        "oneTimeLoading": false,
+        "usage": "encipherment",
+        "buildChain": false
+      }
+    ],
+    "alpn": [],
+    "settings": {
+      "allowInsecure": false,
+      "fingerprint": "random"
+    }
+  },
   "grpcSettings": {
-    "serviceName": "/2053/${cdngrpc}",
-    "authority": "${domain}",
+    "serviceName": "${cdngrpc}",
+    "authority": "",
     "multiMode": false
   }
 }
@@ -975,6 +1003,55 @@ EOF
 
 stream_settings_id2() {
 	stream_settings_id2=$(cat <<EOF
+{
+{
+  "network": "httpupgrade",
+  "security": "tls",
+  "externalProxy": [
+    {
+      "forceTls": "same",
+      "dest": "${domain}",
+      "port": 443,
+      "remark": ""
+    }
+  ],
+  "tlsSettings": {
+    "serverName": "",
+    "minVersion": "1.2",
+    "maxVersion": "1.3",
+    "cipherSuites": "",
+    "rejectUnknownSni": false,
+    "disableSystemRoot": false,
+    "enableSessionResumption": false,
+    "certificates": [
+      {
+        "certificateFile": "${webCertFile}",
+        "keyFile": "${webKeyFile}",
+        "ocspStapling": 3600,
+        "oneTimeLoading": false,
+        "usage": "encipherment",
+        "buildChain": false
+      }
+    ],
+    "alpn": [],
+    "settings": {
+      "allowInsecure": false,
+      "fingerprint": "randomized"
+    }
+  },
+  "httpupgradeSettings": {
+    "acceptProxyProtocol": false,
+    "path": "/2063/${cdnhttpupgrade}",
+    "host": "${domain}",
+    "headers": {}
+  }
+}
+EOF
+)
+}
+
+stream_settings_id3() {
+	stream_settings_id3=$(cat <<EOF
 {
   "network": "ws",
   "security": "tls",
@@ -996,8 +1073,8 @@ stream_settings_id2() {
     "enableSessionResumption": false,
     "certificates": [
       {
-        "certificateFile": "/etc/letsencrypt/live/${domain}/fullchain.pem",
-        "keyFile": "/etc/letsencrypt/live/${domain}/privkey.pem",
+        "certificateFile": "${webCertFile}",
+        "keyFile": "${webKeyFile}",
         "ocspStapling": 3600,
         "oneTimeLoading": false,
         "usage": "encipherment",
@@ -1007,59 +1084,14 @@ stream_settings_id2() {
     "alpn": [],
     "settings": {
       "allowInsecure": false,
-      "fingerprint": "random"
+      "fingerprint": "randomized"
     }
   },
   "wsSettings": {
     "acceptProxyProtocol": false,
-    "path": "/2083/${cdnws}",
+    "path": "/2073/${cdnws}",
     "host": "${domain}",
     "headers": {}
-  }
-}
-EOF
-)
-}
-
-stream_settings_id3() {
-	stream_settings_id3=$(cat <<EOF
-{
-  "network": "tcp",
-  "security": "reality",
-  "externalProxy": [
-    {
-      "forceTls": "same",
-      "dest": "www.${domain}",
-      "port": 443,
-      "remark": ""
-    }
-  ],
-  "realitySettings": {
-    "show": false,
-    "xver": 0,
-    "dest": "${reality}:443",
-    "serverNames": [
-      "${reality}"
-    ],
-    "privateKey": "GHs4uwykI3IJWSdLLfKyuJjUV6J5zf29sAFXWNjePxA",
-    "minClient": "",
-    "maxClient": "",
-    "maxTimediff": 0,
-    "shortIds": [
-      "45eeb98c"
-    ],
-    "settings": {
-      "publicKey": "Tvi8JCN0ESRBUr3PT3hB9Xh3Gr7SRcm6mZBYNN4DD3A",
-      "fingerprint": "randomized",
-      "serverName": "",
-      "spiderX": "/"
-    }
-  },
-  "tcpSettings": {
-    "acceptProxyProtocol": false,
-    "header": {
-      "type": "none"
-    }
   }
 }
 EOF
@@ -1082,20 +1114,27 @@ stream_settings_id4() {
   "realitySettings": {
     "show": false,
     "xver": 0,
-    "dest": "${reality2}:443",
+    "dest": "${reality}:443",
     "serverNames": [
-      "${reality2}"
+      "${reality}"
     ],
-    "privateKey": "iP8Xy-bot_mKf75yI9DC0nkQjR-qaolU4evrKAud3XE",
+    "privateKey": "UE1O35n_PzDxE8_FK6uaPBG0uDbfcf7fOzZYYq6yqEQ",
     "minClient": "",
     "maxClient": "",
     "maxTimediff": 0,
     "shortIds": [
-      "b54428af"
+      "22dff0",
+      "0041e9ca",
+      "49afaa139d",
+      "89",
+      "1addf92cc1bd50",
+      "6e122954e9df",
+      "8d93026df5de065c",
+      "bc85"
     ],
     "settings": {
-      "publicKey": "RPQbnAtvBwa6IrnvYvsEU0WVaRWhRembfHMpbVjZ9lU",
-      "fingerprint": "randomized",
+      "publicKey": "Ydv9h2n5xuds-9qQQmHSEC02rjGLPDct1j_CDTFAgko",
+      "fingerprint": "chrome",
       "serverName": "",
       "spiderX": "/"
     }
@@ -1113,6 +1152,58 @@ EOF
 
 stream_settings_id5() {
 	stream_settings_id5=$(cat <<EOF
+{
+  "network": "tcp",
+  "security": "reality",
+  "externalProxy": [
+    {
+      "forceTls": "same",
+      "dest": "www.${domain}",
+      "port": 443,
+      "remark": ""
+    }
+  ],
+  "realitySettings": {
+    "show": false,
+    "xver": 0,
+    "dest": "${reality2}:443",
+    "serverNames": [
+      "${reality2}"
+    ],
+    "privateKey": "sO0WwnqzoNQKQXGbKOyBFRqPPyF_Bmb6Np0jiQJp3Sk",
+    "minClient": "",
+    "maxClient": "",
+    "maxTimediff": 0,
+    "shortIds": [
+      "cd95c9",
+      "eeed8008",
+      "f2e26eba6c9432cf",
+      "0d6a8b47988f0d",
+      "c1",
+      "1b60e7369779",
+      "7fb9d5f9d8",
+      "6696"
+    ],
+    "settings": {
+      "publicKey": "3tYsVaTef7cPUgKlSUm7ebEZuciswhVyUbn7e_asBnE",
+      "fingerprint": "chrome",
+      "serverName": "",
+      "spiderX": "/"
+    }
+  },
+  "tcpSettings": {
+    "acceptProxyProtocol": false,
+    "header": {
+      "type": "none"
+    }
+  }
+}
+EOF
+)
+}
+
+stream_settings_i6() {
+	stream_settings_id6=$(cat <<EOF
 {
   "network": "tcp",
   "security": "tls",
@@ -1134,8 +1225,8 @@ stream_settings_id5() {
     "enableSessionResumption": false,
     "certificates": [
       {
-        "certificateFile": "/etc/letsencrypt/live/${domain}/fullchain.pem",
-		"keyFile": "/etc/letsencrypt/live/${domain}/privkey.pem",
+        "certificateFile": "${webCertFile}",
+        "keyFile": "${webKeyFile}",
         "ocspStapling": 3600,
         "oneTimeLoading": false,
         "usage": "encipherment",
@@ -1143,7 +1234,6 @@ stream_settings_id5() {
       }
     ],
     "alpn": [
-      "h2",
       "http/1.1"
     ],
     "settings": {
@@ -1162,8 +1252,8 @@ EOF
 )
 }
 
-stream_settings_id6() {
-	stream_settings_id6=$(cat <<EOF
+stream_settings_id7() {
+	stream_settings_id7=$(cat <<EOF
 {
   "network": "kcp",
   "security": "none",
@@ -1186,7 +1276,7 @@ stream_settings_id6() {
     "header": {
       "type": "srtp"
     },
-    "seed": "x2aYTWwqUE"
+    "seed": "iTsaMjully"
   }
 }
 EOF
@@ -1201,11 +1291,12 @@ UPDATE users SET username = '$username' WHERE id = 1;
 UPDATE users SET password = '$password' WHERE id = 1;
 
 UPDATE inbounds SET stream_settings = '$stream_settings_id1' WHERE "key" = '☁CDN_gRPC☁';
-UPDATE inbounds SET stream_settings = '$stream_settings_id2' WHERE "key" = '☁CDN_WS☁';
-UPDATE inbounds SET stream_settings = '$stream_settings_id3' WHERE "key" = '🥷🏻REALITY_TG🥷';
-UPDATE inbounds SET stream_settings = '$stream_settings_id4' WHERE "key" = '🥷🏻REALITY_WA🥷';
-UPDATE inbounds SET stream_settings = '$stream_settings_id5' WHERE "key" = '🦠TROJAN🦠';
-UPDATE inbounds SET stream_settings = '$stream_settings_id6' WHERE "key" = '📲MKCP📲';
+UPDATE inbounds SET stream_settings = '$stream_settings_id2' WHERE "key" = '☁CDN_HU☁';
+UPDATE inbounds SET stream_settings = '$stream_settings_id3' WHERE "key" = '☁CDN_WS☁';
+UPDATE inbounds SET stream_settings = '$stream_settings_id4' WHERE "key" = '🥷🏻REALITY_TG🥷';
+UPDATE inbounds SET stream_settings = '$stream_settings_id5' WHERE "key" = '🥷🏻REALITY_WA🥷🏻';
+UPDATE inbounds SET stream_settings = '$stream_settings_id6' WHERE "key" = '✖️XTLS✖️';
+UPDATE inbounds SET stream_settings = '$stream_settings_id7' WHERE "key" = '📲MKCP📲';
 
 UPDATE settings SET value = '${webPort}' WHERE key = 'webPort';
 UPDATE settings SET value = '/${webBasePath}/' WHERE key = 'webBasePath';
@@ -1361,8 +1452,8 @@ main_script_first() {
 	panel_installation
 	enabling_security
 	ssh_setup
-	data_output
 	install_xuibot "$1"
+	data_output
  	banner_1
 	log_clear
 }
@@ -1379,8 +1470,8 @@ main_script_repeat() {
 	panel_installation
 	enabling_security
 	ssh_setup	
- 	data_output
   	install_xuibot "$1"
+	data_output
 	banner_1
  	log_clear
 }
