@@ -768,7 +768,7 @@ EOF
 
 stream_conf() {
 	cat > /etc/nginx/stream-enabled/stream.conf <<EOF
-map $ssl_preread_protocol $backend {
+map \$ssl_preread_protocol \$backend {
         default $https;
         "" ssh;
 }
