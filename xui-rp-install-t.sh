@@ -101,6 +101,7 @@ choise_dns () {
 				;;
 			2)
 				msg_ok "Выбран systemd-resolved"
+				echo
 				break
 				;;
 			*)	
@@ -225,6 +226,7 @@ data_entry() {
 	echo
 	msg_inf "Введите имя пользователя:"
 	read username
+ 	echo
 	msg_inf "Введите пароль пользователя:"
 	read password
 	echo
@@ -232,12 +234,14 @@ data_entry() {
 	echo
 	msg_inf "Введите доменное имя, под которое будете маскироваться Reality:"
 	read reality
+ 	echo
 	msg_inf "Введите 2 доменное имя, под которое будете маскироваться Reality:"
 	read reality2
 	echo
 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	echo
 	msg_inf "Введите путь к Cloudflare grpc:"
+ 	echo
 	validate_path cdngrpc
 	msg_inf "Введите путь к Cloudflare websocket:"
 	validate_path cdnws
@@ -249,8 +253,10 @@ data_entry() {
 	choise_dns
 	msg_inf "Введите путь к панели (без символов /, $, {}, \):"
 	validate_path webBasePath
+  	echo
 	msg_inf "Введите путь к подписке (без символов /, $, {}, \):"
 	validate_path subPath
+  	echo
 	msg_inf "Введите путь к JSON подписке (без символов /, $, {}, \):"
 	validate_path subJsonPath
 	echo
@@ -263,8 +269,6 @@ data_entry() {
     	if check_xuibot "$1"; then
         	msg_inf "Введите токен Telegram бота: "
 		read BOT_TOKEN
-    		echo
-		msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 		echo
   		msg_inf "Введите ваш Telegram ID:"
     		read AID
@@ -1243,7 +1247,7 @@ ssh_setup() {
  	echo
   	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	echo
-	echo -n "Команда для Windows: " && msg_out "type \$env:USERPROFILE\.ssh\id_rsa.pub | ssh -p 36079 ${username}@${IP4} \"cat >> ~/.ssh/authorized_keys\""	
+	echo -n "Команда для Windows: " && msg_out "type \$env:USERPROFILE\.ssh\id_rsa.pub | ssh -p 22 ${username}@${IP4} \"cat >> ~/.ssh/authorized_keys\""	
   	echo -n "Команда для Linux: " && msg_out "ssh-copy-id -p 22 ${username}@${IP4}"
 	echo
 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
