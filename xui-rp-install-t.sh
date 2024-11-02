@@ -1,6 +1,6 @@
 #!/bin/bash
 
-LOGFILE="/var/log/xui-rp.log"
+LOGFILE="/usr/local/xui-rp/xui-rp.log"
 
 ### INFO ###
 Green="\033[32m"
@@ -1157,8 +1157,8 @@ EOF
 )
 }
 
-stream_settings_id6() {
-	stream_settings_id6=$(cat <<EOF
+stream_settings_id7() {
+	stream_settings_id7=$(cat <<EOF
 {
   "network": "kcp",
   "security": "none",
@@ -1195,24 +1195,25 @@ database_change() {
 UPDATE users SET username = '$username' WHERE id = 1;
 UPDATE users SET password = '$password' WHERE id = 1;
 
-UPDATE inbounds SET stream_settings = '$stream_settings_id1' WHERE id = 1;
-UPDATE inbounds SET stream_settings = '$stream_settings_id2' WHERE id = 2;
-UPDATE inbounds SET stream_settings = '$stream_settings_id3' WHERE id = 3;
-UPDATE inbounds SET stream_settings = '$stream_settings_id4' WHERE id = 4;
-UPDATE inbounds SET stream_settings = '$stream_settings_id5' WHERE id = 5;
-UPDATE inbounds SET stream_settings = '$stream_settings_id6' WHERE id = 6;
+UPDATE inbounds SET stream_settings = '$stream_settings_id1' WHERE remark = ☁CDN_gRPC☁;
+UPDATE inbounds SET stream_settings = '$stream_settings_id2' WHERE remark = ☁CDN_HU☁;
+UPDATE inbounds SET stream_settings = '$stream_settings_id3' WHERE remark = ☁CDN_WS☁;
+UPDATE inbounds SET stream_settings = '$stream_settings_id4' WHERE remark = 🥷🏻REALITY_TG🥷🏻;
+UPDATE inbounds SET stream_settings = '$stream_settings_id5' WHERE remark = 🥷🏻REALITY_WA🥷🏻;
+UPDATE inbounds SET stream_settings = '$stream_settings_id6' WHERE remark = ✖️XTLS✖️;
+UPDATE inbounds SET stream_settings = '$stream_settings_id7' WHERE remark = 📲MKCP📲;
 
-UPDATE settings SET value = '${webPort}' WHERE id = 1;
-UPDATE settings SET value = '/${webBasePath}/' WHERE id = 2;
-UPDATE settings SET value = '${webCertFile}' WHERE id = 8;
-UPDATE settings SET value = '${webKeyFile}' WHERE id = 9;
-UPDATE settings SET value = '${subPort}' WHERE id = 28;
-UPDATE settings SET value = '/${subPath}/' WHERE id = 29;
-UPDATE settings SET value = '${webCertFile}' WHERE id = 31;
-UPDATE settings SET value = '${webKeyFile}' WHERE id = 32;
-UPDATE settings SET value = '${subURI}' WHERE id = 36;
-UPDATE settings SET value = '/${subJsonPath}/' WHERE id = 37;
-UPDATE settings SET value = '${subJsonURI}' WHERE id = 38;
+UPDATE settings SET value = '${webPort}' WHERE key = webPort;
+UPDATE settings SET value = '/${webBasePath}/' WHERE key = webBasePath;
+UPDATE settings SET value = '${webCertFile}' WHERE key = webCertFile;
+UPDATE settings SET value = '${webKeyFile}' WHERE key = webKeyFile;
+UPDATE settings SET value = '${subPort}' WHERE key = subPort;
+UPDATE settings SET value = '/${subPath}/' WHERE key = subPath;
+UPDATE settings SET value = '${webCertFile}' WHERE key = webCertFile;
+UPDATE settings SET value = '${webKeyFile}' WHERE key = webKeyFile;
+UPDATE settings SET value = '${subURI}' WHERE key = subURI;
+UPDATE settings SET value = '/${subJsonPath}/' WHERE key = subJsonPath;
+UPDATE settings SET value = '${subJsonURI}' WHERE key = subJsonURI;
 EOF
 }
 
@@ -1292,7 +1293,7 @@ data_output() {
 # Установока xui бота
 install_xuibot() {
 	if [[ "$1" == "-bot" ]]; then
- 		bash <(curl -Ls https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/main/xui-rp-bot.py) "$BOT_TOKEN" "$AID" "$domain"
+ 		bash <(curl -Ls https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/main/xui-rp-bot.sh) "$BOT_TOKEN" "$AID" "$domain"
 	fi
 }
 
