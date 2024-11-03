@@ -1217,7 +1217,7 @@ stream_settings_i6() {
   ],
   "tlsSettings": {
     "serverName": "www.${domain}",
-    "minVersion": "1.2",
+    "minVersion": "1.3",
     "maxVersion": "1.3",
     "cipherSuites": "",
     "rejectUnknownSni": false,
