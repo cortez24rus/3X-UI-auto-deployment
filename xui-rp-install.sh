@@ -645,13 +645,13 @@ disable_ipv6() {
 ### WARP ###
 warp() {
 	msg_inf "Настройка warp"
- 	echo
-	echo -e "yes" | warp-cli registration new
-	warp-cli mode proxy
-	warp-cli connect
+ 	echo -e "yes" | warp-cli --accept-tos registration new 	
+	warp-cli --accept-tos mode proxy
+	warp-cli --accept-tos proxy port 40000
+	warp-cli --accept-tos connect
     	if [[ -n "$warpkey" ]];
 	then
-		warp-cli registration license ${warpkey}
+		warp-cli --accept-tos registration license ${warpkey}
 	fi
  	echo
 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
@@ -844,6 +844,7 @@ EOF
 
 ### Установка 3x-ui ###
 panel_installation() {
+	mkdir -p /usr/local/xui
 	touch /usr/local/xui-rp/reinstallation_check
 	msg_inf "Настройка 3x-ui xray"
 	while ! wget -q --show-progress --timeout=30 --tries=10 --retry-connrefused https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/main/x-ui.db; do
