@@ -1295,7 +1295,7 @@ UPDATE inbounds SET stream_settings = '$stream_settings_id2' WHERE "key" = '☁C
 UPDATE inbounds SET stream_settings = '$stream_settings_id3' WHERE "key" = '☁CDN_WS☁';
 UPDATE inbounds SET stream_settings = '$stream_settings_id4' WHERE "key" = '🥷🏻REALITY_TG🥷';
 UPDATE inbounds SET stream_settings = '$stream_settings_id5' WHERE "key" = '🥷🏻REALITY_WA🥷🏻';
-UPDATE inbounds SET stream_settings = '$stream_settings_id6' WHERE "key" = '✖️XTLS✖️';
+UPDATE inbounds SET stream_settings = '$stream_settings_id6' WHERE id = 6;
 UPDATE inbounds SET stream_settings = '$stream_settings_id7' WHERE "key" = '📲MKCP📲';
 
 UPDATE settings SET value = '${webPort}' WHERE key = 'webPort';
