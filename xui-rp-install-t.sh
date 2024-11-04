@@ -232,6 +232,10 @@ data_entry() {
 	echo
 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	echo
+ 	check_cf_token
+	echo
+	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+ 	echo
 	msg_inf "Введите доменное имя, под которое будете маскироваться Reality:"
 	read reality
  	echo
@@ -262,10 +266,6 @@ data_entry() {
   	echo
 	msg_inf "Введите путь к JSON подписке (без символов /, $, {}, \):"
 	validate_path subJsonPath
-	echo
-	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
-	echo
- 	check_cf_token
 	echo
 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	echo
@@ -309,6 +309,7 @@ installation_of_utilities() {
       	certbot \
 	python3-certbot-dns-cloudflare \
  	unattended-upgrades
+  
 	curl -fsSL https://pkg.cloudflareclient.com/pubkey.gpg | gpg --yes --dearmor --output /usr/share/keyrings/cloudflare-warp-archive-keyring.gpg
 	echo "deb [signed-by=/usr/share/keyrings/cloudflare-warp-archive-keyring.gpg] https://pkg.cloudflareclient.com/ $(grep "VERSION_CODENAME=" /etc/os-release | cut -d "=" -f 2) main" | tee /etc/apt/sources.list.d/cloudflare-client.list
  	apt-get update && apt-get install cloudflare-warp -y
@@ -924,7 +925,7 @@ EOF
 
 ### Установка 3x-ui ###
 panel_installation() {
-	mkdir -p /usr/local/xui-rp
+	mkdir -p /usr/local/xui-rp/
 	touch /usr/local/xui-rp/reinstallation_check
 	msg_inf "Настройка 3x-ui xray"
 	while ! wget -q --show-progress --timeout=30 --tries=10 --retry-connrefused https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/main/x-ui.gpg; do
@@ -1399,6 +1400,13 @@ EOF
 	echo
 }
 
+# Установока xui бота
+install_xuibot() {
+	if [[ "$1" == "-bot" ]]; then
+ 		bash <(curl -Ls https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/main/xui-rp-bot.sh) "$BOT_TOKEN" "$AID" "$domain"
+	fi
+}
+
 ### Окончание ###
 data_output() {
 	msg_err "PLEASE SAVE THIS SCREEN!"
@@ -1420,13 +1428,6 @@ data_output() {
 	echo
 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	echo
-}
-
-# Установока xui бота
-install_xuibot() {
-	if [[ "$1" == "-bot" ]]; then
- 		bash <(curl -Ls https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/main/xui-rp-bot.sh) "$BOT_TOKEN" "$AID" "$domain"
-	fi
 }
 
 # Удаление всех управляющих последовательностей

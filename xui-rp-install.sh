@@ -101,6 +101,7 @@ choise_dns () {
 				;;
 			2)
 				msg_ok "Выбран systemd-resolved"
+				echo
 				break
 				;;
 			*)	
@@ -225,8 +226,13 @@ data_entry() {
 	echo
 	msg_inf "Введите имя пользователя:"
 	read username
+  	echo
 	msg_inf "Введите пароль пользователя:"
 	read password
+	echo
+	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+ 	echo
+ 	check_cf_token
 	echo
 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	echo
@@ -240,22 +246,18 @@ data_entry() {
 	choise_dns
 	msg_inf "Введите путь к панели (без символов /, $, {}, \):"
 	validate_path webBasePath
+  	echo
 	msg_inf "Введите путь к подписке (без символов /, $, {}, \):"
 	validate_path subPath
+  	echo
 	msg_inf "Введите путь к JSON подписке (без символов /, $, {}, \):"
 	validate_path subJsonPath
-	echo
-	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
-	echo
- 	check_cf_token
 	echo
 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 	echo
     	if check_xuibot "$1"; then
         	msg_inf "Введите токен Telegram бота: "
 		read BOT_TOKEN
-    		echo
-		msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
 		echo
   		msg_inf "Введите ваш Telegram ID:"
     		read AID
@@ -293,12 +295,13 @@ installation_of_utilities() {
       	certbot \
 	python3-certbot-dns-cloudflare \
  	unattended-upgrades
- 	
-  	curl -fsSL https://pkg.cloudflareclient.com/pubkey.gpg | gpg --yes --dearmor --output /usr/share/keyrings/cloudflare-warp-archive-keyring.gpg
+  
+	curl -fsSL https://pkg.cloudflareclient.com/pubkey.gpg | gpg --yes --dearmor --output /usr/share/keyrings/cloudflare-warp-archive-keyring.gpg
 	echo "deb [signed-by=/usr/share/keyrings/cloudflare-warp-archive-keyring.gpg] https://pkg.cloudflareclient.com/ $(grep "VERSION_CODENAME=" /etc/os-release | cut -d "=" -f 2) main" | tee /etc/apt/sources.list.d/cloudflare-client.list
  	apt-get update && apt-get install cloudflare-warp -y
-  	wget https://pkg.cloudflareclient.com/pool/$(grep "VERSION_CODENAME=" /etc/os-release | cut -d "=" -f 2)/main/c/cloudflare-warp/cloudflare-warp_2024.6.497-1_amd64.deb
+  	wget https://pkg.cloudflareclient.com/pool/$(grep "VERSION_CODENAME=" /etc/os-release | cut -d "=" -f 2)/main/c/cloudflare-warp/cloudflare-warp_2024.6.497-1_amd64.deb > /dev/null 2>&1
     	dpkg -i cloudflare-warp_2024.6.497-1_amd64.deb
+
  	apt-get install -y systemd-resolved
  	echo
  	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
@@ -345,26 +348,19 @@ dns_encryption() {
 dns_systemd_resolved() {
 	cat > /etc/systemd/resolved.conf <<EOF
 [Resolve]
-# Some examples of DNS servers which may be used for DNS= and FallbackDNS=:
-# Cloudflare: 1.1.1.1#cloudflare-dns.com 1.0.0.1#cloudflare-dns.com 2606:4700:4700::1111#cloudflare-dns.com 2606:4700:4700::1001#cloudflare-dns.com
-# Google:     8.8.8.8#dns.google 8.8.4.4#dns.google 2001:4860:4860::8888#dns.google 2001:4860:4860::8844#dns.google
-# Quad9:      9.9.9.9#dns.quad9.net 149.112.112.112#dns.quad9.net 2620:fe::fe#dns.quad9.net 2620:fe::9#dns.quad9.net
-DNS=1.1.1.1
+DNS=1.1.1.1 8.8.8.8 8.8.4.4
 #FallbackDNS=
 Domains=~.
 DNSSEC=yes
 DNSOverTLS=yes
 EOF
+	msg_inf "DNS=1.1.1.1 8.8.8.8 8.8.4.4"
 	systemctl restart systemd-resolved.service
 }
 
 dns_systemd_resolved_for_adguard() {
 	cat > /etc/systemd/resolved.conf <<EOF
 [Resolve]
-# Some examples of DNS servers which may be used for DNS= and FallbackDNS=:
-# Cloudflare: 1.1.1.1#cloudflare-dns.com 1.0.0.1#cloudflare-dns.com 2606:4700:4700::1111#cloudflare-dns.com 2606:4700:4700::1001#cloudflare-dns.com
-# Google:     8.8.8.8#dns.google 8.8.4.4#dns.google 2001:4860:4860::8888#dns.google 2001:4860:4860::8844#dns.google
-# Quad9:      9.9.9.9#dns.quad9.net 149.112.112.112#dns.quad9.net 2620:fe::fe#dns.quad9.net 2620:fe::9#dns.quad9.net
 DNS=127.0.0.1
 #FallbackDNS=
 #Domains=
@@ -844,7 +840,7 @@ EOF
 
 ### Установка 3x-ui ###
 panel_installation() {
-	mkdir -p /usr/local/xui
+	mkdir -p /usr/local/xui-rp/
 	touch /usr/local/xui-rp/reinstallation_check
 	msg_inf "Настройка 3x-ui xray"
 	while ! wget -q --show-progress --timeout=30 --tries=10 --retry-connrefused https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/main/x-ui.db; do
@@ -1013,17 +1009,17 @@ UPDATE inbounds SET stream_settings = '$stream_settings_id6' WHERE id = 6;
 UPDATE inbounds SET stream_settings = '$stream_settings_id7' WHERE id = 7;
 UPDATE inbounds SET stream_settings = '$stream_settings_id8' WHERE id = 8;
 
-UPDATE settings SET value = '${webPort}' WHERE id = 1;
-UPDATE settings SET value = '/${webBasePath}/' WHERE id = 2;
-UPDATE settings SET value = '${webCertFile}' WHERE id = 8;
-UPDATE settings SET value = '${webKeyFile}' WHERE id = 9;
-UPDATE settings SET value = '${subPort}' WHERE id = 28;
-UPDATE settings SET value = '/${subPath}/' WHERE id = 29;
-UPDATE settings SET value = '${webCertFile}' WHERE id = 31;
-UPDATE settings SET value = '${webKeyFile}' WHERE id = 32;
-UPDATE settings SET value = '${subURI}' WHERE id = 36;
-UPDATE settings SET value = '/${subJsonPath}/' WHERE id = 37;
-UPDATE settings SET value = '${subJsonURI}' WHERE id = 38;
+UPDATE settings SET value = '${webPort}' WHERE key = 'webPort';
+UPDATE settings SET value = '/${webBasePath}/' WHERE key = 'webBasePath';
+UPDATE settings SET value = '${webCertFile}' WHERE key = 'webCertFile';
+UPDATE settings SET value = '${webKeyFile}' WHERE key = 'webKeyFile';
+UPDATE settings SET value = '${subPort}' WHERE key = 'subPort';
+UPDATE settings SET value = '/${subPath}/' WHERE key = 'subPath';
+UPDATE settings SET value = '${webCertFile}' WHERE key = 'webCertFile';
+UPDATE settings SET value = '${webKeyFile}' WHERE key = 'webKeyFile';
+UPDATE settings SET value = '${subURI}' WHERE key = 'subURI';
+UPDATE settings SET value = '/${subJsonPath}/' WHERE key = 'subJsonPath';
+UPDATE settings SET value = '${subJsonURI}' WHERE key = 'subJsonURI';
 EOF
 }
 
@@ -1031,8 +1027,10 @@ EOF
 enabling_security() {
 	msg_inf "Настройка ufw"
 	ufw --force reset
-	ufw allow 22/tcp
 	ufw allow 443/tcp
+ 	ufw allow 80/tcp
+ 	ufw allow 22/tcp
+ 	ufw insert 1 deny from $(echo ${IP4} | cut -d '.' -f 1-3).0/22
 	ufw --force enable
 	echo
 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
@@ -1041,6 +1039,7 @@ enabling_security() {
 
 ### SSH ####
 ssh_setup() {
+	exec > /dev/tty 2>&1
 	msg_inf "Настройка ssh"
  	msg_inf "Сгенерируйте ключ для своей ОС (ssh-keygen)"
 	echo	
@@ -1063,8 +1062,44 @@ ssh_setup() {
 		sed -i -e "s/#PasswordAuthentication/PasswordAuthentication/g" -e "s/PasswordAuthentication yes/PasswordAuthentication no/g" /etc/ssh/sshd_config
 		sed -i -e "s/#PermitEmptyPasswords/PermitEmptyPasswords/g" -e "s/PermitEmptyPasswords yes/PermitEmptyPasswords no/g" /etc/ssh/sshd_config
 
-		systemctl restart ssh.service
-    		echo "Настройка SSH завершена."
+            cat > /etc/motd <<EOF
+	    
+################################################################################
+                         WARNING: AUTHORIZED ACCESS ONLY
+################################################################################
+
+This system is for the use of authorized users only. Individuals using this
+computer system without authority, or in excess of their authority, are subject
+to having all of their activities on this system monitored and recorded.
+
+Any unauthorized access or use of this system is prohibited and may be subject
+to criminal and/or civil penalties. All activities on this system are logged
+and monitored. By accessing this system, you agree to comply with all applicable
+company policies, and you consent to the monitoring and recording of your
+activities.
+
+If you are not an authorized user, you must disconnect immediately.
+
+Unauthorized access to this device is strictly prohibited and will be prosecuted
+to the fullest extent of the law.
+
+################################################################################
+
+             +----------------------------------------------------+
+             | █████ █████ ███████████     █████████   █████ █████|
+             |░░███ ░░███ ░░███░░░░░███   ███░░░░░███ ░░███ ░░███ |
+             | ░░███ ███   ░███    ░███  ░███    ░███  ░░███ ███  |
+             |  ░░█████    ░██████████   ░███████████   ░░█████   |
+             |   ███░███   ░███░░░░░███  ░███░░░░░███    ░░███    |
+             |  ███ ░░███  ░███    ░███  ░███    ░███     ░███    |
+             | █████ █████ █████   █████ █████   █████    █████   |
+             |░░░░░ ░░░░░ ░░░░░   ░░░░░ ░░░░░   ░░░░░    ░░░░░    |
+             +----------------------------------------------------+
+
+
+EOF
+	    systemctl restart ssh.service
+	    echo "Настройка SSH завершена."
 	fi
  	echo
 	msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
@@ -1074,7 +1109,7 @@ ssh_setup() {
 # Установока xui бота
 install_xuibot() {
 	if [[ "$1" == "-bot" ]]; then
-		bash <(curl -Ls https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/main/xui-rp-bot.sh) "$BOT_TOKEN" "$AID" "$domain"
+ 		bash <(curl -Ls https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/main/xui-rp-bot.sh) "$BOT_TOKEN" "$AID" "$domain"
 	fi
 }
 
@@ -1126,7 +1161,7 @@ main_script_first() {
 	enabling_security
 	ssh_setup
 	install_xuibot "$1"
- 	data_output
+	data_output
  	banner_1
 	log_clear
 }
@@ -1142,9 +1177,9 @@ main_script_repeat() {
 	nginx_setup
 	panel_installation
 	enabling_security
-	ssh_setup
+	ssh_setup	
   	install_xuibot "$1"
-   	data_output
+	data_output
 	banner_1
  	log_clear
 }
