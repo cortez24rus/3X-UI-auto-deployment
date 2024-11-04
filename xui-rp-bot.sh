@@ -9,7 +9,8 @@ fi
 # Установка пакетов
 apt-get update && apt-get install -y python3 python3-pip python3-venv
 
-rm -rf /usr/local/xui-rp/
+rm -rf /usr/local/xui-rp/xui-rp-bot.py
+rm -rf /usr/local/xui-rp/xui-rp-env
 rm -rf /etc/systemd/systemd/xui-rp-bot.service
 systemctl disable xui-rp-bot.service >/dev/null
 systemctl stop xui-rp-bot.service >/dev/null
@@ -17,8 +18,8 @@ systemctl daemon-reload >/dev/null
 
 # Создание директорий и т.д...
 mkdir -p /usr/local/xui-rp/
-python3 -m venv /usr/local/xui-rp/xui-rp-botenv
-source /usr/local/xui-rp/xui-rp-botenv/bin/activate
+python3 -m venv /usr/local/xui-rp/xui-rp-env
+source /usr/local/xui-rp/xui-rp-env/bin/activate
 pip install requests
 pip install python-telegram-bot
 deactivate
@@ -487,7 +488,7 @@ After=network.target
 Type=simple
 User=root
 WorkingDirectory=/usr/local/xui-rp/
-ExecStart=/usr/local/xui-rp/xui-rp-botenv/bin/python /usr/local/xui-rp/xui-rp-bot.py
+ExecStart=/usr/local/xui-rp/xui-rp-env/bin/python /usr/local/xui-rp/xui-rp-bot.py
 Restart=on-failure
 
 [Install]
