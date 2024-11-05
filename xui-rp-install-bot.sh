@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # Пример использования токена
-if [[ -z "$1" =~ ^[A-Za-z0-9_-]+$ ]]; then
-    echo "Неверный формат токена!"
+if [[ -z "$1" || ! "$1" =~ ^[0-9]{9}:[A-Za-z0-9_-]{35}$ ]]; then
+    echo "Неверный формат токена! Токен должен быть в формате '123456789:AAHt-D8V4kM6rmV0TjQjYaS8B6h54gZ5GrY'"
     exit 1
 fi
 
@@ -51,6 +51,6 @@ WantedBy=multi-user.target
 EOF
 
 # Перезагружаем systemd и запускаем службу
-systemctl daemon-reload
-systemctl enable xui-rp-bot.service
-systemctl start xui-rp-bot.service || { echo "Ошибка старта службы"; exit 1; }
+systemctl disable xui-rp-bot.service || { echo "Ошибка при отключении службы"; exit 1; }
+systemctl stop xui-rp-bot.service || { echo "Ошибка при остановке службы"; exit 1; }
+systemctl daemon-reload || { echo "Ошибка при перезагрузке systemd"; exit 1; }
