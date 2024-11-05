@@ -16,11 +16,11 @@ ERROR="${Red}[!]${Font}"
 QUESTION="${Green}[?]${Font}"
 
 function msg_banner()    { echo -e "${Yellow} $1 ${Font}"; }
-function msg_ok()    { echo -e "${OK} ${Blue} $1 ${Font}"; }
-function msg_err()    { echo -e "${ERROR} ${Orange} $1 ${Font}"; }
-function msg_inf()    { echo -e "${QUESTION} ${Yellow} $1 ${Font}"; }
-function msg_out()    { echo -e "${Green} $1 ${Font}"; }
-function msg_tilda()    { echo -e "${Orange}$1${Font}"; }
+function msg_ok()        { echo -e "${OK} ${Blue} $1 ${Font}"; }
+function msg_err()       { echo -e "${ERROR} ${Orange} $1 ${Font}"; }
+function msg_inf()       { echo -e "${QUESTION} ${Yellow} $1 ${Font}"; }
+function msg_out()       { echo -e "${Green} $1 ${Font}"; }
+function msg_tilda()     { echo -e "${Orange}$1${Font}"; }
 
 exec > >(tee -a "$LOGFILE") 2>&1
 
