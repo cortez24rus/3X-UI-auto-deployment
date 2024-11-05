@@ -1,6 +1,7 @@
 #!/bin/bash
 
-LOGFILE="/var/log/xui-rp.log"
+mkdir -p /usr/local/xui-rp/
+LOGFILE="mkdir -p /usr/local/xui-rp/xui-rp.log"
 
 ### INFO ###
 Green="\033[32m"
@@ -1005,9 +1006,9 @@ database_change() {
 UPDATE users SET username = '$username' WHERE id = 1;
 UPDATE users SET password = '$password' WHERE id = 1;
 
-UPDATE inbounds SET stream_settings = '$stream_settings_id6' WHERE id = 6;
-UPDATE inbounds SET stream_settings = '$stream_settings_id7' WHERE id = 7;
-UPDATE inbounds SET stream_settings = '$stream_settings_id8' WHERE id = 8;
+UPDATE inbounds SET stream_settings = '$stream_settings_id6' WHERE remark = '📲MKCP📲';;
+UPDATE inbounds SET stream_settings = '$stream_settings_id7' WHERE remark = '🥷🏻REALITY_WA🥷🏻';
+UPDATE inbounds SET stream_settings = '$stream_settings_id8' WHERE remark = '🦠TROJAN🦠';
 
 UPDATE settings SET value = '${webPort}' WHERE key = 'webPort';
 UPDATE settings SET value = '/${webBasePath}/' WHERE key = 'webBasePath';
