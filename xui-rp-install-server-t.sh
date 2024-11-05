@@ -1,6 +1,7 @@
 #!/bin/bash
 
-LOGFILE="/var/log/xui-rp.log"
+mkdir -p /usr/local/xui-rp/
+LOGFILE="mkdir -p /usr/local/xui-rp/xui-rp.log"
 
 ### INFO ###
 Green="\033[32m"
@@ -1403,7 +1404,7 @@ EOF
 # Установока xui бота
 install_xuibot() {
 	if [[ "$1" == "-bot" ]]; then
- 		bash <(curl -Ls https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/main/xui-rp-bot.sh) "$BOT_TOKEN" "$AID" "$domain"
+ 		bash <(curl -Ls https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/test/xui-rp-install-bot.sh) "$BOT_TOKEN" "$AID" "$domain"
 	fi
 }
 
