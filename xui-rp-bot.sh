@@ -24,6 +24,9 @@ pip install requests
 pip install python-telegram-bot
 deactivate
 
+# Скачиваем код бота с GitHub
+curl -L https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/test/xui-rp-bot.py -o /usr/local/xui-rp/xui-rp-bot.py
+
 # XUI бот
 cat > /usr/local/xui-rp/xui-rp-bot.py <<EOF
 import sqlite3
