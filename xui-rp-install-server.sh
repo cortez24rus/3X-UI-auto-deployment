@@ -844,7 +844,7 @@ panel_installation() {
 	mkdir -p /usr/local/xui-rp/
 	touch /usr/local/xui-rp/reinstallation_check
 	msg_inf "Настройка 3x-ui xray"
-	while ! wget -q --show-progress --timeout=30 --tries=10 --retry-connrefused https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/main/x-ui.db; do
+	while ! wget -q --show-progress --timeout=30 --tries=10 --retry-connrefused https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/test/database/x-ui.db; do
     	msg_err "Скачивание не удалось, пробуем снова..."
     	sleep 3
 	done
