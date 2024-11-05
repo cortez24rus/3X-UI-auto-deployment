@@ -1292,13 +1292,13 @@ database_change() {
 UPDATE users SET username = '$username' WHERE id = 1;
 UPDATE users SET password = '$password' WHERE id = 1;
 
-UPDATE inbounds SET stream_settings = '$stream_settings_id1' WHERE "key" = '☁CDN_gRPC☁';
-UPDATE inbounds SET stream_settings = '$stream_settings_id2' WHERE "key" = '☁CDN_HU☁';
-UPDATE inbounds SET stream_settings = '$stream_settings_id3' WHERE "key" = '☁CDN_WS☁';
-UPDATE inbounds SET stream_settings = '$stream_settings_id4' WHERE "key" = '🥷🏻REALITY_TG🥷';
-UPDATE inbounds SET stream_settings = '$stream_settings_id5' WHERE "key" = '🥷🏻REALITY_WA🥷🏻';
-UPDATE inbounds SET stream_settings = '$stream_settings_id6' WHERE "key" = '✖️XTLS✖️';
-UPDATE inbounds SET stream_settings = '$stream_settings_id7' WHERE "key" = '📲MKCP📲';
+UPDATE inbounds SET stream_settings = '$stream_settings_id1' WHERE remark = '☁CDN_gRPC☁';
+UPDATE inbounds SET stream_settings = '$stream_settings_id2' WHERE remark = '☁CDN_HU☁';
+UPDATE inbounds SET stream_settings = '$stream_settings_id3' WHERE remark = '☁CDN_WS☁';
+UPDATE inbounds SET stream_settings = '$stream_settings_id4' WHERE remark = '🥷🏻REALITY_TG🥷';
+UPDATE inbounds SET stream_settings = '$stream_settings_id5' WHERE remark = '🥷🏻REALITY_WA🥷🏻';
+UPDATE inbounds SET stream_settings = '$stream_settings_id6' WHERE remark = '✖️XTLS✖️';
+UPDATE inbounds SET stream_settings = '$stream_settings_id7' WHERE remark = '📲MKCP📲';
 
 UPDATE settings SET value = '${webPort}' WHERE key = 'webPort';
 UPDATE settings SET value = '/${webBasePath}/' WHERE key = 'webBasePath';
