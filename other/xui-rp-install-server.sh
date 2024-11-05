@@ -46,25 +46,28 @@ answer_input() {
 }
 
 validate_path() {
-    local path_variable_name=$1
-    while true; do
-        read path_value
-        # Проверка на пустой ввод
-        if [[ -z "$path_value" ]]; then
-            msg_err "Ошибка: путь не должен быть пустым"
-            echo
-            msg_inf "Пожалуйста, введите путь заново:"
-        # Проверка на наличие запрещённых символов
-        elif [[ $path_value =~ ['{}\$/'] ]]; then
-            msg_err "Ошибка: путь не должен содержать символы (/, $, {}, \)"
-            echo
-            msg_inf "Пожалуйста, введите путь заново:"
-        else
-            eval $path_variable_name=\$path_value
-            break
-        fi
-    done
+	local path_variable_name=$1
+	while true; do
+		read path_value
+		# Удаление пробелов в начале и конце
+		path_value=$(echo "$path_value" | sed 's/^[ \t]*//;s/[ \t]*$//')
+		# Проверка на пустой ввод
+		if [[ -z "$path_value" ]]; then
+			msg_err "Ошибка: путь не должен быть пустым"
+			echo
+			msg_inf "Пожалуйста, введите путь заново:"
+		# Проверка на наличие запрещённых символов
+		elif [[ $path_value =~ ['{}\$/'] ]]; then
+			msg_err "Ошибка: путь не должен содержать символы (/, $, {}, \\)"
+			echo
+			msg_inf "Пожалуйста, введите путь заново:"
+		else
+			eval $path_variable_name=\$path_value
+			break
+		fi
+	done
 }
+
 
 # Функция для генерации случайного порта
 generate_port() {
