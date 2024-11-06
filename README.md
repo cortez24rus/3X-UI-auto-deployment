@@ -25,6 +25,7 @@
    - Перейдите в раздел SSL/TLS > Overview и выберите Full для параметра Configure.
    - Установите Minimum TLS Version на TLS 1.3.
    - Включите TLS 1.3 (true) в разделе Edge Certificates.
+</details>
 
 > [!NOTE]
 > Скрипт настроен с учётом специфики маршрутизации для пользователей из России.
