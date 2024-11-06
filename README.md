@@ -11,6 +11,9 @@ This script is intended for quick and easy configuration of a hidden proxy serve
 > [!IMPORTANT]
 >  This script has been tested on Debian 12 in a KVM virtualization environment. You will need your own domain, which needs to be bound to Cloudflare for it to work correctly. It is recommended to run the script as root on a freshly installed system.
 
+> [!NOTE]
+> The script is configured according to routing rules for users in Russia.
+
 ### Setting up cloudflare
 1. Upgrade the system and reboot the server.
 2. Configure Cloudflare:
@@ -27,9 +30,6 @@ This script is intended for quick and easy configuration of a hidden proxy serve
    - Set the Minimum TLS Version to TLS 1.3.
    - Enable TLS 1.3 (true) under Edge Certificates.
    
-> [!NOTE]
-> The script is configured according to routing rules for users in Russia.
-
 ### Includes:
   
 1. 3X-UI Xray server configuration:
@@ -45,8 +45,6 @@ This script is intended for quick and easy configuration of a hidden proxy serve
 8. Configuring SSH, to provide minimal security.
 9. Disabling IPv6 to prevent possible vulnerabilities.
 10. Encrypt DNS queries using systemd-resolved or AdGuard Home (DNS over TLS or DNS over HTTPS).
-
------
 
 ### Usage:
 
