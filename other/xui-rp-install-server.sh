@@ -261,12 +261,12 @@ banner_1() {
 
 ### Начало установки ###
 start_installation() {
-    msg_err "ВНИМАНИЕ!"
+    msg_ok "ВНИМАНИЕ!"
     echo
-    msg_err "Перед запуском скрипта рекомендуется выполнить следующие действия:"
-    msg_ok "apt update && apt full-upgrade -y && reboot"
+    msg_ok "Перед запуском скрипта рекомендуется выполнить следующие действия:"
+    msg_err "apt update && apt full-upgrade -y && reboot"
     echo
-    msg_inf "Начать установку XRAY? Выберите опцию [y/N]"
+    msg_ok "Начать установку XRAY? Выберите опцию [y/N]"
     answer_input
 }
 
