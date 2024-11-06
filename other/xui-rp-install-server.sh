@@ -200,11 +200,13 @@ generate_key() {
     case "$key_type" in
         "private")
             key_prefix="privateKey"
-            key=$(openssl genpkey -algorithm RSA -outform PEM -pkeyopt rsa_keygen_bits:2048)
+            # Генерация приватного ключа X25519
+            key=$(openssl genpkey -algorithm X25519 -outform PEM)
             ;;
         "public")
             key_prefix="publicKey"
-            key=$(echo "$key" | openssl rsa -pubout -outform PEM)
+            # Извлечение публичного ключа из приватного
+            key=$(echo "$key" | openssl pkey -pubout -outform PEM)
             ;;
         *)
             echo "Invalid key type. Use 'private' or 'public'."
@@ -215,6 +217,7 @@ generate_key() {
     # Возвращаем ключ
     echo "$key"
 }
+
 
 ### Проверка IP-адреса ###
 check_ip() {
