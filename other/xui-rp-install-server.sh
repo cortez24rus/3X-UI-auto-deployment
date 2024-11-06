@@ -584,8 +584,8 @@ pid                               /run/nginx.pid;
 worker_processes                  auto;
 worker_rlimit_nofile              65535;
 error_log                         /var/log/nginx/error.log;
-
 include                           /etc/nginx/modules-enabled/*.conf;
+include                           /etc/nginx/conf.d/*.conf;
 
 events {
     multi_accept                  on;
@@ -633,8 +633,6 @@ http {
     resolver_timeout              2s;
 
     gzip                          on;
-
-    include /etc/nginx/conf.d/*.conf;
 }
 
 stream {
