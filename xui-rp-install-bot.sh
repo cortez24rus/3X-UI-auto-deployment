@@ -6,18 +6,6 @@ if [[ -z "$1" || ! "$1" =~ ^[0-9]+:[A-Za-z0-9_-]+$ ]]; then
     exit 1
 fi
 
-# Путь к конфигурационному файлу
-CONFIG_FILE="/usr/local/xui-rp/xui-rp-bot-config.json"
-
-# Создаем или обновляем конфигурационный файл
-cat > $CONFIG_FILE <<EOF
-{
-  "BOT_TOKEN": "$1",
-  "BOT_AID": $2,
-  "NAME_MENU": "🎛 $3 🎛"
-}
-EOF
-
 # Установка необходимых пакетов
 apt-get update && apt-get install -y python3 python3-pip python3-venv curl || { echo "Ошибка установки пакетов"; exit 1; }
 
@@ -33,6 +21,18 @@ systemctl daemon-reload >/dev/null
 # Создание директории и виртуального окружения
 mkdir -p /usr/local/xui-rp/
 python3 -m venv /usr/local/xui-rp/xui-rp-env || { echo "Ошибка создания виртуального окружения"; exit 1; }
+
+# Путь к конфигурационному файлу
+CONFIG_FILE="/usr/local/xui-rp/xui-rp-bot-config.json"
+
+# Создаем или обновляем конфигурационный файл
+cat > $CONFIG_FILE <<EOF
+{
+  "BOT_TOKEN": "$1",
+  "BOT_AID": $2,
+  "NAME_MENU": "🎛 $3 🎛"
+}
+EOF
 
 # Активируем окружение и устанавливаем зависимости
 source /usr/local/xui-rp/xui-rp-env/bin/activate
