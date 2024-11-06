@@ -25,8 +25,6 @@
 
 ## Переменные среды
 
-<details>
-  <summary>Нажмите для получения информации о переменных среды</summary>
 
 #### Использование
 
@@ -34,8 +32,6 @@
 | ----- | ---------------- | ---------------- | ------------- |
 | A     | your_domain_name | your_server_ip   | Proxied       |
 | CNAME | www              | your_domain_name | DNS only      |
-
-</details>
 
 
 > [!NOTE]
