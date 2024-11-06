@@ -6,11 +6,28 @@ from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandle
 from telegram.ext import filters
 from datetime import datetime, timedelta
 
+# Чтение данных из конфигурационного файла
+CONFIG_FILE = '/usr/local/xui-rp/config.json'
+
+def load_config():
+    try:
+        with open(CONFIG_FILE, 'r') as f:
+            config = json.load(f)
+    except FileNotFoundError:
+        print(f"Файл конфигурации {CONFIG_FILE} не найден!")
+        exit(1)
+    except json.JSONDecodeError:
+        print("Ошибка в формате конфигурационного файла!")
+        exit(1)
+    return config
+
+config = load_config()
+
 # Вводные данные
 DB_PATH = '/etc/x-ui/x-ui.db'
-BOT_TOKEN = '$1'
-BOT_AID = $2
-NAME_MENU = "🎛 $3 🎛"
+BOT_TOKEN = config['BOT_TOKEN']
+BOT_AID = config['BOT_AID']
+NAME_MENU = config['NAME_MENU']
 
 # Функция для подключения к базе данных
 def get_db_connection():
