@@ -13,8 +13,8 @@ CONFIG_FILE="/usr/local/xui-rp/xui-rp-bot-config.json"
 cat > $CONFIG_FILE <<EOF
 {
   "BOT_TOKEN": "$1",
-  "BOT_AID": "$2",
-  "NAME_MENU": "$3"
+  "BOT_AID": $2,
+  "NAME_MENU": "🎛 $3 🎛"
 }
 EOF
 
