@@ -11,8 +11,8 @@
 ### Настройка cloudflare
 1. Обновите систему и перезагрузите сервер.
 2. Настройте Cloudflare:
-- Привяжите ваш домен к Cloudflare.
-- Добавьте следующие DNS записи:
+   - Привяжите ваш домен к Cloudflare.
+   - Добавьте следующие DNS записи:
 
 | Type  | Name             | Content          | Proxy status  |
 | ----- | ---------------- | ---------------- | ------------- |
@@ -20,10 +20,9 @@
 | CNAME | www              | your_domain_name | DNS only      |
    
 3. Настройки SSL/TLS в Cloudflare:
-  - Перейдите в раздел SSL/TLS > Overview и выберите Full для параметра Configure.
-  - Установите Minimum TLS Version на TLS 1.3.
-  - Включите TLS 1.3 (true) в разделе Edge Certificates.
-</details>
+   - Перейдите в раздел SSL/TLS > Overview и выберите Full для параметра Configure.
+   - Установите Minimum TLS Version на TLS 1.3.
+   - Включите TLS 1.3 (true) в разделе Edge Certificates.
 
 > [!NOTE]
 > Скрипт настроен с учётом специфики маршрутизации для пользователей из России.
@@ -43,8 +42,6 @@
 8. Настройка SSH за NGINX, скрывая реальный SSH-порт.
 9. Отключение IPv6 для предотвращения возможных уязвимостей.
 10. Шифрование DNS-запросов с использованием systemd-resolved или AdGuard Home (DNS over TLS или DNS over HTTPS).
-
-</details>
 
 -----
 
