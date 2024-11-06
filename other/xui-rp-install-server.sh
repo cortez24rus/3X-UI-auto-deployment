@@ -218,7 +218,6 @@ generate_key() {
     echo "$key"
 }
 
-
 ### Проверка IP-адреса ###
 check_ip() {
     IP4_REGEX="^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$"
@@ -985,7 +984,10 @@ EOF
 }
 
 stream_settings_id4() {
-	stream_settings_id4=$(cat <<EOF
+    local public_key=$(generate_key "public")
+    local private_key=$(generate_key "private")
+    
+    stream_settings_id4=$(cat <<EOF
 {
   "network": "tcp",
   "security": "reality",
@@ -1004,7 +1006,7 @@ stream_settings_id4() {
     "serverNames": [
       "${reality}"
     ],
-    "privateKey": "UE1O35n_PzDxE8_FK6uaPBG0uDbfcf7fOzZYYq6yqEQ",
+    "privateKey": "${private_key}",
     "minClient": "",
     "maxClient": "",
     "maxTimediff": 0,
@@ -1019,7 +1021,7 @@ stream_settings_id4() {
       "bc85"
     ],
     "settings": {
-      "publicKey": "Ydv9h2n5xuds-9qQQmHSEC02rjGLPDct1j_CDTFAgko",
+      "publicKey": "${public_key}",
       "fingerprint": "chrome",
       "serverName": "",
       "spiderX": "/"
@@ -1037,7 +1039,10 @@ EOF
 }
 
 stream_settings_id5() {
-	stream_settings_id5=$(cat <<EOF
+    local public_key=$(generate_key "public")
+    local private_key=$(generate_key "private")
+    
+    stream_settings_id5=$(cat <<EOF
 {
   "network": "tcp",
   "security": "reality",
@@ -1056,22 +1061,22 @@ stream_settings_id5() {
     "serverNames": [
       "${reality2}"
     ],
-    "privateKey": "sO0WwnqzoNQKQXGbKOyBFRqPPyF_Bmb6Np0jiQJp3Sk",
+    "privateKey": "${private_key}",
     "minClient": "",
     "maxClient": "",
     "maxTimediff": 0,
     "shortIds": [
-      "cd95c9",
-      "eeed8008",
-      "f2e26eba6c9432cf",
-      "0d6a8b47988f0d",
-      "c1",
-      "1b60e7369779",
-      "7fb9d5f9d8",
-      "6696"
+      "22dff0",
+      "0041e9ca",
+      "49afaa139d",
+      "89",
+      "1addf92cc1bd50",
+      "6e122954e9df",
+      "8d93026df5de065c",
+      "bc85"
     ],
     "settings": {
-      "publicKey": "3tYsVaTef7cPUgKlSUm7ebEZuciswhVyUbn7e_asBnE",
+      "publicKey": "${public_key}",
       "fingerprint": "chrome",
       "serverName": "",
       "spiderX": "/"
