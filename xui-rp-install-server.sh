@@ -1,5 +1,8 @@
 #!/bin/bash
 
+mkdir -p /usr/local/xui-rp/
+LOGFILE="/usr/local/xui-rp/xui-rp.log"
+
 ### INFO ###
 Green="\033[32m"
 Red="\033[31m"
@@ -196,11 +199,13 @@ generate_key() {
     case "$key_type" in
         "private")
             key_prefix="privateKey"
-            key=$(openssl genpkey -algorithm RSA -outform PEM -pkeyopt rsa_keygen_bits:2048)
+            # Генерация приватного ключа X25519 с использованием xray
+            key=$(/usr/local/x-ui/bin/xray-linux-amd64 x25519 | grep "Private key:" | awk '{print $3}')
             ;;
         "public")
             key_prefix="publicKey"
-            key=$(echo "$key" | openssl rsa -pubout -outform PEM)
+            # Генерация публичного ключа X25519 с использованием xray
+            key=$(/usr/local/x-ui/bin/xray-linux-amd64 x25519 | grep "Public key:" | awk '{print $3}')
             ;;
         *)
             echo "Invalid key type. Use 'private' or 'public'."
@@ -717,7 +722,6 @@ EOF
 
 ### Установка 3x-ui ###
 panel_installation() {
-    mkdir -p /usr/local/xui-rp/
     touch /usr/local/xui-rp/reinstallation_check
     msg_inf "Настройка 3x-ui xray"
     while ! wget -q --show-progress --timeout=30 --tries=10 --retry-connrefused https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/test/database/x-ui.db; do
@@ -885,9 +889,9 @@ database_change() {
 UPDATE users SET username = '$username' WHERE id = 1;
 UPDATE users SET password = '$password' WHERE id = 1;
 
-UPDATE inbounds SET stream_settings = '$stream_settings_id6' WHERE remark = '📲MKCP📲';;
-UPDATE inbounds SET stream_settings = '$stream_settings_id7' WHERE remark = '🥷🏻REALITY_WA🥷🏻';
-UPDATE inbounds SET stream_settings = '$stream_settings_id8' WHERE remark = '🦠TROJAN🦠';
+UPDATE inbounds SET stream_settings = '$stream_settings_id6' WHERE "key" = '📲MKCP📲';;
+UPDATE inbounds SET stream_settings = '$stream_settings_id7' WHERE "key" = '🥷🏻REALITY_WA🥷🏻';
+UPDATE inbounds SET stream_settings = '$stream_settings_id8' WHERE "key" = '🦠TROJAN🦠';
 
 UPDATE settings SET value = '${webPort}' WHERE key = 'webPort';
 UPDATE settings SET value = '/${webBasePath}/' WHERE key = 'webBasePath';
@@ -1066,8 +1070,6 @@ main_script_repeat() {
 
 ### Проверка запуска ###
 main_choise() {
-    mkdir -p /usr/local/xui-rp/
-    LOGFILE="/usr/local/xui-rp/xui-rp.log"
     if [ -f /usr/local/xui-rp/reinstallation_check ]; then
         clear
         echo
