@@ -117,26 +117,20 @@ crop_domain() {
 
     # Проверка формата домена
     if ! [[ "$domain" =~ ^([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$ ]]; then
-        msg_err "Ошибка: введённый домен '$domain' имеет неверный формат."
+        echo "Ошибка: введённый домен '$domain' имеет неверный формат."
         return 1
     fi
     return 0
 }
 
-# Функция для отправки запроса в API Cloudflare и получения ответа
 get_test_response() {
-    # Извлечение домена для проверки
     testdomain=$(echo "${domain}" | rev | cut -d '.' -f 1-2 | rev)
 
-    # Определение заголовков в зависимости от типа токена
     if [[ "$cftoken" =~ [A-Z] ]]; then
-        headers="Authorization: Bearer ${cftoken}"
+        test_response=$(curl --silent --request GET --url https://api.cloudflare.com/client/v4/zones --header "Authorization: Bearer ${cftoken}" --header "Content-Type: application/json")
     else
-        headers="X-Auth-Key: ${cftoken} X-Auth-Email: ${email}"
+        test_response=$(curl --silent --request GET --url https://api.cloudflare.com/client/v4/zones --header "X-Auth-Key: ${cftoken}" --header "X-Auth-Email: ${email}" --header "Content-Type: application/json")
     fi
-
-    # Отправка запроса
-    test_response=$(curl --silent --request GET --url https://api.cloudflare.com/client/v4/zones --header "$headers" --header "Content-Type: application/json")
 }
 
 # Функция для проверки правильности ответа от API Cloudflare
