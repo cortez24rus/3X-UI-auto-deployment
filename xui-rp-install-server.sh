@@ -1056,7 +1056,7 @@ main_script_repeat() {
 ### Проверка запуска ###
 main_choise() {
     mkdir -p /usr/local/xui-rp/
-    LOGFILE="mkdir -p /usr/local/xui-rp/xui-rp.log"
+    LOGFILE="/usr/local/xui-rp/xui-rp.log"
     if [ -f /usr/local/xui-rp/reinstallation_check ]; then
         clear
         echo
