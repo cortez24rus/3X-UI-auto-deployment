@@ -24,6 +24,13 @@
    - Перейдите в раздел SSL/TLS > Overview и выберите Full для параметра Configure.
    - Установите Minimum TLS Version на TLS 1.3.
    - Включите TLS 1.3 (true) в разделе Edge Certificates.
+| Переменная       |                      Тип                       | Значение по умолчанию |
+| ---------------- | :------------------------------------------:   | :-------------------- |
+| XUI_LOG_LEVEL    | `"debug"` \| `"info"` \| `"warn"` \| `"error"` | `"info"`             |
+| XUI_DEBUG        |                   `boolean`                    | `false`              |
+| XUI_BIN_FOLDER   |                    `string`                    | `"bin"`              |
+| XUI_DB_FOLDER    |                    `string`                    | `"/etc/x-ui"`        |
+| XUI_LOG_FOLDER   |                    `string`                    | `"/var/log"`         |
 </details>
 
 > [!NOTE]
