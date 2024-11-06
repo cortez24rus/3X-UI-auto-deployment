@@ -1,8 +1,5 @@
 #!/bin/bash
 
-mkdir -p /usr/local/xui-rp/
-LOGFILE="mkdir -p /usr/local/xui-rp/xui-rp.log"
-
 ### INFO ###
 Green="\033[32m"
 Red="\033[31m"
@@ -67,7 +64,6 @@ validate_path() {
 		fi
 	done
 }
-
 
 # Функция для генерации случайного порта
 generate_port() {
@@ -198,6 +194,34 @@ check_cf_token() {
     done
 }
 
+generate_key() {
+    local key_type="$1"
+    local key_length=0
+    local key_prefix=""
+
+    # Определяем длину и префикс для ключа в зависимости от типа
+    case "$key_type" in
+        "private")
+            key_length=43  # длина для приватного ключа (пример)
+            key_prefix="privateKey"
+            ;;
+        "public")
+            key_length=43  # длина для публичного ключа (пример)
+            key_prefix="publicKey"
+            ;;
+        *)
+            echo "Invalid key type. Use 'private' or 'public'."
+            return 1
+            ;;
+    esac
+
+    # Генерация случайной строки с использованием openssl
+    key=$(openssl rand -base64 32 | tr -d '\n=' | head -c $key_length)
+
+    # Возвращаем ключ
+    echo "$key"
+}
+
 ### Проверка IP-адреса ###
 check_ip() {
     IP4_REGEX="^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$"
@@ -281,8 +305,8 @@ data_entry() {
     echo
     msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
     echo
-    msg_inf    "Введите 1, для установки adguard-home (DoH-DoT)"
-    msg_inf    "Введите 2, для установки systemd-resolved (DoT)"
+    msg_inf "Введите 1, для установки adguard-home (DoH-DoT)"
+    msg_inf "Введите 2, для установки systemd-resolved (DoT)"
     choise_dns
     msg_inf "Введите путь к панели (без символов /, $, {}, \):"
     validate_path webBasePath
@@ -1127,6 +1151,9 @@ EOF
 }
 
 stream_settings_id4() {
+    local public_key=$(generate_key "public")
+    local private_key=$(generate_key "private")
+    
     stream_settings_id4=$(cat <<EOF
 {
   "network": "tcp",
@@ -1146,7 +1173,7 @@ stream_settings_id4() {
     "serverNames": [
       "${reality}"
     ],
-    "privateKey": "UE1O35n_PzDxE8_FK6uaPBG0uDbfcf7fOzZYYq6yqEQ",
+    "privateKey": "${private_key}",
     "minClient": "",
     "maxClient": "",
     "maxTimediff": 0,
@@ -1161,7 +1188,7 @@ stream_settings_id4() {
       "bc85"
     ],
     "settings": {
-      "publicKey": "Ydv9h2n5xuds-9qQQmHSEC02rjGLPDct1j_CDTFAgko",
+      "publicKey": "${public_key}",
       "fingerprint": "chrome",
       "serverName": "",
       "spiderX": "/"
@@ -1179,6 +1206,9 @@ EOF
 }
 
 stream_settings_id5() {
+    local public_key=$(generate_key "public")
+    local private_key=$(generate_key "private")
+    
     stream_settings_id5=$(cat <<EOF
 {
   "network": "tcp",
@@ -1194,26 +1224,26 @@ stream_settings_id5() {
   "realitySettings": {
     "show": false,
     "xver": 0,
-    "dest": "${reality2}:443",
+    "dest": "${reality}:443",
     "serverNames": [
-      "${reality2}"
+      "${reality}"
     ],
-    "privateKey": "sO0WwnqzoNQKQXGbKOyBFRqPPyF_Bmb6Np0jiQJp3Sk",
+    "privateKey": "${private_key}",
     "minClient": "",
     "maxClient": "",
     "maxTimediff": 0,
     "shortIds": [
-      "cd95c9",
-      "eeed8008",
-      "f2e26eba6c9432cf",
-      "0d6a8b47988f0d",
-      "c1",
-      "1b60e7369779",
-      "7fb9d5f9d8",
-      "6696"
+      "22dff0",
+      "0041e9ca",
+      "49afaa139d",
+      "89",
+      "1addf92cc1bd50",
+      "6e122954e9df",
+      "8d93026df5de065c",
+      "bc85"
     ],
     "settings": {
-      "publicKey": "3tYsVaTef7cPUgKlSUm7ebEZuciswhVyUbn7e_asBnE",
+      "publicKey": "${public_key}",
       "fingerprint": "chrome",
       "serverName": "",
       "spiderX": "/"
@@ -1506,6 +1536,8 @@ main_script_repeat() {
 
 ### Проверка запуска ###
 main_choise() {
+    mkdir -p /usr/local/xui-rp/
+    LOGFILE="mkdir -p /usr/local/xui-rp/xui-rp.log"
     if [ -f /usr/local/xui-rp/reinstallation_check ]; then
         clear
         echo
