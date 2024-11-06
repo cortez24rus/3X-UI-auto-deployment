@@ -985,10 +985,7 @@ EOF
 }
 
 stream_settings_id4() {
-    local public_key=$(generate_key "public")
-    local private_key=$(generate_key "private")
-    
-    stream_settings_id4=$(cat <<EOF
+	stream_settings_id4=$(cat <<EOF
 {
   "network": "tcp",
   "security": "reality",
@@ -1007,7 +1004,7 @@ stream_settings_id4() {
     "serverNames": [
       "${reality}"
     ],
-    "privateKey": "${private_key}",
+    "privateKey": "UE1O35n_PzDxE8_FK6uaPBG0uDbfcf7fOzZYYq6yqEQ",
     "minClient": "",
     "maxClient": "",
     "maxTimediff": 0,
@@ -1022,7 +1019,7 @@ stream_settings_id4() {
       "bc85"
     ],
     "settings": {
-      "publicKey": "${public_key}",
+      "publicKey": "Ydv9h2n5xuds-9qQQmHSEC02rjGLPDct1j_CDTFAgko",
       "fingerprint": "chrome",
       "serverName": "",
       "spiderX": "/"
@@ -1040,10 +1037,7 @@ EOF
 }
 
 stream_settings_id5() {
-    local public_key=$(generate_key "public")
-    local private_key=$(generate_key "private")
-    
-    stream_settings_id5=$(cat <<EOF
+	stream_settings_id5=$(cat <<EOF
 {
   "network": "tcp",
   "security": "reality",
@@ -1062,22 +1056,22 @@ stream_settings_id5() {
     "serverNames": [
       "${reality2}"
     ],
-    "privateKey": "${private_key}",
+    "privateKey": "sO0WwnqzoNQKQXGbKOyBFRqPPyF_Bmb6Np0jiQJp3Sk",
     "minClient": "",
     "maxClient": "",
     "maxTimediff": 0,
     "shortIds": [
-      "22dff0",
-      "0041e9ca",
-      "49afaa139d",
-      "89",
-      "1addf92cc1bd50",
-      "6e122954e9df",
-      "8d93026df5de065c",
-      "bc85"
+      "cd95c9",
+      "eeed8008",
+      "f2e26eba6c9432cf",
+      "0d6a8b47988f0d",
+      "c1",
+      "1b60e7369779",
+      "7fb9d5f9d8",
+      "6696"
     ],
     "settings": {
-      "publicKey": "${public_key}",
+      "publicKey": "3tYsVaTef7cPUgKlSUm7ebEZuciswhVyUbn7e_asBnE",
       "fingerprint": "chrome",
       "serverName": "",
       "spiderX": "/"
