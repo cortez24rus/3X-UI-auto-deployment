@@ -15,10 +15,7 @@
 2. Настройте Cloudflare:
    - Привяжите ваш домен к Cloudflare.
    - Добавьте следующие DNS записи:
-      | Type  | Name             | Content          | Proxy status  |
-      | ----- | ---------------- | ---------------- | ------------- |
-      | A     | your_domain_name | your_server_ip   | Proxied       |
-      | CNAME | www              | your_domain_name | DNS only      |
+
    
 3. Настройки SSL/TLS в Cloudflare:
    - Перейдите в раздел SSL/TLS > Overview и выберите Full для параметра Configure.
@@ -33,21 +30,13 @@
 
 #### Использование
 
-| Переменная       |                      Тип                       | Значение по умолчанию |
-| ---------------- | :------------------------------------------:   | :-------------------- |
-| XUI_LOG_LEVEL    | `"debug"` \| `"info"` \| `"warn"` \| `"error"` | `"info"`             |
-| XUI_DEBUG        |                   `boolean`                    | `false`              |
-| XUI_BIN_FOLDER   |                    `string`                    | `"bin"`              |
-| XUI_DB_FOLDER    |                    `string`                    | `"/etc/x-ui"`        |
-| XUI_LOG_FOLDER   |                    `string`                    | `"/var/log"`         |
-
-Пример:
-
-```sh
-XUI_BIN_FOLDER="bin" XUI_DB_FOLDER="/etc/x-ui" go build main.go
-```
+| Type  | Name             | Content          | Proxy status  |
+| ----- | ---------------- | ---------------- | ------------- |
+| A     | your_domain_name | your_server_ip   | Proxied       |
+| CNAME | www              | your_domain_name | DNS only      |
 
 </details>
+
 
 > [!NOTE]
 > Скрипт настроен с учётом специфики маршрутизации для пользователей из России.
