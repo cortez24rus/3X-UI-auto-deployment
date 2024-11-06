@@ -29,7 +29,9 @@ This script is intended for quick and easy configuration of a hidden proxy serve
    - Go to SSL/TLS > Overview and select Full for the Configure option.
    - Set the Minimum TLS Version to TLS 1.3.
    - Enable TLS 1.3 (true) under Edge Certificates.
-   
+
+-----
+
 ### Includes:
   
 1. 3X-UI Xray server configuration:
@@ -46,11 +48,20 @@ This script is intended for quick and easy configuration of a hidden proxy serve
 9. Disabling IPv6 to prevent possible vulnerabilities.
 10. Encrypt DNS queries using systemd-resolved or AdGuard Home (DNS over TLS or DNS over HTTPS).
 
+-----
+
 ### Usage:
 
 To begin configuring the server, simply run the following command in a terminal:
 ```sh
 bash <(curl -Ls https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/main/xui-rp-install.sh)
+```
+
+### Tg-bot:
+
+In order to install a bot on the server, it is enough to configure the launch of the base script with the -bot switch:
+```sh
+bash <(curl -Ls https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/main/xui-rp-install.sh) -bot
 ```
 
 The script will then prompt you for the necessary configuration information:
