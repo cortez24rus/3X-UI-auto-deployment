@@ -7,7 +7,7 @@ from telegram.ext import filters
 from datetime import datetime, timedelta
 
 # Чтение данных из конфигурационного файла
-CONFIG_FILE = '/usr/local/xui-rp/config.json'
+CONFIG_FILE = '/usr/local/xui-rp/xui-rp-bot-config.json'
 
 def load_config():
     try:
