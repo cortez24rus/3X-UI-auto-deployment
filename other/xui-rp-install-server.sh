@@ -1224,9 +1224,9 @@ stream_settings_id5() {
   "realitySettings": {
     "show": false,
     "xver": 0,
-    "dest": "${reality}:443",
+    "dest": "${reality2}:443",
     "serverNames": [
-      "${reality}"
+      "${reality2}"
     ],
     "privateKey": "${private_key}",
     "minClient": "",
