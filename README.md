@@ -32,11 +32,11 @@ This script is intended for quick and easy configuration of a hidden proxy serve
 ### Includes:
   
 1. 3X-UI Xray server configuration:
-  - Trojan TLS and VLESS Reality protocols.
-  - Connection of subscription and JSON subscription for automatic configuration updates.
+   - Trojan TLS and VLESS Reality protocols.
+   - Connection of subscription and JSON subscription for automatic configuration updates.
 2. Configuring NGINX reverse proxy on port 443.
 3. providing security:
-  - Automatic system updates via unattended-upgrades.
+   - Automatic system updates via unattended-upgrades.
 4. Configuring Cloudflare SSL certificates with automatic updates to secure connections.
 5. Configuring WARP to protect traffic.
 6. Enabling BBR - improving the performance of TCP connections.
