@@ -13,8 +13,9 @@
 2. Настройте Cloudflare:
    - Привяжите ваш домен к Cloudflare.
    - Добавьте следующие DNS записи:
-   <details>
-     <summary>A | your_domain_name | your_server_ip | Proxied</summary>
+      ```sh
+      XUI_BIN_FOLDER="bin" XUI_DB_FOLDER="/etc/x-ui" go build main.go
+      ```
    
 3. Настройки SSL/TLS в Cloudflare:
    - Перейдите в раздел SSL/TLS > Overview и выберите Full для параметра Configure.
