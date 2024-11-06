@@ -444,6 +444,9 @@ dns_adguard_home() {
     done
     sed -i "s/\${username}/username/g" AdGuardHome/AdGuardHome.yaml
     sed -i "s/\${hash}/hash/g" AdGuardHome/AdGuardHome.yaml
+    sed -i "s/\${username}/domain_temp/g" AdGuardHome/AdGuardHome.yaml
+    sed -i "s/\${webCertFile}/fullchain.pem/g" AdGuardHome/AdGuardHome.yaml
+    sed -i "s/\${webKeyFile}/privkey.pem/g" AdGuardHome/AdGuardHome.yaml
 
     AdGuardHome/AdGuardHome -s restart
 }
