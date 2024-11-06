@@ -34,13 +34,12 @@ check_xuibot() {
 ### Продолжение? ###
 answer_input() {
     read -r answer
-    if [[ "$answer" != "y" && "$answer" != "Y" ]]; then
-    echo
-    msg_err "ОТМЕНА"
-    echo
-        return 1  # Возвращаем 1, если ответ не 'y' или 'Y'
-    fi
-    return 0  # Возвращаем 0, если ответ 'y' или 'Y'
+    case "${answer,,}" in
+        y) return 0 ;;  # 'y' или 'Y' — продолжить
+        *) 
+            msg_err "ОТМЕНА"
+            return 1 ;;  # Для любых других значений — отменить
+    esac
 }
 
 validate_path() {
