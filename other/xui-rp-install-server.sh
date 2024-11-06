@@ -200,13 +200,13 @@ generate_key() {
     case "$key_type" in
         "private")
             key_prefix="privateKey"
-            # Генерация приватного ключа X25519
-            key=$(openssl genpkey -algorithm X25519 -outform PEM)
+            # Генерация приватного ключа X25519 с использованием xray
+            key=$(/usr/local/x-ui/bin/xray-linux-amd64 x25519 | grep "Private key:" | awk '{print $3}')
             ;;
         "public")
             key_prefix="publicKey"
-            # Извлечение публичного ключа из приватного
-            key=$(echo "$key" | openssl pkey -pubout -outform PEM)
+            # Генерация публичного ключа X25519 с использованием xray
+            key=$(/usr/local/x-ui/bin/xray-linux-amd64 x25519 | grep "Public key:" | awk '{print $3}')
             ;;
         *)
             echo "Invalid key type. Use 'private' or 'public'."
