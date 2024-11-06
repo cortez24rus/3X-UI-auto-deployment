@@ -13,7 +13,7 @@
 2. Настройте Cloudflare:
    - Привяжите ваш домен к Cloudflare.
    - Добавьте следующие DNS записи:
-      ```sh
+      ```css
       A | your_domain_name | your_server_ip | Proxied
       CNAME | www | your_domain_name | DNS only
       ```
