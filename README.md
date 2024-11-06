@@ -14,8 +14,9 @@
    - Привяжите ваш домен к Cloudflare.
    - Добавьте следующие DNS записи:
       ```sh
-      A     | your_domain_name | your_server_ip   | Proxied
-      CNAME | www              | your_domain_name | DNS only
+      | A     | your_domain_name | your_server_ip   | Proxied  |
+      | ----- | ---------------- | ---------------- | -------- |
+      | CNAME | www              | your_domain_name | DNS only |
       ```
    
 3. Настройки SSL/TLS в Cloudflare:
