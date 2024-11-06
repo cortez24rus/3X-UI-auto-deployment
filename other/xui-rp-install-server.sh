@@ -112,10 +112,11 @@ choise_dns () {
 
 # Функция для обрезки домена (удаление http://, https:// и www)
 crop_domain() {
-    # Удаление префиксов и www
-    domain=$(echo "$domain" | sed -e 's|https\?://||' -e 's|^www\.||' -e 's|/.*$||')
+    domain=${domain//https:\/\//}
+    domain=${domain//http:\/\//}
+    domain=${domain//www./}
+    domain=${domain%%/*}
 
-    # Проверка формата домена
     if ! [[ "$domain" =~ ^([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$ ]]; then
         msg_err "Ошибка: введённый домен '$domain' имеет неверный формат."
         return 1
@@ -123,31 +124,23 @@ crop_domain() {
     return 0
 }
 
-# Функция для отправки запроса в API Cloudflare и получения ответа
 get_test_response() {
-    # Извлечение домена для проверки
     testdomain=$(echo "${domain}" | rev | cut -d '.' -f 1-2 | rev)
 
-    # Определение заголовков в зависимости от типа токена
     if [[ "$cftoken" =~ [A-Z] ]]; then
-        headers="Authorization: Bearer ${cftoken}"
+        test_response=$(curl --silent --request GET --url https://api.cloudflare.com/client/v4/zones --header "Authorization: Bearer ${cftoken}" --header "Content-Type: application/json")
     else
-        headers="X-Auth-Key: ${cftoken} X-Auth-Email: ${email}"
+        test_response=$(curl --silent --request GET --url https://api.cloudflare.com/client/v4/zones --header "X-Auth-Key: ${cftoken}" --header "X-Auth-Email: ${email}" --header "Content-Type: application/json")
     fi
-
-    # Отправка запроса
-    test_response=$(curl --silent --request GET --url https://api.cloudflare.com/client/v4/zones --header "$headers" --header "Content-Type: application/json")
 }
 
-# Функция для проверки правильности ответа от API Cloudflare
 validate_input() {
     get_test_response
-
-    # Проверка, содержит ли ответ нужные данные
-    if [[ "$test_response" =~ "\"${testdomain}\"" && \
-          "$test_response" =~ "\"#dns_records:edit\"" && \
-          "$test_response" =~ "\"#dns_records:read\"" && \
-          "$test_response" =~ "\"#zone:read\"" ]]; then
+    
+    if [[ -n $(echo "$test_response" | grep "\"${testdomain}\"") ]] && \
+       [[ -n $(echo "$test_response" | grep "\"#dns_records:edit\"") ]] && \
+       [[ -n $(echo "$test_response" | grep "\"#dns_records:read\"") ]] && \
+       [[ -n $(echo "$test_response" | grep "\"#zone:read\"") ]]; then
         return 0
     else
         return 1
@@ -158,26 +151,26 @@ check_cf_token() {
     while true; do
         while [[ -z $domain ]]; do
             msg_inf "Введите ваш домен:"
-            read -r domain
+            read domain
             echo
         done
 
         crop_domain
         
-    if [[ $? -ne 0 ]]; then
+	if [[ $? -ne 0 ]]; then
             domain=""
             continue
         fi
 
         while [[ -z $email ]]; do
             msg_inf "Введите вашу почту, зарегистрированную на Cloudflare:"
-            read -r email
+            read email
             echo
         done
 
         while [[ -z $cftoken ]]; do
             msg_inf "Введите ваш API токен Cloudflare (Edit zone DNS) или Cloudflare global API key:"
-            read -r cftoken
+            read cftoken
             echo
         done
 
