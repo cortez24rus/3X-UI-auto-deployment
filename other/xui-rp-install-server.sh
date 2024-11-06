@@ -451,8 +451,8 @@ dns_adguard_home() {
         msg_err "Скачивание не удалось, пробуем снова..."
         sleep 3
     done
-    sed -i "s/\${username}/$username/g" AdGuardHome/AdGuardHome.yaml
-    sed -i "s/\${hash}/$hash/g" AdGuardHome/AdGuardHome.yaml
+    sed -i "s/\${username}/username/g" AdGuardHome/AdGuardHome.yaml
+    sed -i "s/\${hash}/hash/g" AdGuardHome/AdGuardHome.yaml
 
     AdGuardHome/AdGuardHome -s restart
 }
