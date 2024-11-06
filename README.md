@@ -24,6 +24,15 @@
    - Перейдите в раздел SSL/TLS > Overview и выберите Full для параметра Configure.
    - Установите Minimum TLS Version на TLS 1.3.
    - Включите TLS 1.3 (true) в разделе Edge Certificates.
+
+
+## Переменные среды
+
+<details>
+  <summary>Нажмите для получения информации о переменных среды</summary>
+
+#### Использование
+
 | Переменная       |                      Тип                       | Значение по умолчанию |
 | ---------------- | :------------------------------------------:   | :-------------------- |
 | XUI_LOG_LEVEL    | `"debug"` \| `"info"` \| `"warn"` \| `"error"` | `"info"`             |
@@ -31,6 +40,13 @@
 | XUI_BIN_FOLDER   |                    `string`                    | `"bin"`              |
 | XUI_DB_FOLDER    |                    `string`                    | `"/etc/x-ui"`        |
 | XUI_LOG_FOLDER   |                    `string`                    | `"/var/log"`         |
+
+Пример:
+
+```sh
+XUI_BIN_FOLDER="bin" XUI_DB_FOLDER="/etc/x-ui" go build main.go
+```
+
 </details>
 
 > [!NOTE]
