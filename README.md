@@ -34,6 +34,7 @@
 
 ### Включает:
 <details>
+  
 1) Настройку сервера 3X-UI Xray (протоколы Trojan Tls и VLESS Reality, подписка, json подписка)
 2) Настройку обратного прокси NGINX на 443 порту
 3) Настройку безопасности, включая автоматические обновления (unattended-upgrades)
@@ -43,7 +44,8 @@
 7) Настройка UFW
 8) Настройка SSH за NGINX
 9) Отключение IPv6
-10) Шифрование DNS запросов systemd-resolved или adguard-home (DNS over TLS или DNS over HTTPS) 
+10) Шифрование DNS запросов systemd-resolved или adguard-home (DNS over TLS или DNS over HTTPS)
+
 </details>
 
 -----
