@@ -110,15 +110,15 @@ choise_dns () {
     done
 }
 
+
 # Функция для обрезки домена (удаление http://, https:// и www)
 crop_domain() {
-    domain=${domain//https:\/\//}
-    domain=${domain//http:\/\//}
-    domain=${domain//www./}
-    domain=${domain%%/*}
+    # Удаление префиксов и www
+    domain=$(echo "$domain" | sed -e 's|https\?://||' -e 's|^www\.||' -e 's|/.*$||')
 
+    # Проверка формата домена
     if ! [[ "$domain" =~ ^([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$ ]]; then
-        msg_err "Ошибка: введённый домен '$domain' имеет неверный формат."
+        echo "Ошибка: введённый домен '$domain' имеет неверный формат."
         return 1
     fi
     return 0
@@ -134,13 +134,15 @@ get_test_response() {
     fi
 }
 
+# Функция для проверки правильности ответа от API Cloudflare
 validate_input() {
     get_test_response
-    
-    if [[ -n $(echo "$test_response" | grep "\"${testdomain}\"") ]] && \
-       [[ -n $(echo "$test_response" | grep "\"#dns_records:edit\"") ]] && \
-       [[ -n $(echo "$test_response" | grep "\"#dns_records:read\"") ]] && \
-       [[ -n $(echo "$test_response" | grep "\"#zone:read\"") ]]; then
+
+    # Проверка, содержит ли ответ нужные данные
+    if [[ "$test_response" =~ "\"${testdomain}\"" && \
+          "$test_response" =~ "\"#dns_records:edit\"" && \
+          "$test_response" =~ "\"#dns_records:read\"" && \
+          "$test_response" =~ "\"#zone:read\"" ]]; then
         return 0
     else
         return 1
