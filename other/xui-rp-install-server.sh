@@ -191,27 +191,23 @@ check_cf_token() {
 
 generate_key() {
     local key_type="$1"
-    local key_length=0
     local key_prefix=""
+    local key=""
 
-    # Определяем длину и префикс для ключа в зависимости от типа
     case "$key_type" in
         "private")
-            key_length=43  # длина для приватного ключа (пример)
             key_prefix="privateKey"
+            key=$(openssl genpkey -algorithm RSA -outform PEM -pkeyopt rsa_keygen_bits:2048)
             ;;
         "public")
-            key_length=43  # длина для публичного ключа (пример)
             key_prefix="publicKey"
+            key=$(echo "$key" | openssl rsa -pubout -outform PEM)
             ;;
         *)
             echo "Invalid key type. Use 'private' or 'public'."
             return 1
             ;;
     esac
-
-    # Генерация случайной строки с использованием openssl
-    key=$(openssl rand -base64 32 | tr -d '\n=' | head -c $key_length)
 
     # Возвращаем ключ
     echo "$key"
@@ -354,6 +350,17 @@ installation_of_utilities() {
     certbot \
     python3-certbot-dns-cloudflare \
     unattended-upgrades
+    
+    curl https://nginx.org/keys/nginx_signing.key | gpg --dearmor | tee /usr/share/keyrings/nginx-archive-keyring.gpg >/dev/null
+    gpg --dry-run --quiet --no-keyring --import --import-options import-show /usr/share/keyrings/nginx-archive-keyring.gpg
+    if grep -q "bullseye" /etc/os-release || grep -q "bookworm" /etc/os-release
+    then
+        echo "deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] http://nginx.org/packages/debian `lsb_release -cs` nginx" | tee /etc/apt/sources.list.d/nginx.list
+    else
+        echo "deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] http://nginx.org/packages/ubuntu `lsb_release -cs` nginx" | tee /etc/apt/sources.list.d/nginx.list
+    fi
+    echo -e "Package: *\nPin: origin nginx.org\nPin: release o=nginx\nPin-Priority: 900\n" | tee /etc/apt/preferences.d/99nginx
+    apt install nginx-full -y
   
     curl -fsSL https://pkg.cloudflareclient.com/pubkey.gpg | gpg --yes --dearmor --output /usr/share/keyrings/cloudflare-warp-archive-keyring.gpg
     echo "deb [signed-by=/usr/share/keyrings/cloudflare-warp-archive-keyring.gpg] https://pkg.cloudflareclient.com/ $(grep "VERSION_CODENAME=" /etc/os-release | cut -d "=" -f 2) main" | tee /etc/apt/sources.list.d/cloudflare-client.list
@@ -530,6 +537,11 @@ warp() {
     then
         warp-cli --accept-tos registration license ${warpkey}
     fi
+    mkdir /etc/systemd/system/warp-svc.service.d
+    echo "[Service]" >> /etc/systemd/system/warp-svc.service.d/override.conf
+    echo "LogLevelMax=3" >> /etc/systemd/system/warp-svc.service.d/override.conf
+    systemctl daemon-reload
+    systemctl restart warp-svc.service
     echo
     msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
     echo
@@ -549,7 +561,7 @@ issuance_of_certificates() {
         echo "dns_cloudflare_api_key = ${cftoken}" >> /root/cloudflare.credentials
     fi
     certbot certonly --dns-cloudflare --dns-cloudflare-credentials /root/cloudflare.credentials --dns-cloudflare-propagation-seconds 30 --rsa-key-size 4096 -d ${domain},*.${domain} --agree-tos -m ${email} --no-eff-email --non-interactive
-    { crontab -l; echo "0 0 1 */2 * certbot -q renew"; } | crontab -
+    { crontab -l; echo "0 5 1 */2 * certbot -q renew"; } | crontab -
     echo "renew_hook = systemctl reload nginx" >> /etc/letsencrypt/renewal/${domain}.conf
     echo
     msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
