@@ -5,8 +5,8 @@ http:
   address: 127.0.0.1:8081
   session_ttl: 720h
 users:
-  - name: ${username}
-    password: ${hash}
+  - name: username
+    password: hash
 auth_attempts: 5
 block_auth_min: 15
 http_proxy: ""
