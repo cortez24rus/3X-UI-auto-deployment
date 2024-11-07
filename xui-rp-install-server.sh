@@ -286,7 +286,7 @@ data_entry() {
     echo
     msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
     echo
-    msg_inf "Введите 1, для установки adguard-home (DoH-DoT)"
+    msg_inf "Введите 1, для установки adguard-home (DoH-DoT) (Beta_test, на ваш страх и риск)"
     msg_inf "Введите 2, для установки systemd-resolved (DoT)"
     choise_dns
     msg_inf "Введите путь к панели (без символов /, $, {}, \):"
