@@ -63,6 +63,6 @@ WantedBy=multi-user.target
 EOF
 
 # Перезагружаем systemd и запускаем службу
-systemctl disable xui-rp-bot.service || { echo "Ошибка при отключении службы"; exit 1; }
-systemctl stop xui-rp-bot.service || { echo "Ошибка при остановке службы"; exit 1; }
+systemctl enable xui-rp-bot.service || { echo "Ошибка при отключении службы"; exit 1; }
+systemctl start xui-rp-bot.service || { echo "Ошибка при остановке службы"; exit 1; }
 systemctl daemon-reload || { echo "Ошибка при перезагрузке systemd"; exit 1; }
