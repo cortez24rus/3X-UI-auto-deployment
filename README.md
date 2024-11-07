@@ -1,5 +1,5 @@
 [RUSSIAN](/README_RU.md)
-<p align="center"><a href="#"><img src="./media/3X-UI.png" alt="Image"></a></p>
+<p align="center"><a href="#"><img src="https://github.com/cortez24rus/xui-reverse-proxy/blob/test/media/3X-UI.png?raw=true" alt="Image"></a></p>
 
 # XUI-REVERSE-PROXY
 
