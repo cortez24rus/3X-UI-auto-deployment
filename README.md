@@ -44,7 +44,7 @@ This script is intended for quick and easy configuration of a hidden proxy serve
 5. Configuring WARP to protect traffic.
 6. Enabling BBR - improving the performance of TCP connections.
 7. Configuring UFW (Uncomplicated Firewall) for access control.
-8. Configuring SSH, to provide minimal security.
+8. Configuring SSH, to provide the minimum required security.
 9. Disabling IPv6 to prevent possible vulnerabilities.
 10. Encrypt DNS queries using systemd-resolved or AdGuard Home (DNS over TLS or DNS over HTTPS).
 
