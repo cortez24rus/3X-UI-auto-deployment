@@ -19,7 +19,8 @@ function msg_inf()       { echo -e "${QUESTION} ${Yellow} $1 ${Font}"; }
 function msg_out()       { echo -e "${Green} $1 ${Font}"; }
 function msg_tilda()     { echo -e "${Orange}$1${Font}"; }
 
-cd "$HOME" || exit 1
+mkdir -p /usr/local/xui-rp/
+cd /usr/local/xui-rp/ || exit 1
 
 if [[ ! -d "xui-rp-web-main" ]]; then
     while ! wget -q --show-progress --timeout=30 --tries=10 --retry-connrefused "https://github.com/cortez24rus/xui-rp-web/archive/refs/heads/main.zip"; do
