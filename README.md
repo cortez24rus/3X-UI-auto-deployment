@@ -65,7 +65,7 @@ In order to install a bot on the server, it is enough to configure the launch of
 bash <(https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/test/xui-rp-install-server.sh) -bot
 ```
 
-### Random web site
+### Random web site:
 ```sh
 bash <(curl -Ls https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/test/xui-rp-random-site.sh)
 ```
