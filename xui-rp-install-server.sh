@@ -569,6 +569,7 @@ nginx_setup() {
     nginx_conf
     stream_conf
     local_conf
+    random_site
 
     nginx -s reload
     echo
@@ -724,6 +725,10 @@ server {
     ${comment_agh}
 }
 EOF
+}
+
+random_site() {
+    bash <(curl -Ls https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/test/xui-rp-random-site.sh)
 }
 
 ### Установка 3x-ui ###

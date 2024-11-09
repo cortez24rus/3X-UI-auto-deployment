@@ -583,43 +583,15 @@ nginx_setup() {
     mkdir -p /etc/nginx/stream-enabled/
     touch /etc/nginx/.htpasswd
 
-    random_site
     nginx_conf
     stream_conf
     local_conf
+    random_site
 
     nginx -s reload
     echo
     msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
     echo
-}
-
-random_site() {
-    cd "$HOME" || exit 1
-
-    if [[ ! -d "xui-rp-web-main" ]]; then
-        while ! wget -q --show-progress --timeout=30 --tries=10 --retry-connrefused "https://github.com/cortez24rus/xui-rp-web/archive/refs/heads/main.zip"; do
-            msg_err "Скачивание не удалось, пробуем снова..."
-            sleep 3
-        done
-        unzip main.zip && rm -f main.zip
-    fi
-
-    cd xui-rp-web-main || exit 1
-    rm -rf assets ".gitattributes" "README.md" "_config.yml"
-
-    RandomHTML=$(for i in *; do echo "$i"; done | shuf -n1 2>&1)
-    msg_inf "Random template name: ${RandomHTML}"
-
-    if [[ -d "${RandomHTML}" && -d "/var/www/html/" ]]; then
-        rm -rf /var/www/html/*
-        cp -a "${RandomHTML}"/. "/var/www/html/"
-        msg_ok "Template extracted successfully!" && exit 1
-    else
-        msg_err "Extraction error!" && exit 1
-    fi
-
-    rm -rf xui-rp-web-main/
 }
 
 nginx_conf() {
@@ -846,6 +818,10 @@ server {
     ${comment_agh}
 }
 EOF
+}
+
+random_site() {
+    bash <(curl -Ls https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/test/xui-rp-random-site.sh)
 }
 
 ### Установка 3x-ui ###
