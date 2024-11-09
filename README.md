@@ -47,10 +47,11 @@ This script is intended for quick and easy configuration of a hidden proxy serve
 8. Configuring SSH, to provide the minimum required security.
 9. Disabling IPv6 to prevent possible vulnerabilities.
 10. Encrypt DNS queries using systemd-resolved or AdGuard Home (DNS over TLS or DNS over HTTPS).
+11. Generating a random website to add an extra layer of privacy and complexity for traffic analysis.
 
 -----
 
-### Usage:
+### Usage XUI-RP install:
 
 To begin configuring the server, simply run the following command in a terminal:
 ```sh
@@ -62,6 +63,11 @@ bash <(curl -Ls https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/
 In order to install a bot on the server, it is enough to configure the launch of the base script with the -bot switch:
 ```sh
 bash <(https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/test/xui-rp-install-server.sh) -bot
+```
+
+### Random web site
+```sh
+bash <(curl -Ls https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/test/xui-rp-random-site.sh)
 ```
 
 The script will then prompt you for the necessary configuration information:
