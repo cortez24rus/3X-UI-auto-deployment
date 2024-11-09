@@ -44,4 +44,3 @@ else
 fi
 
 cd ~/
-rm -rf xui-rp-web-main/
