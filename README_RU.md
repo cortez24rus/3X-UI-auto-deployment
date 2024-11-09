@@ -47,7 +47,7 @@
 8. Настройка SSH, для обеспечения минимально необходимой безопасности.
 9. Отключение IPv6 для предотвращения возможных уязвимостей.
 10. Шифрование DNS-запросов с использованием systemd-resolved или AdGuard Home (DNS over TLS или DNS over HTTPS).
-
+11. Генерация случайного веб-сайта для добавления дополнительного уровня конфиденциальности и сложности для анализа трафика
 -----
 
 ### Использование:
@@ -62,6 +62,11 @@ bash <(curl -Ls https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/
 Для того чтобы установить бота на сервер, достаточно выполнить запуск базового скрипта с ключем -bot:
 ```sh
 bash <(curl -Ls https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/test/xui-rp-install-server.sh) -bot
+```
+
+### Рандомный веб сайт
+```sh
+bash <(curl -Ls https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/test/xui-rp-random-site.sh)
 ```
 
 После этого скрипт запросит у вас необходимую информацию для конфигурации:
