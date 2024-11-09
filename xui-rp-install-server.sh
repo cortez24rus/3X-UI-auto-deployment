@@ -677,16 +677,19 @@ server {
     ssl_certificate_key         ${webKeyFile};
     ssl_trusted_certificate     /etc/letsencrypt/live/${domain}/chain.pem;
 
+    index index.html index.htm index.php index.nginx-debian.html;
+    root /var/www/html/;
+
     # Disable direct IP access
     if (\$host = ${IP4}) {
         return 444;
     }
 
     # Auth
-    location / {
-        auth_basic "Restricted Content";
-        auth_basic_user_file /etc/nginx/.htpasswd;
-    }
+ #   location / {
+ #       auth_basic "Restricted Content";
+ #       auth_basic_user_file /etc/nginx/.htpasswd;
+ #   }
     # X-ui Admin panel
     location /${webBasePath} {
         proxy_redirect off;

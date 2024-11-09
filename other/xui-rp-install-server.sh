@@ -39,7 +39,7 @@ answer_input() {
     read -r answer
     case "${answer,,}" in
         y) return 0 ;;  # 'y' или 'Y' — продолжить
-        *) 
+        *)
             msg_err "ОТМЕНА"
             return 1 ;;  # Для любых других значений — отменить
     esac
@@ -106,7 +106,7 @@ choise_dns () {
                 echo
                 break
                 ;;
-            *)    
+            *)
                 msk_err "Неверный выбор, попробуйте снова"
                 ;;
         esac
@@ -161,7 +161,7 @@ check_cf_token() {
         done
 
         crop_domain
-        
+
 	if [[ $? -ne 0 ]]; then
             domain=""
             continue
@@ -221,15 +221,15 @@ generate_key() {
 ### Проверка IP-адреса ###
 check_ip() {
     IP4_REGEX="^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$"
-    
+
     # Попробуем получить IP через ip route
     IP4=$(ip route get 8.8.8.8 2>/dev/null | grep -Po -- 'src \K\S*')
-    
+
     # Если не получилось, пробуем через curl
     if [[ ! $IP4 =~ $IP4_REGEX ]]; then
     IP4=$(curl -s --max-time 5 ipinfo.io/ip 2>/dev/null)  # Устанавливаем таймаут для curl
     fi
-    
+
     # Если не удается получить IP, выводим ошибку
     if [[ ! $IP4 =~ $IP4_REGEX ]]; then
         echo "Не удалось определить IP-адрес!"
@@ -345,6 +345,7 @@ installation_of_utilities() {
     apt-get update && apt-get upgrade -y && apt-get install -y gnupg2 \
     wget \
     sudo \
+    zip \
     nginx-full \
     net-tools \
     apache2-utils \
@@ -355,7 +356,7 @@ installation_of_utilities() {
     certbot \
     python3-certbot-dns-cloudflare \
     unattended-upgrades
-    
+
     curl https://nginx.org/keys/nginx_signing.key | gpg --dearmor | tee /usr/share/keyrings/nginx-archive-keyring.gpg >/dev/null
     gpg --dry-run --quiet --no-keyring --import --import-options import-show /usr/share/keyrings/nginx-archive-keyring.gpg
     if grep -q "bullseye" /etc/os-release || grep -q "bookworm" /etc/os-release
@@ -366,7 +367,7 @@ installation_of_utilities() {
     fi
     echo -e "Package: *\nPin: origin nginx.org\nPin: release o=nginx\nPin-Priority: 900\n" | tee /etc/apt/preferences.d/99nginx
     apt install nginx-full -y
-  
+
     curl -fsSL https://pkg.cloudflareclient.com/pubkey.gpg | gpg --yes --dearmor --output /usr/share/keyrings/cloudflare-warp-archive-keyring.gpg
     echo "deb [signed-by=/usr/share/keyrings/cloudflare-warp-archive-keyring.gpg] https://pkg.cloudflareclient.com/ $(grep "VERSION_CODENAME=" /etc/os-release | cut -d "=" -f 2) main" | tee /etc/apt/sources.list.d/cloudflare-client.list
     apt-get update && apt-get install cloudflare-warp -y
@@ -449,10 +450,10 @@ dns_adguard_home() {
         sleep 3
     done
     tar xvf AdGuardHome_linux_amd64.tar.gz
-    
+
     AdGuardHome/AdGuardHome -s install
     hash=$(htpasswd -B -C 10 -n -b ${username} ${password} | cut -d ":" -f 2)
-    
+
     rm -f AdGuardHome/AdGuardHome.yaml
     while ! wget -q --show-progress --timeout=30 --tries=10 --retry-connrefused "https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/test/adh/AdGuardHome.yaml" -O AdGuardHome/AdGuardHome.yaml; do
         msg_err "Скачивание не удалось, пробуем снова..."
@@ -537,7 +538,7 @@ disable_ipv6() {
 ### WARP ###
 warp() {
     msg_inf "Настройка warp"
-    echo -e "yes" | warp-cli --accept-tos registration new     
+    echo -e "yes" | warp-cli --accept-tos registration new
     warp-cli --accept-tos mode proxy
     warp-cli --accept-tos proxy port 40000
     warp-cli --accept-tos connect
@@ -582,6 +583,7 @@ nginx_setup() {
     mkdir -p /etc/nginx/stream-enabled/
     touch /etc/nginx/.htpasswd
 
+    random_site
     nginx_conf
     stream_conf
     local_conf
@@ -590,6 +592,34 @@ nginx_setup() {
     echo
     msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
     echo
+}
+
+random_site() {
+    cd "$HOME" || exit 1
+
+    if [[ ! -d "xui-rp-web-main" ]]; then
+        while ! wget -q --show-progress --timeout=30 --tries=10 --retry-connrefused "https://github.com/cortez24rus/xui-rp-web/archive/refs/heads/main.zip"; do
+            msg_err "Скачивание не удалось, пробуем снова..."
+            sleep 3
+        done
+        unzip main.zip && rm -f main.zip
+    fi
+
+    cd xui-rp-web-main || exit 1
+    rm -rf assets ".gitattributes" "README.md" "_config.yml"
+
+    RandomHTML=$(for i in *; do echo "$i"; done | shuf -n1 2>&1)
+    msg_inf "Random template name: ${RandomHTML}"
+
+    if [[ -d "${RandomHTML}" && -d "/var/www/html/" ]]; then
+        rm -rf /var/www/html/*
+        cp -a "${RandomHTML}"/. "/var/www/html/"
+        msg_ok "Template extracted successfully!" && exit 1
+    else
+        msg_err "Extraction error!" && exit 1
+    fi
+
+    rm -rf xui-rp-web-main/
 }
 
 nginx_conf() {
@@ -647,7 +677,7 @@ http {
     resolver_timeout              2s;
 
     gzip                          on;
-    
+
     include                       /etc/nginx/conf.d/*.conf;
 }
 
@@ -712,6 +742,9 @@ server {
     ssl_certificate_key         ${webKeyFile};
     ssl_trusted_certificate     /etc/letsencrypt/live/${domain}/chain.pem;
 
+    index index.html index.htm index.php index.nginx-debian.html;
+    root /var/www/html/;
+
     # Security headers
     add_header X-XSS-Protection          "1; mode=block" always;
     add_header X-Content-Type-Options    "nosniff" always;
@@ -736,11 +769,10 @@ server {
         return 444;
     }
 
-    # Auth
-    location / {
-        auth_basic "Restricted Content";
-        auth_basic_user_file /etc/nginx/.htpasswd;
-    }
+#    location / {
+#        auth_basic "Restricted Content";
+#        auth_basic_user_file /etc/nginx/.htpasswd;
+#    }
     location /metrics {
         proxy_pass http://127.0.0.1:9100;
         proxy_set_header Host \$host;
@@ -760,7 +792,7 @@ server {
         proxy_pass https://127.0.0.1:${webPort}/${webBasePath};
         break;
     }
-    # Subscription 
+    # Subscription
     location /${subPath} {
         if (\$hack = 1) {return 404;}
         proxy_redirect off;
@@ -995,7 +1027,7 @@ EOF
 stream_settings_id4() {
     local public_key=$(generate_key "public")
     local private_key=$(generate_key "private")
-    
+
     stream_settings_id4=$(cat <<EOF
 {
   "network": "tcp",
@@ -1050,7 +1082,7 @@ EOF
 stream_settings_id5() {
     local public_key=$(generate_key "public")
     local private_key=$(generate_key "private")
-    
+
     stream_settings_id5=$(cat <<EOF
 {
   "network": "tcp",
@@ -1232,13 +1264,13 @@ ssh_setup() {
     exec > /dev/tty 2>&1
     msg_inf "Настройка ssh"
     msg_inf "Сгенерируйте ключ для своей ОС (ssh-keygen)"
-    echo    
+    echo
     msg_inf "В windows нужно установить пакет openSSH, и ввести команду в POWERSHELL (предлагаю изучить как генерировать ключ в интернете)"
     msg_inf "Если у вас linux, то вы сами все умеете С:"
     echo
     msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
     echo
-    echo -n "Команда для Windows: " && msg_out "type \$env:USERPROFILE\.ssh\id_rsa.pub | ssh -p 22 ${username}@${IP4} \"cat >> ~/.ssh/authorized_keys\""    
+    echo -n "Команда для Windows: " && msg_out "type \$env:USERPROFILE\.ssh\id_rsa.pub | ssh -p 22 ${username}@${IP4} \"cat >> ~/.ssh/authorized_keys\""
     echo -n "Команда для Linux: " && msg_out "ssh-copy-id -p 22 ${username}@${IP4}"
     echo
     msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
@@ -1255,7 +1287,7 @@ ssh_setup() {
         sed -i -e "s/#PermitEmptyPasswords/PermitEmptyPasswords/g" -e "s/PermitEmptyPasswords yes/PermitEmptyPasswords no/g" /etc/ssh/sshd_config
 
         cat > /etc/motd <<EOF
-        
+
 ################################################################################
                          WARNING: AUTHORIZED ACCESS ONLY
 ################################################################################
@@ -1316,7 +1348,7 @@ data_output() {
     fi
     msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
     echo -n "Подключение по ssh: " && msg_out "ssh -p 36079 ${username}@${IP4}"
-    msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"     
+    msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
     echo -n "Username: " && msg_out "$username"
     echo -n "Password: " && msg_out "$password"
     echo
@@ -1369,7 +1401,7 @@ main_script_repeat() {
     nginx_setup
     panel_installation
     enabling_security
-    ssh_setup    
+    ssh_setup
     install_xuibot "$1"
     data_output
     banner_1
