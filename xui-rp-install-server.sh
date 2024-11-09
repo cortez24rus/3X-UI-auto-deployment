@@ -107,23 +107,10 @@ choise_dns () {
                 break
                 ;;
             *)    
-                msk_err "Неверный выбор, попробуйте снова"
+                msg_err "Неверный выбор, попробуйте снова"
                 ;;
         esac
     done
-}
-
-# Функция для обрезки домена (удаление http://, https:// и www)
-crop_domain() {
-    # Удаление префиксов и www
-    domain=$(echo "$domain" | sed -e 's|https\?://||' -e 's|^www\.||' -e 's|/.*$||')
-
-    # Проверка формата домена
-    if ! [[ "$domain" =~ ^([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$ ]]; then
-        echo "Ошибка: введённый домен '$domain' имеет неверный формат."
-        return 1
-    fi
-    return 0
 }
 
 get_test_response() {
@@ -151,6 +138,25 @@ validate_input() {
     fi
 }
 
+# Функция для обрезки домена (удаление http://, https:// и www)
+crop_domain() {
+    local input_value="$1"   # Считываем переданный домен или reality
+    local temp_value          # Временная переменная для обработки
+
+    # Удаление префиксов и www
+    temp_value=$(echo "$input_value" | sed -e 's|https\?://||' -e 's|^www\.||' -e 's|/.*$||')
+
+    # Проверка формата домена
+    if ! [[ "$temp_value" =~ ^([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$ ]]; then
+        echo "Ошибка: введённый адрес '$temp_value' имеет неверный формат."
+        return 1
+    fi
+
+    # Присваиваем обратно в переменную, которая была передана
+    eval "$1=\"$temp_value\""
+    return 0
+}
+
 check_cf_token() {
     while true; do
         while [[ -z $domain ]]; do
@@ -159,7 +165,7 @@ check_cf_token() {
             echo
         done
 
-        crop_domain
+        domain=$(crop_domain "$domain")
         
     if [[ $? -ne 0 ]]; then
             domain=""
@@ -187,6 +193,24 @@ check_cf_token() {
             domain=""
             email=""
             cftoken=""
+        fi
+    done
+}
+
+reality() {
+    while true; do
+        while [[ -z $reality ]]; do
+            msg_inf "Введите доменное имя, под которое будете маскироваться Reality:"
+            read reality
+            echo
+        done
+        
+        reality=$(crop_domain "$reality")
+        
+        if [[ "$reality" == "$domain" ]]; then
+            echo "Ошибка: доменное имя для reality не должно совпадать с основным доменом ($domain). Попробуйте снова."
+        else
+            break
         fi
     done
 }
@@ -281,8 +305,7 @@ data_entry() {
     echo
     msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
     echo
-    msg_inf "Введите доменное имя, под которое будете маскироваться Reality:"
-    read reality
+    reality
     echo
     msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
     echo
