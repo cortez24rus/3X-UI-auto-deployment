@@ -461,7 +461,7 @@ dns_adguard_home() {
     hash=$(htpasswd -B -C 10 -n -b ${username} ${password} | cut -d ":" -f 2)
     
     rm -f AdGuardHome/AdGuardHome.yaml
-    while ! wget -q --show-progress --timeout=30 --tries=10 --retry-connrefused "https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/test/adh/AdGuardHome.yaml" -O AdGuardHome/AdGuardHome.yaml; do
+    while ! wget -q --show-progress --timeout=30 --tries=10 --retry-connrefused "https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/main/adh/AdGuardHome.yaml" -O AdGuardHome/AdGuardHome.yaml; do
         msg_err "Скачивание не удалось, пробуем снова..."
         sleep 3
     done
@@ -751,14 +751,14 @@ EOF
 }
 
 random_site() {
-    bash <(curl -Ls https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/test/xui-rp-random-site.sh)
+    bash <(curl -Ls https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/main/xui-rp-random-site.sh)
 }
 
 ### Установка 3x-ui ###
 panel_installation() {
     touch /usr/local/xui-rp/reinstallation_check
     msg_inf "Настройка 3x-ui xray"
-    while ! wget -q --show-progress --timeout=30 --tries=10 --retry-connrefused https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/test/database/x-ui.db; do
+    while ! wget -q --show-progress --timeout=30 --tries=10 --retry-connrefused https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/main/database/x-ui.db; do
         msg_err "Скачивание не удалось, пробуем снова..."
         sleep 3
     done
@@ -1027,7 +1027,7 @@ EOF
 # Установока xui бота
 install_xuibot() {
     if [[ "$1" == "-bot" ]]; then
-         bash <(curl -Ls https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/test/xui-rp-install-bot.sh) "$BOT_TOKEN" "$AID" "$domain"
+         bash <(curl -Ls https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/main/xui-rp-install-bot.sh) "$BOT_TOKEN" "$AID" "$domain"
     fi
 }
 
