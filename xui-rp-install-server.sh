@@ -923,9 +923,9 @@ database_change() {
 UPDATE users SET username = '$username' WHERE id = 1;
 UPDATE users SET password = '$password' WHERE id = 1;
 
-UPDATE inbounds SET stream_settings = '$stream_settings_id6' WHERE "key" = '📲MKCP📲';;
-UPDATE inbounds SET stream_settings = '$stream_settings_id7' WHERE "key" = '🥷🏻REALITY_WA🥷🏻';
-UPDATE inbounds SET stream_settings = '$stream_settings_id8' WHERE "key" = '🦠TROJAN🦠';
+UPDATE inbounds SET stream_settings = '$stream_settings_id6' WHERE id = 6;
+UPDATE inbounds SET stream_settings = '$stream_settings_id7' WHERE id = 7;
+UPDATE inbounds SET stream_settings = '$stream_settings_id8' WHERE id = 8;
 
 UPDATE settings SET value = '${webPort}' WHERE key = 'webPort';
 UPDATE settings SET value = '/${webBasePath}/' WHERE key = 'webBasePath';
