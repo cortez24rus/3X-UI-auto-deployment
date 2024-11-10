@@ -54,19 +54,19 @@
 
 Для того чтобы начать настройку сервера, достаточно выполнить следующую команду в терминале:
 ```sh
-bash <(curl -Ls https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/test/xui-rp-install-server.sh)
+bash <(curl -Ls https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/main/xui-rp-install-server.sh)
 ```
 
 ### Tg-bot:
 
 Для того чтобы установить бота на сервер, достаточно выполнить запуск базового скрипта с ключем -bot:
 ```sh
-bash <(curl -Ls https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/test/xui-rp-install-server.sh) -bot
+bash <(curl -Ls https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/main/xui-rp-install-server.sh) -bot
 ```
 
 ### Рандомный веб сайт:
 ```sh
-bash <(curl -Ls https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/test/xui-rp-random-site.sh)
+bash <(curl -Ls https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/main/xui-rp-random-site.sh)
 ```
 
 После этого скрипт запросит у вас необходимую информацию для конфигурации:
