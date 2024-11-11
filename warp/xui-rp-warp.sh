@@ -27,7 +27,7 @@ EOF
 
 systemctl daemon-reload
 systemctl restart warp-svc.service
+
 sleep 5
 curl -x socks5h://localhost:40000 https://2ip.io
-sleep 1
-curl -x socks5h://localhost:40000 https://2ip.io
+warp-cli tunnel stats
