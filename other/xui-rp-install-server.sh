@@ -308,18 +308,18 @@ data_entry() {
     msg_inf "Введите доменное имя, под которое будете маскироваться Reality:"
     reality
     echo
-    msg_inf "Введите 2 доменное имя, под которое будете маскироваться Reality:"
-    read reality2
-    echo
     msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
     echo
-    msg_inf "Введите путь к grpc:"
+    msg_inf "Введите путь к Grpc:"
     validate_path cdngrpc
     echo
-    msg_inf "Введите путь к httpupgrade:"
+    msg_inf "Введите путь к Split:"
+    validate_path cdnsplit
+    echo
+    msg_inf "Введите путь к HttpUpgrade:"
     validate_path cdnhttpupgrade
     echo
-    msg_inf "Введите путь к websocket:"
+    msg_inf "Введите путь к Websocket:"
     validate_path cdnws
     echo
     msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
@@ -348,11 +348,6 @@ data_entry() {
         msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
         echo
     fi
-    msg_inf "Введите ключ для регистрации WARP или нажмите Enter для пропуска:"
-    read warpkey
-    echo
-    msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
-    echo
     webPort=$(port_issuance)
     subPort=$(port_issuance)
 
@@ -561,19 +556,13 @@ disable_ipv6() {
 ### WARP ###
 warp() {
     msg_inf "Настройка warp"
-    echo -e "yes" | warp-cli --accept-tos registration new
-    warp-cli --accept-tos mode proxy
-    warp-cli --accept-tos proxy port 40000
-    warp-cli --accept-tos connect
-        if [[ -n "$warpkey" ]];
-    then
-        warp-cli --accept-tos registration license ${warpkey}
-    fi
-    mkdir /etc/systemd/system/warp-svc.service.d
-    echo "[Service]" >> /etc/systemd/system/warp-svc.service.d/override.conf
-    echo "LogLevelMax=3" >> /etc/systemd/system/warp-svc.service.d/override.conf
-    systemctl daemon-reload
-    systemctl restart warp-svc.service
+    while ! wget -q --show-progress --timeout=30 --tries=10 --retry-connrefused https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/main/warp/xui-rp-warp.sh; do
+        msg_err "Скачивание не удалось, пробуем снова..."
+        sleep 3
+    done
+    chmod +x xui-rp-warp.sh
+    ./xui-rp-warp.sh
+    rm -rf xui-rp-warp.sh
     echo
     msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
     echo
