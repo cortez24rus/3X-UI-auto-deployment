@@ -829,9 +829,9 @@ stream_settings_id7() {
   "realitySettings": {
     "show": false,
     "xver": 0,
-    "dest": "${reality}:443",
+    "dest": "36076",
     "serverNames": [
-      "${reality}"
+      "${domain}"
     ],
     "privateKey": "${private_key}",
     "minClient": "",
@@ -923,9 +923,9 @@ database_change() {
 UPDATE users SET username = '$username' WHERE id = 1;
 UPDATE users SET password = '$password' WHERE id = 1;
 
-UPDATE inbounds SET stream_settings = '$stream_settings_id6' WHERE id = 6;
-UPDATE inbounds SET stream_settings = '$stream_settings_id7' WHERE id = 7;
-UPDATE inbounds SET stream_settings = '$stream_settings_id8' WHERE id = 8;
+UPDATE inbounds SET stream_settings = '$stream_settings_id7' WHERE remark = '📲MKCP📲';
+UPDATE inbounds SET stream_settings = '$stream_settings_id7' WHERE remark = '🥷🏻REALITY🥷🏻';
+UPDATE inbounds SET stream_settings = '$stream_settings_id7' WHERE remark = '🦠TROJAN🦠';
 
 UPDATE settings SET value = '${webPort}' WHERE key = 'webPort';
 UPDATE settings SET value = '/${webBasePath}/' WHERE key = 'webBasePath';
