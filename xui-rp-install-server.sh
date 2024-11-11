@@ -515,9 +515,8 @@ warp() {
         msg_err "Скачивание не удалось, пробуем снова..."
         sleep 3
     done
-    chmod +x xui-rp-warp.sh
-    ./xui-rp-warp.sh
-    rm -rf xui-rp-warp.sh
+    chmod +x xui-rp-warp.sh && ./xui-rp-warp.sh
+    rm -rf xui-rp-warp.sh*
     echo
     msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
     echo
