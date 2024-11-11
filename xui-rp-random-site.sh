@@ -24,7 +24,7 @@ mkdir -p /usr/local/xui-rp/
 cd /usr/local/xui-rp/ || exit 1
 
 if [[ ! -d "xui-rp-web-main" ]]; then
-    while ! wget -q --show-progress --timeout=30 --tries=10 --retry-connrefused "https://github.com/cortez24rus/xui-rp-web/archive/refs/heads/main.zip"; do
+    while ! wget -q --show-progress --timeout=30 --tries=10 --retry-connrefused "https://github.com/cortez24rus/xui-rp-web/archive/refs/heads/main.zip" > /dev/null 2>&1; do
         msg_err "Скачивание не удалось, пробуем снова..."
         sleep 3
     done
