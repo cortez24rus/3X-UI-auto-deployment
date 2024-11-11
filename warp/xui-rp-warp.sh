@@ -11,7 +11,8 @@ warp-cli status
 #warp-cli --accept-tos mode proxy
 #warp-cli --accept-tos proxy port 40000
 #warp-cli --accept-tos connect
-yes | warp-cli registration new
+#yes | warp-cli registration new
+warp-cli --accept-tos registration new
 warp-cli mode proxy
 warp-cli proxy port 40000
 warp-cli connect
