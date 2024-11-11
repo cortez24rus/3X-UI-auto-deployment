@@ -689,18 +689,15 @@ map \$ssl_preread_protocol \$backend {
     "" ssh;
 }
 map \$ssl_preread_server_name \$https {
-    cg.${domain}   cg;
-    ${reality}     reality;
-    ${reality2}    reality2;
-    www.${domain}  xtls;
     ${domain}      web;
+    ${reality}     reality;
+    www.${domain}  xtls;
 }
-upstream cg              { server 127.0.0.1:2053; }
-upstream reality         { server 127.0.0.1:7443; }
-upstream reality2        { server 127.0.0.1:8443; }
+upstream web             { server 127.0.0.1:7443; }
+#upstream web             { server 127.0.0.1:46076; }
+upstream reality         { server 127.0.0.1:8443; }
 upstream xtls            { server 127.0.0.1:9443; }
 upstream ssh             { server 127.0.0.1:36079; }
-upstream web             { server 127.0.0.1:46076; }
 
 server {
     listen 443           reuseport;
