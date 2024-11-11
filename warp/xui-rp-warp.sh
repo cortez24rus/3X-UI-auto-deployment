@@ -6,6 +6,8 @@ apt-get update && apt-get install cloudflare-warp -y
 wget https://pkg.cloudflareclient.com/pool/$(grep "VERSION_CODENAME=" /etc/os-release | cut -d "=" -f 2)/main/c/cloudflare-warp/cloudflare-warp_2024.6.497-1_amd64.deb > /dev/null 2>&1
 dpkg -i cloudflare-warp_2024.6.497-1_amd64.deb
 
+systemctl start warp-svc.service
+systemctl enable warp-svc.service
 #echo -e "yes" | warp-cli --accept-tos registration new
 #warp-cli --accept-tos mode proxy
 #warp-cli --accept-tos proxy port 40000
