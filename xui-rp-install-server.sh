@@ -346,12 +346,6 @@ installation_of_utilities() {
     fi
     echo -e "Package: *\nPin: origin nginx.org\nPin: release o=nginx\nPin-Priority: 900\n" | tee /etc/apt/preferences.d/99nginx
     apt install nginx-full -y
-  
-    curl -fsSL https://pkg.cloudflareclient.com/pubkey.gpg | gpg --yes --dearmor --output /usr/share/keyrings/cloudflare-warp-archive-keyring.gpg
-    echo "deb [signed-by=/usr/share/keyrings/cloudflare-warp-archive-keyring.gpg] https://pkg.cloudflareclient.com/ $(grep "VERSION_CODENAME=" /etc/os-release | cut -d "=" -f 2) main" | tee /etc/apt/sources.list.d/cloudflare-client.list
-    apt-get update && apt-get install cloudflare-warp -y
-        wget https://pkg.cloudflareclient.com/pool/$(grep "VERSION_CODENAME=" /etc/os-release | cut -d "=" -f 2)/main/c/cloudflare-warp/cloudflare-warp_2024.6.497-1_amd64.deb > /dev/null 2>&1
-    dpkg -i cloudflare-warp_2024.6.497-1_amd64.deb
 
     apt-get install -y systemd-resolved
     echo
@@ -517,15 +511,13 @@ disable_ipv6() {
 ### WARP ###
 warp() {
     msg_inf "Настройка warp"
-    echo -e "yes" | warp-cli --accept-tos registration new     
-    warp-cli --accept-tos mode proxy
-    warp-cli --accept-tos proxy port 40000
-    warp-cli --accept-tos connect
-    mkdir /etc/systemd/system/warp-svc.service.d
-    echo "[Service]" >> /etc/systemd/system/warp-svc.service.d/override.conf
-    echo "LogLevelMax=3" >> /etc/systemd/system/warp-svc.service.d/override.conf
-    systemctl daemon-reload
-    systemctl restart warp-svc.service
+    while ! wget -q --show-progress --timeout=30 --tries=10 --retry-connrefused https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/main/warp/xui-rp-warp.sh; do
+        msg_err "Скачивание не удалось, пробуем снова..."
+        sleep 3
+    done
+    chmod +x xui-rp-warp.sh
+    ./xui-rp-warp.sh
+    rm -rf xui-rp-warp.sh
     echo
     msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
     echo
