@@ -21,3 +21,5 @@ EOF
 
 systemctl daemon-reload
 systemctl restart warp-svc.service
+
+curl -x socks5h://localhost:40000 https://2ip.io
