@@ -5,8 +5,8 @@
 
 -----
 
-### Proxy using Trojan and VLESS (Reality) protocols behind NGINX reverse-proxy
-This script is intended for quick and easy configuration of a hidden proxy server using Trojan TLS and VLESS (Reality) protocols, with masking through NGINX. In this variant, all incoming requests are processed by NGINX and the server acts as a proxy server only if the request contains the correct path (URI). This increases security and helps hide the true purpose of the server.
+### Proxy using VLESS-TCP-XTLS-Vision and VLESS-TCP-REALITY (Steal from yourself) behind reverse-proxy NGINX
+This script is designed to quickly and easily set up a hidden proxy server, with masking via NGINX. In this variant, all incoming requests are handled by NGINX, and the server acts as a proxy server only if the request contains the correct path (URI). This increases security and helps to hide the true purpose of the server.
 
 > [!IMPORTANT]
 >  This script has been tested on Debian 12 in a KVM virtualization environment. You will need your own domain, which needs to be bound to Cloudflare for it to work correctly. It is recommended to run the script as root on a freshly installed system.
@@ -35,7 +35,7 @@ This script is intended for quick and easy configuration of a hidden proxy serve
 ### Includes:
   
 1. 3X-UI Xray server configuration:
-   - Trojan TLS and VLESS Reality protocols.
+   - VLESS-TCP-XTLS-Vision и VLESS-TCP-REALITY (Steal from yourself).
    - Connection of subscription and JSON subscription for automatic configuration updates.
 2. Configuring NGINX reverse proxy on port 443.
 3. providing security:
