@@ -322,6 +322,9 @@ data_entry() {
     msg_inf "Введите путь к Websocket:"
     validate_path cdnws
     echo
+    msg_inf "Введите путь к Node Exporter:"
+    validate_path metrics
+    echo
     msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
     echo
     msg_inf "Введите 1, для установки adguard-home (DoH-DoT)"
@@ -747,7 +750,7 @@ server {
 #        auth_basic "Restricted Content";
 #        auth_basic_user_file /etc/nginx/.htpasswd;
 #    }
-     location /secret_node_metrics {
+     location /${metrics} {
         proxy_pass http://127.0.0.1:9100/metrics;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
@@ -798,6 +801,11 @@ server {
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
         proxy_pass https://127.0.0.1:${subPort}/${subJsonPath};
         break;
+    }
+    location /${cdnsplit} {
+        proxy_pass http://127.0.0.1:2063;
+        proxy_http_version 1.1;
+        proxy_redirect off;
     }
     # Xray Config
     location ~ ^/(?<fwdport>\d+)/(?<fwdpath>.*)\$ {
