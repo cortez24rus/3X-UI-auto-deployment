@@ -1262,7 +1262,6 @@ enabling_security() {
     ufw --force reset
     ufw allow 36079/tcp
     ufw allow 443/tcp
-    ufw allow 80/tcp
     ufw allow 22/tcp
     ufw insert 1 deny from $(echo ${IP4} | cut -d '.' -f 1-3).0/22
     ufw --force enable
