@@ -1052,9 +1052,9 @@ stream_settings_id4() {
   "realitySettings": {
     "show": false,
     "xver": 0,
-    "dest": "${reality}:443",
+    "dest": "46076",
     "serverNames": [
-      "${reality}"
+      "${domain}"
     ],
     "privateKey": "${private_key}",
     "minClient": "",
@@ -1107,9 +1107,9 @@ stream_settings_id5() {
   "realitySettings": {
     "show": false,
     "xver": 0,
-    "dest": "${reality2}:443",
+    "dest": "${reality}:443",
     "serverNames": [
-      "${reality2}"
+      "${reality}"
     ],
     "privateKey": "${private_key}",
     "minClient": "",
