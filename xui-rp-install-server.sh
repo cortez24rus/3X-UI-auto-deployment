@@ -197,24 +197,6 @@ check_cf_token() {
     done
 }
 
-reality() {
-    while true; do
-        while [[ -z $reality ]]; do
-            msg_inf "Введите доменное имя, под которое будете маскироваться Reality:"
-            read reality
-            echo
-        done
-        
-        reality=$(crop_domain "$reality")
-        
-        if [[ "$reality" == "$domain" ]]; then
-            echo "Ошибка: доменное имя для reality не должно совпадать с основным доменом ($domain). Попробуйте снова."
-        else
-            break
-        fi
-    done
-}
-
 generate_key() {
     local key_type="$1"
     local key_prefix=""
@@ -305,10 +287,6 @@ data_entry() {
     echo
     msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
     echo
-    reality
-    echo
-    msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
-    echo
     msg_inf "Введите 1, для установки adguard-home (DoH-DoT) (Beta_test, на ваш страх и риск)"
     msg_inf "Введите 2, для установки systemd-resolved (DoT)"
     choise_dns
@@ -333,11 +311,6 @@ data_entry() {
         msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
         echo
     fi
-    msg_inf "Введите ключ для регистрации WARP или нажмите Enter для пропуска:"
-    read warpkey
-    echo
-    msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
-    echo
     webPort=$(port_issuance)
     subPort=$(port_issuance)
 
@@ -405,13 +378,13 @@ dns_encryption() {
     }"
             dns_adguard_home
             dns_systemd_resolved_for_adguard
-               echo
+            echo
             msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
             echo
             ;;
         2)
             comment_agh=""
-               echo
+            echo
             msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
             echo
             ;;
@@ -548,10 +521,6 @@ warp() {
     warp-cli --accept-tos mode proxy
     warp-cli --accept-tos proxy port 40000
     warp-cli --accept-tos connect
-        if [[ -n "$warpkey" ]];
-    then
-        warp-cli --accept-tos registration license ${warpkey}
-    fi
     mkdir /etc/systemd/system/warp-svc.service.d
     echo "[Service]" >> /etc/systemd/system/warp-svc.service.d/override.conf
     echo "LogLevelMax=3" >> /etc/systemd/system/warp-svc.service.d/override.conf
@@ -665,13 +634,14 @@ EOF
 stream_conf() {
     cat > /etc/nginx/stream-enabled/stream.conf <<EOF
 map \$ssl_preread_server_name \$backend {
-    ${reality}        reality;
-    www.${domain}     trojan;
-    ${domain}         web;
+    ${domain}           web;
+    www.${domain}       xtls;
+#   domain_reality      reality;
 }
-upstream reality        { server 127.0.0.1:7443; }
-upstream trojan         { server 127.0.0.1:9443; }
-upstream web            { server 127.0.0.1:36076; }
+#upstream web             { server 127.0.0.1:36076; }
+upstream web             { server 127.0.0.1:7443; }
+#upstream reality         { server 127.0.0.1:8443; }
+upstream xtls            { server 127.0.0.1:9443; }
 
 server {
     listen 443          reuseport;
@@ -764,9 +734,9 @@ panel_installation() {
     done
     echo -e "n" | bash <(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh) > /dev/null 2>&1
 
-    stream_settings_id6
-    stream_settings_id7
-    stream_settings_id8
+    stream_settings_id1
+    stream_settings_id2
+    stream_settings_id3
     database_change
 
     x-ui stop
@@ -779,42 +749,61 @@ panel_installation() {
 }
 
 ### Изменение базы данных ###
-stream_settings_id6() {
-stream_settings_id6=$(cat <<EOF
+stream_settings_id1() {
+stream_settings_id1=$(cat <<EOF
 {
-  "network": "kcp",
-  "security": "none",
+  "network": "tcp",
+  "security": "tls",
   "externalProxy": [
     {
       "forceTls": "same",
       "dest": "www.${domain}",
-      "port": 2091,
+      "port": 443,
       "remark": ""
     }
   ],
-  "kcpSettings": {
-    "mtu": 1350,
-    "tti": 20,
-    "uplinkCapacity": 50,
-    "downlinkCapacity": 100,
-    "congestion": false,
-    "readBufferSize": 1,
-    "writeBufferSize": 1,
+  "tlsSettings": {
+    "serverName": "www.${domain}",
+    "minVersion": "1.3",
+    "maxVersion": "1.3",
+    "cipherSuites": "",
+    "rejectUnknownSni": false,
+    "disableSystemRoot": false,
+    "enableSessionResumption": false,
+    "certificates": [
+      {
+        "certificateFile": "/etc/letsencrypt/live/${domain}/fullchain.pem",
+        "keyFile": "/etc/letsencrypt/live/${domain}/privkey.pem",
+        "ocspStapling": 3600,
+        "oneTimeLoading": false,
+        "usage": "encipherment",
+        "buildChain": false
+      }
+    ],
+    "alpn": [
+      "http/1.1"
+    ],
+    "settings": {
+      "allowInsecure": false,
+      "fingerprint": "randomized"
+    }
+  },
+  "tcpSettings": {
+    "acceptProxyProtocol": false,
     "header": {
-      "type": "srtp"
-    },
-    "seed": "x2aYTWwqUE"
+      "type": "none"
+    }
   }
 }
 EOF
 )
 }
 
-stream_settings_id7() {
+stream_settings_id2() {
     local public_key=$(generate_key "public")
     local private_key=$(generate_key "private")
     
-    stream_settings_id7=$(cat <<EOF
+    stream_settings_id2=$(cat <<EOF
 {
   "network": "tcp",
   "security": "reality",
@@ -865,51 +854,31 @@ EOF
 )
 }
 
-stream_settings_id8() {
-stream_settings_id8=$(cat <<EOF
+stream_settings_id3() {
+stream_settings_id3=$(cat <<EOF
 {
-  "network": "tcp",
-  "security": "tls",
+  "network": "kcp",
+  "security": "none",
   "externalProxy": [
     {
       "forceTls": "same",
       "dest": "www.${domain}",
-      "port": 443,
+      "port": 2091,
       "remark": ""
     }
   ],
-  "tlsSettings": {
-    "serverName": "www.${domain}",
-    "minVersion": "1.2",
-    "maxVersion": "1.3",
-    "cipherSuites": "",
-    "rejectUnknownSni": false,
-    "disableSystemRoot": false,
-    "enableSessionResumption": false,
-    "certificates": [
-      {
-    "certificateFile": "/etc/letsencrypt/live/${domain}/fullchain.pem",
-    "keyFile": "/etc/letsencrypt/live/${domain}/privkey.pem",
-    "ocspStapling": 3600,
-    "oneTimeLoading": false,
-    "usage": "encipherment",
-    "buildChain": false
-      }
-    ],
-    "alpn": [
-      "h2",
-      "http/1.1"
-    ],
-    "settings": {
-      "allowInsecure": false,
-      "fingerprint": "chrome"
-    }
-  },
-  "tcpSettings": {
-    "acceptProxyProtocol": false,
+  "kcpSettings": {
+    "mtu": 1350,
+    "tti": 20,
+    "uplinkCapacity": 50,
+    "downlinkCapacity": 100,
+    "congestion": false,
+    "readBufferSize": 1,
+    "writeBufferSize": 1,
     "header": {
-      "type": "none"
-    }
+      "type": "srtp"
+    },
+    "seed": "x2aYTWwqUE"
   }
 }
 EOF
@@ -923,9 +892,9 @@ database_change() {
 UPDATE users SET username = '$username' WHERE id = 1;
 UPDATE users SET password = '$password' WHERE id = 1;
 
-UPDATE inbounds SET stream_settings = '$stream_settings_id7' WHERE remark = '📲MKCP📲';
-UPDATE inbounds SET stream_settings = '$stream_settings_id7' WHERE remark = '🥷🏻REALITY🥷🏻';
-UPDATE inbounds SET stream_settings = '$stream_settings_id7' WHERE remark = '🦠TROJAN🦠';
+UPDATE inbounds SET stream_settings = '$stream_settings_id1' WHERE remark = '✖️XTLS';
+UPDATE inbounds SET stream_settings = '$stream_settings_id2' WHERE remark = '🥷🏻Steal';
+UPDATE inbounds SET stream_settings = '$stream_settings_id3' WHERE remark = '📲MKCP';
 
 UPDATE settings SET value = '${webPort}' WHERE key = 'webPort';
 UPDATE settings SET value = '/${webBasePath}/' WHERE key = 'webBasePath';
