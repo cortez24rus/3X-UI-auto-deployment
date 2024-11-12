@@ -301,13 +301,13 @@ data_entry() {
     validate_path cdnsplit
     echo
     msg_inf "Введите путь к HttpUpgrade:"
-    validate_path cdnhttpupgrade
+    validate_path cdnhttpu
     echo
     msg_inf "Введите путь к Websocket:"
     validate_path cdnws
     echo
     msg_inf "Введите путь к Node Exporter:"
-    validate_path metrics
+    validate_path node_metrics
     echo
     msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
     echo
@@ -569,11 +569,13 @@ nginx_setup() {
     msg_inf "Настройка NGINX"
     mkdir -p /etc/nginx/stream-enabled/
     touch /etc/nginx/.htpasswd
+    htpasswd -nb "$username" "$password" >> /etc/nginx/.htpasswd
 
     nginx_conf
     stream_conf
     local_conf
     random_site
+    monitoring
 
     nginx -s reload
     echo
@@ -586,7 +588,7 @@ nginx_conf() {
 user                              www-data;
 pid                               /run/nginx.pid;
 worker_processes                  auto;
-worker_rlimit_nofile              65535;
+worker_rlimit_nofile              65535;ngin
 error_log                         /var/log/nginx/error.log;
 include                           /etc/nginx/modules-enabled/*.conf;
 
@@ -661,7 +663,7 @@ upstream web             { server 127.0.0.1:7443; }
 #upstream web             { server 127.0.0.1:46076; }
 upstream reality         { server 127.0.0.1:8443; }
 upstream xtls            { server 127.0.0.1:9443; }
-upstream ssh             { server 127.0.0.1:36079; }
+#upstream ssh             { server 127.0.0.1:36079; }
 
 server {
     listen 443           reuseport;
@@ -729,7 +731,7 @@ server {
 #        auth_basic "Restricted Content";
 #        auth_basic_user_file /etc/nginx/.htpasswd;
 #    }
-     location /${metrics} {
+     location /${node_metrics} {
         proxy_pass http://127.0.0.1:9100/metrics;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
@@ -826,6 +828,10 @@ random_site() {
     bash <(curl -Ls https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/main/xui-rp-random-site.sh)
 }
 
+monitoring() {
+    bash <(curl -Ls https://github.com/cortez24rus/grafana-prometheus/raw/refs/heads/main/prometheus_node_exporter.sh)
+}
+
 ### Установка 3x-ui ###
 panel_installation() {
     touch /usr/local/xui-rp/reinstallation_check
@@ -837,13 +843,14 @@ panel_installation() {
     echo ${password} | gpg --batch --yes --passphrase-fd 0 -d x-ui.gpg > x-ui.db
     echo -e "n" | bash <(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh) > /dev/null 2>&1
 
-    stream_settings_id1
-    stream_settings_id2
-    stream_settings_id3
-    stream_settings_id4
-    stream_settings_id5
-    stream_settings_id6
-    stream_settings_id7
+    stream_settings_grpc
+    stream_settings_split
+    stream_settings_httpu
+    stream_settings_ws
+    stream_settings_steal
+    stream_settings_reality
+    stream_settings_xtls
+    stream_settings_mkcp
     database_change
 
     x-ui stop
@@ -858,46 +865,22 @@ panel_installation() {
 }
 
 ### Изменение базы данных ###
-stream_settings_id1() {
-    stream_settings_id1=$(cat <<EOF
+stream_settings_grpc() {
+    stream_settings_grpc=$(cat <<EOF
 {
   "network": "grpc",
-  "security": "tls",
+  "security": "none",
   "externalProxy": [
     {
       "forceTls": "same",
-      "dest": "cg.${domain}",
+      "dest": "${domain}",
       "port": 443,
       "remark": ""
     }
   ],
-  "tlsSettings": {
-    "serverName": "",
-    "minVersion": "1.2",
-    "maxVersion": "1.3",
-    "cipherSuites": "",
-    "rejectUnknownSni": false,
-    "disableSystemRoot": false,
-    "enableSessionResumption": false,
-    "certificates": [
-      {
-        "certificateFile": "${webCertFile}",
-        "keyFile": "${webKeyFile}",
-        "ocspStapling": 3600,
-        "oneTimeLoading": false,
-        "usage": "encipherment",
-        "buildChain": false
-      }
-    ],
-    "alpn": [],
-    "settings": {
-      "allowInsecure": false,
-      "fingerprint": "random"
-    }
-  },
   "grpcSettings": {
-    "serviceName": "${cdngrpc}",
-    "authority": "",
+    "serviceName": "/2053/${cdngrpc}",
+    "authority": "${domain}",
     "multiMode": false
   }
 }
@@ -905,9 +888,42 @@ EOF
 )
 }
 
-stream_settings_id2() {
-    stream_settings_id2=$(cat <<EOF
+stream_settings_split() {
+    stream_settings_split=$(cat <<EOF
 {
+  "network": "splithttp",
+  "security": "none",
+  "externalProxy": [
+    {
+      "forceTls": "same",
+      "dest": "${domain}",
+      "port": 443,
+      "remark": ""
+    }
+  ],
+  "splithttpSettings": {
+    "path": "/${cdnsplit}",
+    "host": "",
+    "headers": {},
+    "scMaxConcurrentPosts": "100-200",
+    "scMaxEachPostBytes": "1000000-2000000",
+    "scMinPostsIntervalMs": "10-50",
+    "noSSEHeader": false,
+    "xPaddingBytes": "100-1000",
+    "xmux": {
+      "maxConcurrency": "16-32",
+      "maxConnections": 0,
+      "cMaxReuseTimes": "64-128",
+      "cMaxLifetimeMs": 0
+    }
+  }
+}
+EOF
+)
+}
+
+stream_settings_httpu() {
+    stream_settings_httpu=$(cat <<EOF
 {
   "network": "httpupgrade",
   "security": "tls",
@@ -945,7 +961,7 @@ stream_settings_id2() {
   },
   "httpupgradeSettings": {
     "acceptProxyProtocol": false,
-    "path": "/2063/${cdnhttpupgrade}",
+    "path": "/2073/${cdnhttpu}",
     "host": "${domain}",
     "headers": {}
   }
@@ -954,8 +970,8 @@ EOF
 )
 }
 
-stream_settings_id3() {
-    stream_settings_id3=$(cat <<EOF
+stream_settings_ws() {
+    stream_settings_ws=$(cat <<EOF
 {
   "network": "ws",
   "security": "tls",
@@ -993,7 +1009,7 @@ stream_settings_id3() {
   },
   "wsSettings": {
     "acceptProxyProtocol": false,
-    "path": "/2073/${cdnws}",
+    "path": "/2083/${cdnws}",
     "host": "${domain}",
     "headers": {}
   }
@@ -1002,10 +1018,10 @@ EOF
 )
 }
 
-stream_settings_id4() {
+stream_settings_steal() {
     read private_key public_key <<< "$(generate_keys)"
 
-    stream_settings_id4=$(cat <<EOF
+    stream_settings_steal=$(cat <<EOF
 {
   "network": "tcp",
   "security": "reality",
@@ -1040,7 +1056,7 @@ stream_settings_id4() {
     ],
     "settings": {
       "publicKey": "${public_key}",
-      "fingerprint": "chrome",
+      "fingerprint": "randomized"
       "serverName": "",
       "spiderX": "/"
     }
@@ -1056,10 +1072,10 @@ EOF
 )
 }
 
-stream_settings_id5() {
+stream_settings_reality() {
     read private_key public_key <<< "$(generate_keys)"
 
-    stream_settings_id5=$(cat <<EOF
+    stream_settings_reality=$(cat <<EOF
 {
   "network": "tcp",
   "security": "reality",
@@ -1083,18 +1099,18 @@ stream_settings_id5() {
     "maxClient": "",
     "maxTimediff": 0,
     "shortIds": [
-      "22dff0",
-      "0041e9ca",
-      "49afaa139d",
-      "89",
-      "1addf92cc1bd50",
-      "6e122954e9df",
-      "8d93026df5de065c",
-      "bc85"
+      "cd95c9",
+      "eeed8008",
+      "f2e26eba6c9432cf",
+      "0d6a8b47988f0d",
+      "c1",
+      "1b60e7369779",
+      "7fb9d5f9d8",
+      "6696"
     ],
     "settings": {
       "publicKey": "${public_key}",
-      "fingerprint": "chrome",
+      "fingerprint": "randomized"
       "serverName": "",
       "spiderX": "/"
     }
@@ -1110,8 +1126,8 @@ EOF
 )
 }
 
-stream_settings_id6() {
-    stream_settings_id6=$(cat <<EOF
+stream_settings_xtls() {
+    stream_settings_xtls=$(cat <<EOF
 {
   "network": "tcp",
   "security": "tls",
@@ -1160,8 +1176,8 @@ EOF
 )
 }
 
-stream_settings_id7() {
-    stream_settings_id7=$(cat <<EOF
+stream_settings_mkcp() {
+    stream_settings_mkcp=$(cat <<EOF
 {
   "network": "kcp",
   "security": "none",
@@ -1169,7 +1185,7 @@ stream_settings_id7() {
     {
       "forceTls": "same",
       "dest": "www.${domain}",
-      "port": 2091,
+      "port": 9999,
       "remark": ""
     }
   ],
@@ -1198,13 +1214,14 @@ database_change() {
 UPDATE users SET username = '$username' WHERE id = 1;
 UPDATE users SET password = '$password' WHERE id = 1;
 
-UPDATE inbounds SET stream_settings = '$stream_settings_id1' WHERE "key" = '☁CDN_gRPC☁';
-UPDATE inbounds SET stream_settings = '$stream_settings_id2' WHERE "key" = '☁CDN_HU☁';
-UPDATE inbounds SET stream_settings = '$stream_settings_id3' WHERE "key" = '☁CDN_WS☁';
-UPDATE inbounds SET stream_settings = '$stream_settings_id4' WHERE "key" = '🥷🏻REALITY_TG🥷';
-UPDATE inbounds SET stream_settings = '$stream_settings_id5' WHERE "key" = '🥷🏻REALITY_WA🥷🏻';
-UPDATE inbounds SET stream_settings = '$stream_settings_id6' WHERE "key" = '✖️XTLS✖️';
-UPDATE inbounds SET stream_settings = '$stream_settings_id7' WHERE "key" = '📲MKCP📲';
+UPDATE inbounds SET stream_settings = '$stream_settings_grpc' WHERE "key" = '☁gRPC
+UPDATE inbounds SET stream_settings = '$stream_settings_split' WHERE "key" = '☁Split';
+UPDATE inbounds SET stream_settings = '$stream_settings_httpu' WHERE "key" = '☁HttpU';
+UPDATE inbounds SET stream_settings = '$stream_settings_ws' WHERE "key" = '☁WS';
+UPDATE inbounds SET stream_settings = '$stream_settings_steal' WHERE "key" = '🥷🏻Steal';
+UPDATE inbounds SET stream_settings = '$stream_settings_reality' WHERE "key" = '🥷🏻Whatsapp';
+UPDATE inbounds SET stream_settings = '$stream_settings_xtls' WHERE "key" = '✖️XTLS';
+UPDATE inbounds SET stream_settings = '$stream_settings_mkcp' WHERE "key" = '📲MKCP';
 
 UPDATE settings SET value = '${webPort}' WHERE key = 'webPort';
 UPDATE settings SET value = '/${webBasePath}/' WHERE key = 'webBasePath';

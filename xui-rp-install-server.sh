@@ -623,6 +623,13 @@ EOF
 
 local_conf() {
     cat > /etc/nginx/conf.d/local.conf <<EOF
+server {
+    listen 9090 default_server;
+    server_name _;
+    location / {
+        return 301  https://${domain}\$request_uri;
+    }
+}
 # Main
 server {
     listen                      36076 ssl default_server;
