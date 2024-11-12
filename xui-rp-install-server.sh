@@ -798,7 +798,7 @@ stream_settings_id2() {
     "serverNames": [
       "${domain}"
     ],
-    "privateKey": "QI6xQiJFXwxgaNpPmJkEOk-QvidjsJmU9p9G4ZbtcAQ",
+    "privateKey": "${private_key}",
     "minClient": "",
     "maxClient": "",
     "maxTimediff": 0,
@@ -813,8 +813,8 @@ stream_settings_id2() {
       "bc85"
     ],
     "settings": {
-      "publicKey": "acU_SUeaHvhjf6nbLDLCpfkF8o6XOm05WH2xaiPHdjk",
-      "fingerprint": "chrome",
+      "publicKey": "${public_key}",
+      "fingerprint": "randomized",
       "serverName": "",
       "spiderX": "/"
     }

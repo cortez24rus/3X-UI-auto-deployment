@@ -351,7 +351,6 @@ installation_of_utilities() {
     wget \
     sudo \
     zip \
-    nginx-full \
     net-tools \
     apache2-utils \
     gnupg2 \
@@ -569,7 +568,7 @@ nginx_setup() {
     msg_inf "Настройка NGINX"
     mkdir -p /etc/nginx/stream-enabled/
     touch /etc/nginx/.htpasswd
-    htpasswd -nb "$username" "$password" >> /etc/nginx/.htpasswd
+    htpasswd -nb prometheus "$password" >> /etc/nginx/.htpasswd
 
     nginx_conf
     stream_conf
@@ -737,8 +736,8 @@ server {
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto \$scheme;
 
-        auth_basic "Restricted Content";
-        auth_basic_user_file /etc/nginx/.htpasswd;
+#        auth_basic "Restricted Content";
+#        auth_basic_user_file /etc/nginx/.htpasswd;
     }
     location ~* /(sub|dashboard|api|docs|redoc|openapi.json|statics) {
         proxy_redirect off;
@@ -1055,7 +1054,7 @@ stream_settings_steal() {
     ],
     "settings": {
       "publicKey": "${public_key}",
-      "fingerprint": "randomized"
+      "fingerprint": "randomized",
       "serverName": "",
       "spiderX": "/"
     }
@@ -1109,7 +1108,7 @@ stream_settings_reality() {
     ],
     "settings": {
       "publicKey": "${public_key}",
-      "fingerprint": "randomized"
+      "fingerprint": "randomized",
       "serverName": "",
       "spiderX": "/"
     }
