@@ -197,30 +197,14 @@ check_cf_token() {
     done
 }
 
-generate_key() {
-    local key_type="$1"
-    local key_prefix=""
-    local key=""
-
-    case "$key_type" in
-        "private")
-            key_prefix="privateKey"
-            # Генерация приватного ключа X25519 с использованием xray
-            key=$(/usr/local/x-ui/bin/xray-linux-amd64 x25519 | grep "Private key:" | awk '{print $3}')
-            ;;
-        "public")
-            key_prefix="publicKey"
-            # Генерация публичного ключа X25519 с использованием xray
-            key=$(/usr/local/x-ui/bin/xray-linux-amd64 x25519 | grep "Public key:" | awk '{print $3}')
-            ;;
-        *)
-            echo "Invalid key type. Use 'private' or 'public'."
-            return 1
-            ;;
-    esac
-
-    # Возвращаем ключ
-    echo "$key"
+generate_keys() {
+    # Генерация пары ключей X25519 с использованием xray
+    local key_pair=$(/usr/local/x-ui/bin/xray-linux-amd64 x25519)
+    local private_key=$(echo "$key_pair" | grep "Private key:" | awk '{print $3}')
+    local public_key=$(echo "$key_pair" | grep "Public key:" | awk '{print $3}')
+    
+    # Возвращаем ключи в виде строки, разделенной пробелом
+    echo "$private_key $public_key"
 }
 
 ### Проверка IP-адреса ###
@@ -511,12 +495,7 @@ disable_ipv6() {
 ### WARP ###
 warp() {
     msg_inf "Настройка warp"
-    while ! wget -q --show-progress --timeout=30 --tries=10 --retry-connrefused https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/main/warp/xui-rp-warp.sh; do
-        msg_err "Скачивание не удалось, пробуем снова..."
-        sleep 3
-    done
-    chmod +x xui-rp-warp.sh && ./xui-rp-warp.sh
-    rm -rf xui-rp-warp.sh
+    bash <(curl -Ls https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/main/warp/xui-rp-warp.sh)
     echo
     msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
     echo
@@ -791,8 +770,7 @@ EOF
 }
 
 stream_settings_id2() {
-    local public_key=$(generate_key "public")
-    local private_key=$(generate_key "private")
+    read private_key public_key <<< "$(generate_keys)"
     
     stream_settings_id2=$(cat <<EOF
 {
@@ -813,7 +791,7 @@ stream_settings_id2() {
     "serverNames": [
       "${domain}"
     ],
-    "privateKey": "${private_key}",
+    "privateKey": "QI6xQiJFXwxgaNpPmJkEOk-QvidjsJmU9p9G4ZbtcAQ",
     "minClient": "",
     "maxClient": "",
     "maxTimediff": 0,
@@ -828,7 +806,7 @@ stream_settings_id2() {
       "bc85"
     ],
     "settings": {
-      "publicKey": "${public_key}",
+      "publicKey": "acU_SUeaHvhjf6nbLDLCpfkF8o6XOm05WH2xaiPHdjk",
       "fingerprint": "chrome",
       "serverName": "",
       "spiderX": "/"
@@ -997,6 +975,7 @@ data_output() {
     printf '0\n' | x-ui | grep --color=never -i ':'
     msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
     echo -n "Доступ по ссылке к 3x-ui панели: " && msg_out "https://${domain}/${webBasePath}/"
+    echo -n "Быстрая ссылка, на подписку, для подключения: " && msg_out "${subURI}user"
     if [[ $choise = "1" ]]; then
         echo -n "Доступ по ссылке к adguard-home: " && msg_out "https://${domain}/${adguardPath}/login.html"
     fi
@@ -1004,7 +983,7 @@ data_output() {
     echo -n "Подключение по ssh: " && msg_out "ssh -p 22 ${username}@${IP4}"
     msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"     
     echo -n "Username: " && msg_out "$username"
-    echo -n "Password: " && msg_out "$password"
+    echo -n "Password: " && msg_out "$password" 
     echo
     msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
     echo
