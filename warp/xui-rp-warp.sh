@@ -7,12 +7,12 @@ wget https://pkg.cloudflareclient.com/pool/$(grep "VERSION_CODENAME=" /etc/os-re
 dpkg -i cloudflare-warp_2024.6.497-1_amd64.deb
 
 warp-cli status
-#echo -e "yes" | warp-cli --accept-tos registration new
+echo -e "yes" | warp-cli --accept-tos registration new
 #warp-cli --accept-tos mode proxy
 #warp-cli --accept-tos proxy port 40000
 #warp-cli --accept-tos connect
 #yes | warp-cli registration new
-warp-cli --accept-tos registration new
+#warp-cli --accept-tos registration new
 warp-cli mode proxy
 warp-cli proxy port 40000
 warp-cli connect
