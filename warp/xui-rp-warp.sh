@@ -35,5 +35,10 @@ curl -x socks5h://localhost:40000 https://2ip.io
 
 # Статистика туннеля (опционально)
 warp-cli tunnel stats
-echo "ПОЛИТИКИ НУЖНО ПРИНЯТЬ САМОМУ, БЕЗ ЭТОГО ВАРП НЕ ЗАРАБОТАЕТ!!!"
-echo "Введите warp-cli status, если не было или пропустили сообщение о принятии." 
+echo "Подключить варп нужно этими командами, последняя для проверки, если ip отдан, то все работает. Без эти команд WARP не заработает."
+
+echo "warp-cli --accept-tos registration new"
+echo "warp-cli --accept-tos mode proxy"
+echo "warp-cli --accept-tos proxy port 40000"
+echo "warp-cli --accept-tos connect"
+echo "curl -x socks5h://localhost:40000 https://2ip.io"
