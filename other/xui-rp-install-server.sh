@@ -568,7 +568,7 @@ nginx_setup() {
     msg_inf "Настройка NGINX"
     mkdir -p /etc/nginx/stream-enabled/
     touch /etc/nginx/.htpasswd
-    htpasswd -nb prometheus "$password" >> /etc/nginx/.htpasswd
+    htpasswd -nb "$username" "$password" >> /etc/nginx/.htpasswd
 
     nginx_conf
     stream_conf
@@ -730,14 +730,13 @@ server {
 #        auth_basic_user_file /etc/nginx/.htpasswd;
 #    }
      location /${node_metrics} {
+        auth_basic "Restricted Content";
+        auth_basic_user_file /etc/nginx/.htpasswd;
         proxy_pass http://127.0.0.1:9100/metrics;
         proxy_set_header Host \$host;
         proxy_set_header X-Real-IP \$remote_addr;
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto \$scheme;
-
-#        auth_basic "Restricted Content";
-#        auth_basic_user_file /etc/nginx/.htpasswd;
     }
     location ~* /(sub|dashboard|api|docs|redoc|openapi.json|statics) {
         proxy_redirect off;
