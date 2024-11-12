@@ -991,11 +991,8 @@ data_output() {
     msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"     
     echo -n "Username: " && msg_out "$username"
     echo -n "Password: " && msg_out "$password" 
-    echo
     msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
-    echo
     echo -n "Путь к лог файлу: " && msg_out "$LOGFILE"
-    echo
     msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
     echo
 }
