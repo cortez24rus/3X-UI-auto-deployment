@@ -249,7 +249,7 @@ start_installation() {
     msg_ok "ВНИМАНИЕ!"
     echo
     msg_ok "Перед запуском скрипта рекомендуется выполнить следующие действия:"
-    msg_err "apt update && apt full-upgrade -y && reboot"
+    msg_err "apt-get update && apt-get full-upgrade -y && reboot"
     echo
     msg_ok "Начать установку XRAY? Выберите опцию [y/N]"
     answer_input
@@ -329,7 +329,7 @@ installation_of_utilities() {
         echo "deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] http://nginx.org/packages/ubuntu `lsb_release -cs` nginx" | tee /etc/apt/sources.list.d/nginx.list
     fi
     echo -e "Package: *\nPin: origin nginx.org\nPin: release o=nginx\nPin-Priority: 900\n" | tee /etc/apt/preferences.d/99nginx
-    apt install nginx-full -y
+    apt-get install nginx-full -y
 
     apt-get install -y systemd-resolved
     echo

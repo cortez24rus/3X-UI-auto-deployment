@@ -19,7 +19,7 @@ function msg_inf()       { echo -e "${QUESTION} ${Yellow} $1 ${Font}"; }
 function msg_out()       { echo -e "${Green} $1 ${Font}"; }
 function msg_tilda()     { echo -e "${Orange}$1${Font}"; }
 
-apt update && apt install -y zip
+apt-get update && apt-get install -y zip
 mkdir -p /usr/local/xui-rp/
 cd /usr/local/xui-rp/ || exit 1
 
