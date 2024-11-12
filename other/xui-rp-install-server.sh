@@ -289,7 +289,7 @@ data_entry() {
     echo
     msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
     echo
-    msg_inf "Введите доменное имя, под которое будете маскироваться Reality:"
+    msg_inf "Введите sni для Reality:"
     reality
     echo
     msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
@@ -575,7 +575,6 @@ nginx_setup() {
     stream_conf
     local_conf
     random_site
-    monitoring
 
     nginx -s reload
     echo
@@ -588,7 +587,7 @@ nginx_conf() {
 user                              www-data;
 pid                               /run/nginx.pid;
 worker_processes                  auto;
-worker_rlimit_nofile              65535;ngin
+worker_rlimit_nofile              65535;
 error_log                         /var/log/nginx/error.log;
 include                           /etc/nginx/modules-enabled/*.conf;
 
@@ -733,10 +732,10 @@ server {
 #    }
      location /${node_metrics} {
         proxy_pass http://127.0.0.1:9100/metrics;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
 
         auth_basic "Restricted Content";
         auth_basic_user_file /etc/nginx/.htpasswd;
@@ -744,12 +743,12 @@ server {
     location ~* /(sub|dashboard|api|docs|redoc|openapi.json|statics) {
         proxy_redirect off;
         proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Upgrade \$http_upgrade;
         proxy_set_header Connection "upgrade";
         proxy_pass https://127.0.0.1:8000;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
     }
     # X-ui Admin panel
     location /${webBasePath} {
@@ -1214,14 +1213,14 @@ database_change() {
 UPDATE users SET username = '$username' WHERE id = 1;
 UPDATE users SET password = '$password' WHERE id = 1;
 
-UPDATE inbounds SET stream_settings = '$stream_settings_grpc' WHERE "key" = '☁gRPC
-UPDATE inbounds SET stream_settings = '$stream_settings_split' WHERE "key" = '☁Split';
-UPDATE inbounds SET stream_settings = '$stream_settings_httpu' WHERE "key" = '☁HttpU';
-UPDATE inbounds SET stream_settings = '$stream_settings_ws' WHERE "key" = '☁WS';
-UPDATE inbounds SET stream_settings = '$stream_settings_steal' WHERE "key" = '🥷🏻Steal';
-UPDATE inbounds SET stream_settings = '$stream_settings_reality' WHERE "key" = '🥷🏻Whatsapp';
-UPDATE inbounds SET stream_settings = '$stream_settings_xtls' WHERE "key" = '✖️XTLS';
-UPDATE inbounds SET stream_settings = '$stream_settings_mkcp' WHERE "key" = '📲MKCP';
+UPDATE inbounds SET stream_settings = '$stream_settings_grpc' WHERE remark = '☁gRPC';
+UPDATE inbounds SET stream_settings = '$stream_settings_split' WHERE remark = '☁Split';
+UPDATE inbounds SET stream_settings = '$stream_settings_httpu' WHERE remark = '☁HttpU';
+UPDATE inbounds SET stream_settings = '$stream_settings_ws' WHERE remark = '☁WS';
+UPDATE inbounds SET stream_settings = '$stream_settings_steal' WHERE remark = '🥷🏻Steal';
+UPDATE inbounds SET stream_settings = '$stream_settings_reality' WHERE remark = '🥷🏻Whatsapp';
+UPDATE inbounds SET stream_settings = '$stream_settings_xtls' WHERE remark = '✖️XTLS';
+UPDATE inbounds SET stream_settings = '$stream_settings_mkcp' WHERE remark = '📲MKCP';
 
 UPDATE settings SET value = '${webPort}' WHERE key = 'webPort';
 UPDATE settings SET value = '/${webBasePath}/' WHERE key = 'webBasePath';
@@ -1344,11 +1343,8 @@ data_output() {
     msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
     echo -n "Username: " && msg_out "$username"
     echo -n "Password: " && msg_out "$password"
-    echo
     msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
-    echo
     echo -n "Путь к лог файлу: " && msg_out "$LOGFILE"
-    echo
     msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
     echo
 }
@@ -1373,6 +1369,7 @@ main_script_first() {
     disable_ipv6
     warp
     issuance_of_certificates
+    monitoring
     nginx_setup
     panel_installation
     enabling_security
