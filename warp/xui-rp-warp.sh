@@ -7,7 +7,7 @@
 
 # Установка конкретной версии Cloudflare WARP
 wget https://pkg.cloudflareclient.com/pool/$(grep "VERSION_CODENAME=" /etc/os-release | cut -d "=" -f 2)/main/c/cloudflare-warp/cloudflare-warp_2024.6.497-1_amd64.deb > /dev/null 2>&1
-apt install cloudflare-warp_2024.6.497-1_amd64.deb
+apt install ./cloudflare-warp_2024.6.497-1_amd64.deb
 
 # Удаление временных файлов
 rm -rf cloudflare-warp_*
