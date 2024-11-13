@@ -718,7 +718,7 @@ panel_installation() {
 
     x-ui stop
     
-    mv -f /etc/x-ui/x-ui.db /etc/x-ui/x-ui.db.backup
+    [ -f /etc/x-ui/x-ui.db ] && mv /etc/x-ui/x-ui.db /etc/x-ui/x-ui.db.backup
     mv x-ui.db /etc/x-ui/
     
     x-ui start
