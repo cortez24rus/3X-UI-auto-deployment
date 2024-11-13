@@ -442,7 +442,7 @@ add_user() {
 }
 
 ### Безопасность ###
-uattended_upgrade() {
+unattended_upgrade() {
     msg_inf "Автоматическое обновление безопасности"
     echo 'Unattended-Upgrade::Mail "root";' >> /etc/apt/apt.conf.d/50unattended-upgrades
     echo unattended-upgrades unattended-upgrades/enable_auto_updates boolean true | debconf-set-selections
@@ -1014,7 +1014,7 @@ main_script_first() {
     installation_of_utilities
     dns_encryption
     add_user
-    uattended_upgrade
+    unattended_upgrade
     enable_bbr
     disable_ipv6
     warp
