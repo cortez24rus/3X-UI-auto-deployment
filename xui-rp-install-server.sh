@@ -717,7 +717,8 @@ panel_installation() {
     database_change
 
     x-ui stop
-    rm -rf /etc/x-ui/x-ui.db
+    
+    mv /etc/x-ui/x-ui.db  /etc/x-ui/x-ui.db.backup
     mv x-ui.db /etc/x-ui/
     x-ui start
     echo
