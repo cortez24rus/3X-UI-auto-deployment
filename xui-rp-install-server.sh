@@ -718,8 +718,9 @@ panel_installation() {
 
     x-ui stop
     
-    mv /etc/x-ui/x-ui.db /etc/x-ui/x-ui.db.backup
+    mv -f /etc/x-ui/x-ui.db /etc/x-ui/x-ui.db.backup
     mv x-ui.db /etc/x-ui/
+    
     x-ui start
     echo
     msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
