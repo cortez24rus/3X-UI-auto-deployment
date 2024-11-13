@@ -852,7 +852,7 @@ panel_installation() {
 
     x-ui stop
     rm -rf x-ui.gpg
-    rm -rf /etc/x-ui/x-ui.db
+    mv /etc/x-ui/x-ui.db /etc/x-ui/x-ui.db.backup
     mv x-ui.db /etc/x-ui/
     x-ui start
     echo -e "20\n1" | x-ui > /dev/null 2>&1
