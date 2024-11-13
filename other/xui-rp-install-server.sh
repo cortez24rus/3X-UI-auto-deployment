@@ -690,7 +690,10 @@ server {
     ssl_session_cache           shared:SSL:10m;
 }
 server {
-    listen                      46076 ssl http2;
+#    listen                      46076 ssl http2;
+    listen                      46076 ssl http2 proxy_protocol;
+    set_real_ip_from            127.0.0.1;
+    real_ip_header              proxy_protocol;
     server_name                 ${domain} www.${domain};
 
     # SSL
@@ -1034,7 +1037,7 @@ stream_settings_steal() {
   ],
   "realitySettings": {
     "show": false,
-    "xver": 0,
+    "xver": 2,
     "dest": "46076",
     "serverNames": [
       "${domain}"
@@ -1088,7 +1091,7 @@ stream_settings_reality() {
   ],
   "realitySettings": {
     "show": false,
-    "xver": 0,
+    "xver": 2,
     "dest": "${reality}:443",
     "serverNames": [
       "${reality}"
