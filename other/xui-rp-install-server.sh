@@ -370,9 +370,9 @@ installation_of_utilities() {
         echo "deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] http://nginx.org/packages/ubuntu `lsb_release -cs` nginx" | tee /etc/apt/sources.list.d/nginx.list
     fi
     echo -e "Package: *\nPin: origin nginx.org\nPin: release o=nginx\nPin-Priority: 900\n" | tee /etc/apt/preferences.d/99nginx
-    apt-get install nginx-full -y
-
-    apt-get install -y systemd-resolved
+    
+    apt-get update && apt-get install -y nginx-full \
+    systemd-resolved
     echo
     msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
     echo
