@@ -22,7 +22,7 @@
 
 | Type  | Name             | Content          | Proxy status  |
 | ----- | ---------------- | ---------------- | ------------- |
-| A     | your_domain_name | your_server_ip   | Proxied       |
+| A     | your_domain_name | your_server_ip   | DNS only      |
 | CNAME | www              | your_domain_name | DNS only      |
    
 3. Настройки SSL/TLS в Cloudflare:
