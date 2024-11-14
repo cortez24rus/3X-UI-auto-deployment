@@ -1,24 +1,6 @@
 #!/bin/bash
 
 ### INFO ###
-Green="\033[32m"
-Red="\033[31m"
-Yellow="\e[1;33m"
-Blue="\033[36m"
-Orange="\033[38;5;214m"
-Font="\e[0m"
-
-OK="${Green}[OK]${Font}"
-ERROR="${Red}[!]${Font}"
-QUESTION="${Green}[?]${Font}"
-
-function msg_banner()    { echo -e "${Yellow} $1 ${Font}"; }
-function msg_ok()        { echo -e "${OK} ${Blue} $1 ${Font}"; }
-function msg_err()       { echo -e "${ERROR} ${Orange} $1 ${Font}"; }
-function msg_inf()       { echo -e "${QUESTION} ${Yellow} $1 ${Font}"; }
-function msg_out()       { echo -e "${Green} $1 ${Font}"; }
-function msg_tilda()     { echo -e "${Orange}$1${Font}"; }
-
 out_data()   { echo -e "\e[1;33m$1\033[0m \033[38;5;214m$2\033[0m"; }
 tilda()      { echo -e "\033[31m\033[38;5;214m$*\033[0m"; }
 warning()    { echo -e "\033[31m [!]\033[38;5;214m$*\033[0m"; }
@@ -31,7 +13,7 @@ text()       { eval echo "\${${L}[$*]}"; }
 text_eval()  { eval echo "\$(eval echo "\${${L}[$*]}")"; }
 
 E[0]="Language:\n  1.English (default) \n  2.Русский"
-R[0]="Язык:\n  1.English (по умолчанию) \n  2.Русский"
+R[0]="${E[0]}"
 E[1]="Choose:"
 R[1]="Выбери:"
 E[2]="Error: this script requires superuser (root) privileges to run."
@@ -46,7 +28,6 @@ E[6]="It is recommended to perform the following actions before running the scri
 R[6]="Перед запуском скрипта рекомендуется выполнить следующие действия"
 E[7]=""
 R[7]=""
-C[7]=""
 E[8]="Start the XRAY installation? Choose option [y/N]:"
 R[8]="Начать установку XRAY? Выберите опцию [y/N]:"
 E[9]="CANCEL"
