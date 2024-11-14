@@ -292,6 +292,9 @@ check_cf_token() {
         if validate_input; then
             break
         else
+            echo ${domain}
+            echo ${email}
+            echo ${cftoken}
             warning " $(text 18)"
             domain=""
             email=""
