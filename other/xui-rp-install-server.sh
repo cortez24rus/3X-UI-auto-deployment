@@ -1284,18 +1284,33 @@ ssh_setup() {
     echo
     msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
     echo
-    msg_inf "Настроить ssh (шаг не обязательный)? [y/N]"
-    answer_input
+    while true; do
+        msg_inf "Настроить ssh (шаг не обязательный)? [y/N]"
+        answer_input
 
-    if [[ $? -eq 0 ]]; then
-        sed -i -e "s/#Port/Port/g" /etc/ssh/sshd_config
-        sed -i -e "s/Port 22/Port 36079/g" /etc/ssh/sshd_config
-        sed -i -e "s/#PermitRootLogin/PermitRootLogin/g" -e "s/PermitRootLogin yes/PermitRootLogin prohibit-password/g" /etc/ssh/sshd_config
-        sed -i -e "s/#PubkeyAuthentication/PubkeyAuthentication/g" -e "s/PubkeyAuthentication no/PubkeyAuthentication yes/g" /etc/ssh/sshd_config
-        sed -i -e "s/#PasswordAuthentication/PasswordAuthentication/g" -e "s/PasswordAuthentication yes/PasswordAuthentication no/g" /etc/ssh/sshd_config
-        sed -i -e "s/#PermitEmptyPasswords/PermitEmptyPasswords/g" -e "s/PermitEmptyPasswords yes/PermitEmptyPasswords no/g" /etc/ssh/sshd_config
+        if [[ $? -eq 0 ]]; then
 
-        cat > /etc/motd <<EOF
+            if [[ ! -s /home/${username}/.ssh/id_rsa.pub && ! -s /root/.ssh/id_rsa.pub ]]; then
+                msg_err "Ошибка: Ключи не найдены в файле /home/${username}/.ssh/id_rsa.pub или /root/.ssh/id_rsa.pub"
+                msg_err "Cоздайте ключи и добавьте их на сервер, прежде чем продолжить"
+                msg_inf "Попробуйте снова"
+                echo
+            else
+                # Если ключи найдены, продолжаем настройку SSH
+                sed -i -e "
+                    s/#Port/Port/g;
+                    s/Port 22/Port 36079/g;
+                    s/#PermitRootLogin/PermitRootLogin/g;
+                    s/PermitRootLogin yes/PermitRootLogin prohibit-password/g;
+                    s/#PubkeyAuthentication/PubkeyAuthentication/g;
+                    s/PubkeyAuthentication no/PubkeyAuthentication yes/g;
+                    s/#PasswordAuthentication/PasswordAuthentication/g;
+                    s/PasswordAuthentication yes/PasswordAuthentication no/g;
+                    s/#PermitEmptyPasswords/PermitEmptyPasswords/g;
+                    s/PermitEmptyPasswords yes/PermitEmptyPasswords no/g;
+                " /etc/ssh/sshd_config
+                
+                cat > /etc/motd <<EOF
 
 ################################################################################
                          WARNING: AUTHORIZED ACCESS ONLY
@@ -1331,9 +1346,16 @@ to the fullest extent of the law.
 
 
 EOF
-        systemctl restart ssh.service
-        echo "Настройка SSH завершена."
-    fi
+                systemctl restart ssh.service
+                echo "Настройка SSH завершена."
+                break
+            fi
+        else
+            echo "Настройка SSH пропущена."
+            break
+        fi
+    done
+
     echo
     msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
     echo
@@ -1433,3 +1455,25 @@ main_choise() {
 }
 
 main_choise "$1"
+
+
+
+
+#location /adguard-home/ {
+#    proxy_pass http://127.0.0.1:8081/;
+#    proxy_redirect / /adguard-home/;
+#    proxy_cookie_path / /adguard-home/;
+#}
+
+
+#location ~* /(admin|api|dashboard|openapi.json|statics|docs) {
+#    proxy_redirect off;
+#    proxy_http_version 1.1;
+#    proxy_set_header Upgrade \$http_upgrade;
+#    proxy_set_header Connection "upgrade";
+#    proxy_pass http://127.0.0.1:8081/;
+    
+#    proxy_set_header Host \$host;
+#    proxy_set_header X-Real-IP \$remote_addr;
+#    proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+#}
