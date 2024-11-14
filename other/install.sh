@@ -1,12 +1,24 @@
 #!/bin/bash
 
-
-export DEBIAN_FRONTEND=noninteractive
-
-mkdir -p /usr/local/xui-rp/
-LOGFILE="/usr/local/xui-rp/xui-rp.log"
-
 ### INFO ###
+Green="\033[32m"
+Red="\033[31m"
+Yellow="\e[1;33m"
+Blue="\033[36m"
+Orange="\033[38;5;214m"
+Font="\e[0m"
+
+OK="${Green}[OK]${Font}"
+ERROR="${Red}[!]${Font}"
+QUESTION="${Green}[?]${Font}"
+
+function msg_banner()    { echo -e "${Yellow} $1 ${Font}"; }
+function msg_ok()        { echo -e "${OK} ${Blue} $1 ${Font}"; }
+function msg_err()       { echo -e "${ERROR} ${Orange} $1 ${Font}"; }
+function msg_inf()       { echo -e "${QUESTION} ${Yellow} $1 ${Font}"; }
+function msg_out()       { echo -e "${Green} $1 ${Font}"; }
+function msg_tilda()     { echo -e "${Orange}$1${Font}"; }
+
 out_data()   { echo -e "\e[1;33m$1\033[0m \033[38;5;214m$2\033[0m"; }
 tilda()      { echo -e "\033[31m\033[38;5;214m$*\033[0m"; }
 warning()    { echo -e "\033[31m [!]\033[38;5;214m$*\033[0m"; }
@@ -18,335 +30,145 @@ reading()    { read -rp " $(question "$1")" "$2"; }
 text()       { eval echo "\${${L}[$*]}"; }
 text_eval()  { eval echo "\$(eval echo "\${${L}[$*]}")"; }
 
-E[0]="Language:\n  1. English (default)\n  2. Русский\n  3. 中文\n  4. فارسی"
-R[0]="Язык:\n  1. English (по умолчанию)\n  2.Русский\n  3. فارسی"
-C[0]="语言:\n  1. English (默认)\n  2. Русский\n  3. 中文\n  4. فارسی"
-P[0]="زبان:\n  1. English (پیش‌فرض)\n  2. Русский\n  3. 中文\n  4. فارسی"
-
+E[0]="Language:\n  1.English (default) \n  2.Русский"
+R[0]="Язык:\n  1.English (по умолчанию) \n  2.Русский"
 E[1]="Choose:"
 R[1]="Выбери:"
-C[1]="选择:"
-P[1]="انتخاب کنید:"
-
 E[2]="Error: this script requires superuser (root) privileges to run."
 R[2]="Ошибка: для выполнения этого скрипта необходимы права суперпользователя (root)."
-C[2]="错误: 该脚本需要超级用户(root)权限才能运行。"
-P[2]="خطا: این اسکریپت به دسترسی‌های کاربر ریشه (root) نیاز دارد."
-
 E[3]="Unable to determine IP address."
 R[3]="Не удалось определить IP-адрес."
-C[3]="无法确定IP地址。"
-P[3]="نمی‌توان آدرس IP را شناسایی کرد."
-
 E[4]="Reinstalling script..."
 R[4]="Повторная установка скрипта..."
-C[4]="正在重新安装脚本..."
-P[4]="در حال نصب مجدد اسکریپت..."
-
 E[5]="WARNING!"
 R[5]="ВНИМАНИЕ!"
-C[5]="警告！"
-P[5]="هشدار!"
-
 E[6]="It is recommended to perform the following actions before running the script"
 R[6]="Перед запуском скрипта рекомендуется выполнить следующие действия"
-C[6]="建议在运行脚本之前执行以下操作"
-P[6]="پیشنهاد می‌شود قبل از اجرای اسکریپت اقدامات زیر انجام شود."
-
 E[7]=""
 R[7]=""
 C[7]=""
-P[7]=""
-
 E[8]="Start the XRAY installation? Choose option [y/N]:"
 R[8]="Начать установку XRAY? Выберите опцию [y/N]:"
-C[8]="开始XRAY安装？选择选项[y/N]："
-P[8]="آیا می‌خواهید نصب XRAY را شروع کنید؟ گزینه را انتخاب کنید [y/N]:"
-
 E[9]="CANCEL"
 R[9]="ОТМЕНА"
-C[9]="取消"
-P[9]="لغو"
-
 E[10]="\n|-----------------------------------------------------------------------------|\n"
 R[10]="\n|-----------------------------------------------------------------------------|\n"
-C[10]="\n|-----------------------------------------------------------------------------|\n"
-P[10]="\n|-----------------------------------------------------------------------------|\n"
-
 E[11]="Enter username:"
 R[11]="Введите имя пользователя:"
-C[11]="请输入用户名："
-P[11]="نام کاربری را وارد کنید:"
-
 E[12]="Enter user password:"
 R[12]="Введите пароль пользователя:"
-C[12]="请输入用户密码："
-P[12]="رمز عبور کاربر را وارد کنید:"
-
 E[13]="Enter your domain:"
 R[13]="Введите ваш домен:"
-C[13]="请输入您的域名："
-P[13]="دامنه خود را وارد کنید:"
-
 E[14]="Error: the entered address '$temp_value' is incorrectly formatted."
 R[14]="Ошибка: введённый адрес '$temp_value' имеет неверный формат."
-C[14]="错误：输入的地址 '$temp_value' 格式不正确。"
-P[14]="خطا: آدرس وارد شده '$temp_value' به درستی فرمت نشده است."
-
 E[15]="Enter your email registered with Cloudflare:"
 R[15]="Введите вашу почту, зарегистрированную на Cloudflare:"
-C[15]="请输入您的Cloudflare注册电子邮件："
-P[15]="ایمیل خود را که در Cloudflare ثبت شده وارد کنید:"
-
 E[16]="Enter your Cloudflare API token (Edit zone DNS) or global API key:"
 R[16]="Введите ваш API токен Cloudflare (Edit zone DNS) или Cloudflare global API key:"
-C[16]="请输入您的Cloudflare API令牌（编辑区域DNS）或全局API密钥："
-P[16]="توکن API خود را از Cloudflare وارد کنید (Edit zone DNS) یا کلید API جهانی Cloudflare:"
-
 E[17]="Verifying domain, API token/key, and email..."
 R[17]="Проверка домена, API токена/ключа и почты..."
-C[17]="正在验证域名、API令牌/密钥和电子邮件..."
-P[17]="در حال بررسی دامنه، توکن/کلید API و ایمیل..."
-
 E[18]="Error: invalid domain, API token/key, or email. Please try again."
 R[18]="Ошибка: неправильно введён домен, API токен/ключ или почта. Попробуйте снова."
-C[18]="错误：域名、API令牌/密钥或电子邮件无效。请再试一次。"
-P[18]="خطا: دامنه، توکن/کلید API یا ایمیل نادرست است. لطفا دوباره امتحان کنید."
-
 E[19]="Enter SNI for Reality:"
 R[19]="Введите sni для Reality:"
-C[19]="请输入Reality的SNI："
-P[19]="SNI برای Reality را وارد کنید:"
-
 E[20]="Enter Grpc path:"
 R[20]="Введите путь к Grpc:"
-C[20]="请输入Grpc路径："
-P[20]="مسیر Grpc را وارد کنید:"
-
 E[21]="Enter Split path:"
 R[21]="Введите путь к Split:"
-C[21]="请输入Split路径："
-P[21]="مسیر Split را وارد کنید:"
-
 E[22]="Enter HttpUpgrade path:"
 R[22]="Введите путь к HttpUpgrade:"
-C[22]="请输入HttpUpgrade路径："
-P[22]="مسیر HttpUpgrade را وارد کنید:"
-
 E[23]="Enter Websocket path:"
 R[23]="Введите путь к Websocket:"
-C[23]="请输入Websocket路径："
-P[23]="مسیر Websocket را وارد کنید:"
-
 E[24]="Enter Node Exporter path:"
 R[24]="Введите путь к Node Exporter:"
-C[24]="请输入Node Exporter路径："
-P[24]="مسیر Node Exporter را وارد کنید:"
-
 E[25]="Enter Adguard-home path:"
 R[25]="Введите путь к Adguard-home:"
-C[25]="请输入Adguard-home路径："
-P[25]="مسیر Adguard-home را وارد کنید:"
-
 E[26]="Enter panel path:"
 R[26]="Введите путь к панели:"
-C[26]="请输入面板路径："
-P[26]="مسیر پنل را وارد کنید:"
-
 E[27]="Enter subscription path:"
 R[27]="Введите путь к подписке:"
-C[27]="请输入订阅路径："
-P[27]="مسیر اشتراک را وارد کنید:"
-
 E[28]="Enter JSON subscription path:"
 R[28]="Введите путь к JSON подписке:"
-C[28]="请输入JSON订阅路径："
-P[28]="مسیر اشتراک JSON را وارد کنید:"
-
 E[29]="Error: path cannot be empty, please re-enter."
 R[29]="Ошибка: путь не может быть пустым, повторите ввод."
-C[29]="错误：路径不能为空，请重新输入。"
-P[29]="خطا: مسیر نمی‌تواند خالی باشد، لطفا دوباره وارد کنید."
-
 E[30]="Error: path must not contain characters {, }, /, $, \\, please re-enter."
 R[30]="Ошибка: путь не должен содержать символы {, }, /, $, \\, повторите ввод."
-C[30]="错误：路径不得包含字符{、}、/、$、\\，请重新输入。"
-P[30]="خطا: مسیر نباید شامل کاراکترهای {،}، /، $، \\ باشد، لطفا دوباره وارد کنید."
-
 E[31]="DNS server:\n  1. Systemd-resolved \n  2. Adguard-home"
 R[31]="DNS сервер:\n  1. Systemd-resolved \n  2. Adguard-home"
-C[31]="DNS服务器：\n  1. Systemd-resolved \n  2. Adguard-home"
-P[31]="سرور DNS:\n  1. Systemd-resolved \n  2. Adguard-home"
-
 E[32]="Systemd-resolved selected."
 R[32]="Выбран systemd-resolved."
-C[32]="选择了Systemd-resolved。"
-P[32]="Systemd-resolved انتخاب شد."
-
 E[33]="Error: invalid choice, please try again."
 R[33]="Ошибка: неверный выбор, попробуйте снова."
-C[33]="错误：无效的选择，请再试一次。"
-P[33]="خطا: انتخاب نادرست، لطفا دوباره امتحان کنید."
-
 E[34]="Enter Telegram bot token:"
 R[34]="Введите токен Telegram бота:"
-C[34]="请输入Telegram机器人令牌："
-P[34]="توکن ربات تلگرام خود را وارد کنید:"
-
 E[35]="Enter your Telegram ID:"
 R[35]="Введите ваш Telegram ID:"
-C[35]="请输入您的Telegram ID："
-P[35]="شناسه تلگرام خود را وارد کنید:"
-
-E[36]="Enter WebSocket address:"
-R[36]="Введите адрес WebSocket:"
-C[36]="请输入WebSocket地址："
-P[36]="آدرس WebSocket را وارد کنید:"
-
-E[37]="Enter panel URL:"
-R[37]="Введите URL панели:"
-C[37]="请输入面板URL："
-P[37]="آدرس URL پنل را وارد کنید:"
-
-E[38]="Enter subscription URL:"
-R[38]="Введите URL подписки:"
-C[38]="请输入订阅URL："
-P[38]="آدرس URL اشتراک را وارد کنید:"
-
-E[39]="Enter user authentication username:"
-R[39]="Введите имя пользователя для аутентификации:"
-C[39]="请输入身份验证用户名："
-P[39]="نام کاربری برای احراز هویت را وارد کنید:"
-
-E[40]="Enter user authentication password:"
-R[40]="Введите пароль для аутентификации:"
-C[40]="请输入身份验证密码："
-P[40]="رمز عبور برای احراز هویت را وارد کنید:"
-
-E[41]="Error: Authentication failed."
-R[41]="Ошибка: не удалось пройти аутентификацию."
-C[41]="错误：身份验证失败。"
-P[41]="خطا: احراز هویت ناموفق بود."
-
-E[42]="Adding user to the database..."
-R[42]="Добавление пользователя в базу данных..."
-C[42]="正在将用户添加到数据库..."
-P[42]="در حال افزودن کاربر به پایگاه داده..."
-
-E[43]="Removing user from the database..."
-R[43]="Удаление пользователя из базы данных..."
-C[43]="正在从数据库中删除用户..."
-P[43]="در حال حذف کاربر از پایگاه داده..."
-
-E[44]="Operation successful."
-R[44]="Операция выполнена успешно."
-C[44]="操作成功。"
-P[44]="عملیات با موفقیت انجام شد."
-
-E[45]="Error: User does not exist in the database."
-R[45]="Ошибка: пользователь не существует в базе данных."
-C[45]="错误：用户不存在数据库中。"
-P[45]="خطا: کاربر در پایگاه داده وجود ندارد."
-
-E[46]="Please try again later."
-R[46]="Пожалуйста, попробуйте позже."
-C[46]="请稍后再试。"
-P[46]="لطفا بعدا دوباره امتحان کنید."
-
+E[36]="Updating system and installing necessary packages."
+R[36]="Обновление системы и установка необходимых пакетов."
+E[37]="Configuring DNS."
+R[37]="Настройка DNS."
+E[38]="Download failed, retrying..."
+R[38]="Скачивание не удалось, пробуем снова..."
+E[39]="Adding user."
+R[39]="Добавление пользователя."
+E[40]="Enabling automatic security updates."
+R[40]="Автоматическое обновление безопасности."
+E[41]="Enabling BBR."
+R[41]="Включение BBR."
+E[42]="Disabling IPv6."
+R[42]="Отключение IPv6."
+E[43]="Configuring WARP."
+R[43]="Настройка WARP."
+E[44]="Issuing certificates."
+R[44]="Выдача сертификатов."
+E[45]="Configuring NGINX."
+R[45]="Настройка NGINX."
+E[46]="Configuring 3x-ui Xray."
+R[46]="Настройка 3x-ui Xray."
 E[47]="Configuring UFW."
 R[47]="Настройка UFW."
-C[47]="正在配置UFW。"
-P[47]="در حال پیکربندی UFW."
-
 E[48]="Configuring SSH."
 R[48]="Настройка SSH."
-C[48]="正在配置SSH。"
-P[48]="در حال پیکربندی SSH."
-
 E[49]="Generate a key for your OS (ssh-keygen)."
 R[49]="Сгенерируйте ключ для своей ОС (ssh-keygen)."
-C[49]="为您的操作系统生成一个密钥（ssh-keygen）。"
-P[49]="برای سیستم عامل خود یک کلید بسازید (ssh-keygen)."
-
 E[50]="In Windows, install the openSSH package and enter the command in PowerShell (recommended to research key generation online)."
 R[50]="В Windows нужно установить пакет openSSH и ввести команду в PowerShell (рекомендуется изучить генерацию ключей в интернете)."
-C[50]="在Windows中，安装openSSH包并在PowerShell中输入命令（建议在线研究密钥生成）。"
-P[50]="در ویندوز، بسته openSSH را نصب کنید و دستور را در PowerShell وارد کنید (پیشنهاد می‌شود که درباره‌ی تولید کلید آنلاین جستجو کنید)."
-
 E[51]="If you are on Linux, you probably know what to do :C"
 R[51]="Если у вас Linux, то вы сами все умеете :С"
-C[51]="如果您使用Linux，您可能知道该怎么做：C"
-P[51]="اگر شما لینوکس دارید، احتمالاً می‌دانید که چه کار کنید :C"
-
 E[52]="Command for Windows:"
 R[52]="Команда для Windows:"
-C[52]="Windows的命令："
-P[52]="دستور برای ویندوز:"
-
 E[53]="Command for Linux:"
 R[53]="Команда для Linux:"
-C[53]="Linux的命令："
-P[53]="دستور برای لینوکس:"
-
 E[54]="Configure SSH (optional step)? [y/N]:"
 R[54]="Настроить SSH (необязательный шаг)? [y/N]:"
-C[54]="是否配置SSH（可选步骤）？[y/N]："
-P[54]="آیا SSH را پیکربندی کنید (مرحله اختیاری)؟ [y/N]:"
-
 E[55]="Error: keys not found in /home/${username}/.ssh/id_rsa.pub or /root/.ssh/id_rsa.pub"
 R[55]="Ошибка: ключи не найдены в файле /home/${username}/.ssh/id_rsa.pub или /root/.ssh/id_rsa.pub"
-C[55]="错误：在 /home/${username}/.ssh/id_rsa.pub 或 /root/.ssh/id_rsa.pub 中未找到密钥"
-P[55]="خطا: کلیدها در /home/${username}/.ssh/id_rsa.pub یا /root/.ssh/id_rsa.pub یافت نشد."
-
 E[56]="Create keys and add them to the server before retrying."
 R[56]="Создайте ключи и добавьте их на сервер, прежде чем повторить снова."
-C[56]="创建密钥并在重试之前将它们添加到服务器。"
-P[56]="کلیدها را ایجاد کرده و قبل از تلاش مجدد آنها را به سرور اضافه کنید."
-
 E[57]="Installing xui bot."
 R[57]="Установка xui бота."
-C[57]="正在安装xui机器人。"
-P[57]="در حال نصب ربات xui."
-
 E[58]="PLEASE SAVE THIS SCREEN!"
 R[58]="ПОЖАЛУЙСТА, СОХРАНИ ЭТОТ ЭКРАН!"
-C[58]="请保存此屏幕！"
-P[58]="لطفاً این صفحه را ذخیره کنید!"
-
 E[59]="Access the 3x-ui panel at the link:"
 R[59]="Доступ по ссылке к 3x-ui панели:"
-C[59]="访问3x-ui面板的链接："
-P[59]="دسترسی به پنل 3x-ui از طریق لینک:"
-
 E[60]="Quick subscription link for connection:"
 R[60]="Быстрая ссылка на подписку для подключения:"
-C[60]="连接的快速订阅链接："
-P[60]="لینک سریع اشتراک برای اتصال:"
-
 E[61]="Access Adguard-home at the link:"
 R[61]="Доступ по ссылке к adguard-home:"
-C[61]="访问Adguard-home的链接："
-P[61]="دسترسی به Adguard-home از طریق لینک:"
-
 E[62]="SSH connection:"
 R[62]="Подключение по SSH:"
-C[62]="SSH连接："
-P[62]="اتصال SSH:"
-
 E[63]="Username:"
 R[63]="Имя пользователя:"
-C[63]="用户名："
-P[63]="نام کاربری:"
-
 E[64]="Password:"
 R[64]="Пароль:"
-C[64]="密码："
-P[64]="گذرواژه:"
-
 E[65]="Log file path:"
 R[65]="Путь к лог файлу:"
-C[65]="日志文件路径："
-P[65]="مسیر فایل لاگ:"
+
+log_entry() {
+    mkdir -p /usr/local/xui-rp/
+    LOGFILE="/usr/local/xui-rp/xui-rp.log"
+    exec > >(tee -a "$LOGFILE") 2>&1
+}
 
 select_language() {
   L=E
@@ -354,13 +176,11 @@ select_language() {
   reading " $(text 1) " LANGUAGE  # Запрашивает выбор языка
 
   # Устанавливаем язык в зависимости от выбора
-  case "$LANGUAGE" in
-    1) L=E ;;   # Если выбран английский
-    2) L=R ;;   # Если выбран русский
-    3) L=C ;;   # Если выбран китайский
-    4) L=P ;;   # Если выбран персидский
-    *) L=E ;;   # По умолчанию — английский
-  esac
+  if [ "$LANGUAGE" = 2 ]; then
+    L=R  # Если выбран русский язык
+  elif [ "$LANGUAGE" = 3 ]; then
+    L=C  # Если выбран китайский язык
+  fi
 }
 
 ### Проверка рута ###
@@ -1749,7 +1569,6 @@ main_script_repeat() {
 main_choise() {
     log_entry
     select_language
-    exec > >(tee -a "$LOGFILE") 2>&1
     if [ -f /usr/local/xui-rp/reinstallation_check ]; then
         info " $(text 4) "
         sleep 2
