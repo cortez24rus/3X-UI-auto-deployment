@@ -1,24 +1,6 @@
 #!/usr/bin/env bash
 
 ### INFO ###
-Green="\033[32m"
-Red="\033[31m"
-Yellow="\e[1;33m"
-Blue="\033[36m"
-Orange="\033[38;5;214m"
-Font="\e[0m"
-
-OK="${Green}[OK]${Font}"
-ERROR="${Red}[!]${Font}"
-QUESTION="${Green}[?]${Font}"
-
-function msg_banner()    { echo -e "${Yellow} $1 ${Font}"; }
-function msg_ok()        { echo -e "${OK} ${Blue} $1 ${Font}"; }
-function msg_err()       { echo -e "${ERROR} ${Orange} $1 ${Font}"; }
-function msg_inf()       { echo -e "${QUESTION} ${Yellow} $1 ${Font}"; }
-function msg_out()       { echo -e "${Green} $1 ${Font}"; }
-function msg_tilda()     { echo -e "${Orange}$1${Font}"; }
-
 out_data()   { echo -e "\e[1;33m$1\033[0m \033[38;5;214m$2\033[0m"; }
 tilda()      { echo -e "\033[31m\033[38;5;214m$*\033[0m"; }
 warning()    { echo -e "\033[31m [!]\033[38;5;214m$*\033[0m"; }
