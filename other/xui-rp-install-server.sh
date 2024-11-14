@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 mkdir -p /usr/local/xui-rp/
 LOGFILE="/usr/local/xui-rp/xui-rp.log"
