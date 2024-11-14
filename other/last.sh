@@ -155,10 +155,10 @@ log_entry() {
 select_language() {
   L=E
   hint " $(text 0) \n"  # Показывает информацию о доступных языках
-  reading " $(text 1) " LANGUAGE  # Запрашивает выбор языка
+  reading " $(text 1) " language  # Запрашивает выбор языка
 
   # Устанавливаем язык в зависимости от выбора
-  case "$LANGUAGE" in
+  case "$language" in
     1) L=E ;;   # Если выбран английский
     2) L=R ;;   # Если выбран русский
 #    3) L=C ;;   # Если выбран китайский
@@ -292,9 +292,6 @@ check_cf_token() {
         if validate_input; then
             break
         else
-            echo ${domain}
-            echo ${email}
-            echo ${cftoken}
             warning " $(text 18)"
             domain=""
             email=""
@@ -312,31 +309,31 @@ validate_path() {
     # Проверка на пустое значение
     while true; do
         case "$variable_name" in
-            CDNGRPC)
+            cdngrpc)
                 reading " $(text 20) " path_value
                 ;;
-            CDNSPLIT)
+            cdnsplit)
                 reading " $(text 21) " path_value
                 ;;
-            CDNHTTPU)
+            cdnhttpu)
                 reading " $(text 22) " path_value
                 ;;
-            CDNWS)
+            cdnws)
                 reading " $(text 23) " path_value
                 ;;
-            METRICS)
+            metrics)
                 reading " $(text 24) " path_value
                 ;;
             adguardpath)
                 reading " $(text 25) " path_value
                 ;;
-            WEBBASEPATH)
+            webbasepath)
                 reading " $(text 26) " path_value
                 ;;
-            SUBPATH)
+            subpath)
                 reading " $(text 27) " path_value
                 ;;                                
-            SUBJSONPATH)
+            subjsonpath)
                 reading " $(text 28) " path_value
                 ;;                
         esac
@@ -353,32 +350,32 @@ validate_path() {
     done
 
     case "$variable_name" in
-        CDNGRPC)
-            export CDNGRPC="$path_value"
+        cdngrpc)
+            export cdngrpc="$path_value"
             ;;
-        CDNSPLIT)
-            export CDNSPLIT="$path_value"
+        cdnsplit)
+            export cdnsplit="$path_value"
             ;;
-        CDNHTTPU)
-            export CDNHTTPU="$path_value"
+        cdnhttpu)
+            export cdnhttpu="$path_value"
             ;;
-        CDNWS)
-            export CDNWS="$path_value"
+        cdnws)
+            export cdnws="$path_value"
             ;;
-        METRICS)
-            export METRICS="$path_value"
+        metrics)
+            export metrics="$path_value"
             ;;
         adguardpath)
             export adguardpath="$path_value"
             ;;
-        WEBBASEPATH)
-            export WEBBASEPATH="$path_value"
+        webbasepath)
+            export webbasepath="$path_value"
             ;;
-        SUBPATH)
-            export SUBPATH="$path_value"
+        subpath)
+            export subpath="$path_value"
             ;;
-        SUBJSONPATH)
-            export SUBJSONPATH="$path_value"
+        subjsonpath)
+            export subjsonpath="$path_value"
             ;;
     esac
 }
@@ -441,30 +438,30 @@ port_issuance() {
 ### Ввод данных ###
 data_entry() {
     tilda "$(text 10)"
-    reading " $(text 11) " USERNAME
+    reading " $(text 11) " username
     echo
-    reading " $(text 12) " PASSWORD
+    reading " $(text 12) " password
     tilda "$(text 10)"
     check_cf_token
     tilda "$(text 10)"
-    reading " $(text 19) " REALITY
+    reading " $(text 19) " reality
     tilda "$(text 10)"
-    validate_path "CDNGRPC"
+    validate_path "cdngrpc"
     echo
-    validate_path "CDNSPLIT"
+    validate_path "cdnsplit"
     echo
-    validate_path "CDNHTTPU"
+    validate_path "cdnhttpu"
     echo
-    validate_path "CDNWS"
+    validate_path "cdnws"
     echo
-    validate_path "METRICS"
+    validate_path "metrics"
     tilda "$(text 10)"
     choise_dns
-    validate_path WEBBASEPATH
+    validate_path webbasepath
     echo
-    validate_path SUBPATH
+    validate_path subpath
     echo    
-    validate_path SUBJSONPATH
+    validate_path subjsonpath
     tilda "$(text 10)"
     if check_xuibot "$1"; then
         reading " $(text 34) " BOT_TOKEN
@@ -477,8 +474,8 @@ data_entry() {
 
     webCertFile=/etc/letsencrypt/live/${domain}/fullchain.pem
     webKeyFile=/etc/letsencrypt/live/${domain}/privkey.pem
-    subURI=https://${domain}/${subPath}/
-    subJsonURI=https://${domain}/${subJsonPath}/
+    subURI=https://${domain}/${subpath}/
+    subJsonURI=https://${domain}/${subjsonpath}/
 }
 
 ### Обновление системы и установка пакетов ###
@@ -874,7 +871,7 @@ server {
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
     }
     # X-ui Admin panel
-    location /${webBasePath} {
+    location /${webbasepath} {
         proxy_redirect off;
         proxy_set_header Host \$host;
         proxy_set_header X-Real-IP \$remote_addr;
@@ -882,27 +879,27 @@ server {
         proxy_set_header X-Real-IP \$remote_addr;
         proxy_set_header Range \$http_range;
         proxy_set_header If-Range \$http_if_range;
-        proxy_pass https://127.0.0.1:${webPort}/${webBasePath};
+        proxy_pass https://127.0.0.1:${webPort}/${webbasepath};
         break;
     }
     # Subscription
-    location /${subPath} {
+    location /${subpath} {
         if (\$hack = 1) {return 404;}
         proxy_redirect off;
         proxy_set_header Host \$host;
         proxy_set_header X-Real-IP \$remote_addr;
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-        proxy_pass https://127.0.0.1:${subPort}/${subPath};
+        proxy_pass https://127.0.0.1:${subPort}/${subpath};
         break;
     }
     # Subscription json
-    location /${subJsonPath} {
+    location /${subjsonpath} {
         if (\$hack = 1) {return 404;}
         proxy_redirect off;
         proxy_set_header Host \$host;
         proxy_set_header X-Real-IP \$remote_addr;
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-        proxy_pass https://127.0.0.1:${subPort}/${subJsonPath};
+        proxy_pass https://127.0.0.1:${subPort}/${subjsonpath};
         break;
     }
     location /${cdnsplit} {
@@ -1324,15 +1321,15 @@ UPDATE inbounds SET stream_settings = '$stream_settings_xtls' WHERE remark = '�
 UPDATE inbounds SET stream_settings = '$stream_settings_mkcp' WHERE remark = '📲MKCP';
 
 UPDATE settings SET value = '${webPort}' WHERE key = 'webPort';
-UPDATE settings SET value = '/${webBasePath}/' WHERE key = 'webBasePath';
+UPDATE settings SET value = '/${webbasepath}/' WHERE key = 'webbasepath';
 UPDATE settings SET value = '${webCertFile}' WHERE key = 'webCertFile';
 UPDATE settings SET value = '${webKeyFile}' WHERE key = 'webKeyFile';
 UPDATE settings SET value = '${subPort}' WHERE key = 'subPort';
-UPDATE settings SET value = '/${subPath}/' WHERE key = 'subPath';
+UPDATE settings SET value = '/${subpath}/' WHERE key = 'subpath';
 UPDATE settings SET value = '${webCertFile}' WHERE key = 'subCertFile';
 UPDATE settings SET value = '${webKeyFile}' WHERE key = 'subKeyFile';
 UPDATE settings SET value = '${subURI}' WHERE key = 'subURI';
-UPDATE settings SET value = '/${subJsonPath}/' WHERE key = 'subJsonPath';
+UPDATE settings SET value = '/${subjsonpath}/' WHERE key = 'subjsonpath';
 UPDATE settings SET value = '${subJsonURI}' WHERE key = 'subJsonURI';
 EOF
 }
@@ -1485,7 +1482,7 @@ data_output() {
     msg_err "PLEASE SAVE THIS SCREEN!"
     printf '0\n' | x-ui | grep --color=never -i ':'
     tilda "$(text 10)"
-    out_data " $(text 59) " "https://${domain}/${webBasePath}/"
+    out_data " $(text 59) " "https://${domain}/${webbasepath}/"
     out_data " $(text 60) " "${subURI}user"
     if [[ $choise = "1" ]]; then
         out_data " $(text 61) " "https://${domain}/${adguardPath}/login.html"
