@@ -307,20 +307,47 @@ data_entry() {
 ### Обновление системы и установка пакетов ###
 installation_of_utilities() {
     msg_inf "Обновление системы и установка необходимых пакетов"
-    apt-get update && apt-get upgrade -y && apt-get install -y gnupg2 \
-    ufw \
-    zip \
-    wget \
-    sudo \
-    curl \    
-    sqlite3 \
-    certbot \
-    net-tools \
-    nginx-full \
-    apache2-utils \
-    unattended-upgrades
-    python3-certbot-dns-cloudflare \
-    systemd-resolved
+    apt-get update && apt-get upgrade -y && apt-get install -y \
+        ufw \
+        zip \
+        wget \
+        sudo \
+        curl \
+        gnupg2 \
+        sqlite3 \
+        certbot \
+        net-tools \
+        apache2-utils \
+        unattended-upgrades \
+        python3-certbot-dns-cloudflare
+    
+    curl https://nginx.org/keys/nginx_signing.key | gpg --dearmor | tee /usr/share/keyrings/nginx-archive-keyring.gpg >/dev/null
+    gpg --dry-run --quiet --no-keyring --import --import-options import-show /usr/share/keyrings/nginx-archive-keyring.gpg
+    if grep -q "bullseye" /etc/os-release || grep -q "bookworm" /etc/os-release
+    then
+        echo "deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] http://nginx.org/packages/debian `lsb_release -cs` nginx" | tee /etc/apt/sources.list.d/nginx.list
+    else
+        echo "deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] http://nginx.org/packages/ubuntu `lsb_release -cs` nginx" | tee /etc/apt/sources.list.d/nginx.list
+    fi
+    echo -e "Package: *\nPin: origin nginx.org\nPin: release o=nginx\nPin-Priority: 900\n" | tee /etc/apt/preferences.d/99nginx
+    
+    apt-get update && apt-get install -y \
+        nginx \
+        nginx-module-ssl \
+        nginx-module-http2 \
+        nginx-module-proxy \
+        nginx-module-rewrite \
+        nginx-module-gzip \
+        nginx-module-geoip \
+        nginx-module-websocket \
+        nginx-module-fastcgi \
+        nginx-module-limit-req \
+        nginx-module-limit-conn \
+        nginx-module-stream \
+        nginx-module-security \
+        nginx-module-upstream \
+        systemd-resolved
+
     echo
     msg_tilda "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
     echo
