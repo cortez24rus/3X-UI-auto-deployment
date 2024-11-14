@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 ### INFO ###
 out_data()   { echo -e "\e[1;33m$1\033[0m \033[38;5;214m$2\033[0m"; }
