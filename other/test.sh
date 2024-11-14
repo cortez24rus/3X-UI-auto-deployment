@@ -1,5 +1,8 @@
 #!/bin/bash
 
+mkdir -p /usr/local/xui-rp/
+LOGFILE="/usr/local/xui-rp/xui-rp.log"
+
 ### INFO ###
 out_data()   { echo -e "\e[1;33m$1\033[0m \033[38;5;214m$2\033[0m"; }
 tilda()      { echo -e "\033[31m\033[38;5;214m$*\033[0m"; }
@@ -341,12 +344,6 @@ E[65]="Log file path:"
 R[65]="Путь к лог файлу:"
 C[65]="日志文件路径："
 P[65]="مسیر فایل لاگ:"
-
-log_entry() {
-    mkdir -p /usr/local/xui-rp/
-    LOGFILE="/usr/local/xui-rp/xui-rp.log"
-    exec > >(tee -a "$LOGFILE") 2>&1
-}
 
 select_language() {
   L=E
@@ -1749,6 +1746,7 @@ main_script_repeat() {
 main_choise() {
     log_entry
     select_language
+    exec > >(tee -a "$LOGFILE") 2>&1
     if [ -f /usr/local/xui-rp/reinstallation_check ]; then
         info " $(text 4) "
         sleep 2
