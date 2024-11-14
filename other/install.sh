@@ -13,7 +13,7 @@ text()       { eval echo "\${${L}[$*]}"; }
 text_eval()  { eval echo "\$(eval echo "\${${L}[$*]}")"; }
 
 E[0]="Language:\n  1.English (default) \n  2.Русский"
-R[0]="${E[0]}"
+R[0]="Язык:\n  1.English (по умолчанию) \n  2.Русский"
 E[1]="Choose:"
 R[1]="Выбери:"
 E[2]="Error: this script requires superuser (root) privileges to run."
@@ -157,11 +157,13 @@ select_language() {
   reading " $(text 1) " LANGUAGE  # Запрашивает выбор языка
 
   # Устанавливаем язык в зависимости от выбора
-  if [ "$LANGUAGE" = 2 ]; then
-    L=R  # Если выбран русский язык
-  elif [ "$LANGUAGE" = 3 ]; then
-    L=C  # Если выбран китайский язык
-  fi
+  case "$LANGUAGE" in
+    1) L=E ;;   # Если выбран английский
+    2) L=R ;;   # Если выбран русский
+#    3) L=C ;;   # Если выбран китайский
+#    4) L=F ;;   # Если выбран персидский
+    *) L=E ;;   # По умолчанию — английский
+  esac
 }
 
 ### Проверка рута ###
