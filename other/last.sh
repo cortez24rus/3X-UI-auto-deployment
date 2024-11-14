@@ -223,10 +223,10 @@ start_installation() {
 get_test_response() {
     testdomain=$(echo "${domain}" | rev | cut -d '.' -f 1-2 | rev)
 
-    if [[ "$CFTOKEN" =~ [A-Z] ]]; then
-        testdomain=$(curl --silent --request GET --url https://api.cloudflare.com/client/v4/zones --header "Authorization: Bearer ${CFTOKEN}" --header "Content-Type: application/json")
+    if [[ "$cftoken" =~ [A-Z] ]]; then
+        testdomain=$(curl --silent --request GET --url https://api.cloudflare.com/client/v4/zones --header "Authorization: Bearer ${cftoken}" --header "Content-Type: application/json")
     else
-        testdomain=$(curl --silent --request GET --url https://api.cloudflare.com/client/v4/zones --header "X-Auth-Key: ${CFTOKEN}" --header "X-Auth-email: ${email}" --header "Content-Type: application/json")
+        testdomain=$(curl --silent --request GET --url https://api.cloudflare.com/client/v4/zones --header "X-Auth-Key: ${cftoken}" --header "X-Auth-email: ${email}" --header "Content-Type: application/json")
     fi
 }
 
