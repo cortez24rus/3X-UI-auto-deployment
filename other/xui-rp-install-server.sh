@@ -373,19 +373,6 @@ installation_of_utilities() {
     
     apt-get update && apt-get install -y \
         nginx \
-        nginx-module-ssl \
-        nginx-module-http2 \
-        nginx-module-proxy \
-        nginx-module-rewrite \
-        nginx-module-gzip \
-        nginx-module-geoip \
-        nginx-module-websocket \
-        nginx-module-fastcgi \
-        nginx-module-limit-req \
-        nginx-module-limit-conn \
-        nginx-module-stream \
-        nginx-module-security \
-        nginx-module-upstream \
         systemd-resolved
 
     echo
