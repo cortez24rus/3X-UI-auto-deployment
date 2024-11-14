@@ -1,5 +1,8 @@
 #!/bin/bash
 
+
+export DEBIAN_FRONTEND=noninteractive
+
 mkdir -p /usr/local/xui-rp/
 LOGFILE="/usr/local/xui-rp/xui-rp.log"
 
