@@ -9,19 +9,17 @@ export DEBIAN_FRONTEND=noninteractive
 
 mkdir -p /usr/local/xui-rp/
 
-    echo "Попытка скачать $url ..."
-    while ! wget -q --show-progress --timeout=30 --tries=10 --retry-connrefused "https://pkg.cloudflareclient.com/pool/$(grep "VERSION_CODENAME=" /etc/os-release | cut -d "=" -f 2)/main/c/cloudflare-warp/cloudflare-warp_2024.6.497-1_amd64.deb" -O /usr/local/xui-rp/cloudflare-warp_2024.6.497-1_amd64.deb; do
-        echo "Не удалось скачать. Повторная попытка через 3 секунды..."
-        sleep 3
-    done
-    echo "Скачивание завершено успешно."
+echo "Попытка скачать пакет..."
+while ! wget -q --show-progress --timeout=30 --tries=10 --retry-connrefused "https://pkg.cloudflareclient.com/pool/$(grep "VERSION_CODENAME=" /etc/os-release | cut -d "=" -f 2)/main/c/cloudflare-warp/cloudflare-warp_2024.6.497-1_amd64.deb" -O /usr/local/xui-rp/cloudflare-warp_2024.6.497-1_amd64.deb; do
+    echo "Не удалось скачать. Повторная попытка через 3 секунды..."
+    sleep 3
+done
+echo "Скачивание завершено успешно."
 
 cd /usr/local/xui-rp/
-apt install -y .cloudflare-warp_2024.6.497-1_amd64.deb
+apt install -y ./cloudflare-warp_2024.6.497-1_amd64.deb
 rm -rf cloudflare-warp_*
 cd ~/
-# Удаление временных файлов
-
 
 # Создание директории для конфигурации
 mkdir -p /etc/systemd/system/warp-svc.service.d
@@ -37,7 +35,8 @@ echo
 systemctl daemon-reload
 systemctl restart warp-svc.service
 sleep 5  # Ожидание запуска демона
-systemctl status warp-svc
+
+systemctl status warp-svc || echo "Служба warp-svc не найдена или не запустилась."
 
 # Запуск команд с соглашением об условиях
 warp-cli --accept-tos registration new
