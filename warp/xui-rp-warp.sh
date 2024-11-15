@@ -9,9 +9,14 @@ export DEBIAN_FRONTEND=noninteractive
 
 mkdir -p /usr/local/xui-rp/
 
-# Скачиваем и устанавливаем пакет Cloudflare WARP
-wget https://pkg.cloudflareclient.com/pool/$(grep "VERSION_CODENAME=" /etc/os-release | cut -d "=" -f 2)/main/c/cloudflare-warp/cloudflare-warp_2024.6.497-1_amd64.deb -O /usr/local/xui-rp/cloudflare-warp_2024.6.497-1_amd64.deb > /dev/null 2>&1
-apt install -y /usr/local/xui-rp/cloudflare-warp_2024.6.497-1_amd64.deb
+    echo "Попытка скачать $url ..."
+    while ! wget -q --show-progress --timeout=30 --tries=10 --retry-connrefused "https://pkg.cloudflareclient.com/pool/$(grep "VERSION_CODENAME=" /etc/os-release | cut -d "=" -f 2)/main/c/cloudflare-warp/cloudflare-warp_2024.6.497-1_amd64.deb" -O /usr/local/xui-rp/cloudflare-warp_2024.6.497-1_amd64.deb; do
+        echo "Не удалось скачать. Повторная попытка через 3 секунды..."
+        sleep 3
+    done
+    echo "Скачивание завершено успешно."
+
+apt install -y ./usr/local/xui-rp/cloudflare-warp_2024.6.497-1_amd64.deb
 
 # Удаление временных файлов
 rm -rf /usr/local/xui-rp//cloudflare-warp_*
