@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ### INFO ###
-out_data()   { echo -e "\e[1;33m$1\033[0m \033[38;5;214m$2\033[0m"; }
+out_data()   { echo -e "\e[1;33m$1\033[0m \033[1;37m$2\033[0m"; }
 tilda()      { echo -e "\033[31m\033[38;5;214m$*\033[0m"; }
 warning()    { echo -e "\033[31m [!]\033[38;5;214m$*\033[0m"; }
 error()      { echo -e "\033[31m\033[01m$*\033[0m"; exit 1; }
@@ -123,8 +123,8 @@ E[53]="Command for Linux:"
 R[53]="Команда для Linux:"
 E[54]="Configure SSH (optional step)? [y/N]:"
 R[54]="Настроить SSH (необязательный шаг)? [y/N]:"
-E[55]="Error: keys not found in /home/${username}/.ssh/id_rsa.pub or /root/.ssh/id_rsa.pub"
-R[55]="Ошибка: ключи не найдены в файле /home/${username}/.ssh/id_rsa.pub или /root/.ssh/id_rsa.pub"
+E[55]="Error: keys not found in /home/${USERNAME}/.ssh/id_rsa.pub or /root/.ssh/id_rsa.pub"
+R[55]="Ошибка: ключи не найдены в файле /home/${USERNAME}/.ssh/id_rsa.pub или /root/.ssh/id_rsa.pub"
 E[56]="Create keys and add them to the server before retrying."
 R[56]="Создайте ключи и добавьте их на сервер, прежде чем повторить снова."
 E[57]="Installing xui bot."
@@ -155,10 +155,10 @@ log_entry() {
 select_language() {
   L=E
   hint " $(text 0) \n"  # Показывает информацию о доступных языках
-  reading " $(text 1) " language  # Запрашивает выбор языка
+  reading " $(text 1) " LANGUAGE  # Запрашивает выбор языка
 
   # Устанавливаем язык в зависимости от выбора
-  case "$language" in
+  case "$LANGUAGE" in
     1) L=E ;;   # Если выбран английский
     2) L=R ;;   # Если выбран русский
 #    3) L=C ;;   # Если выбран китайский
@@ -195,7 +195,6 @@ check_ip() {
 
 ### Баннер ###
 banner_1() {
-    
     echo
     echo " ╻ ╻┏━┓┏━┓╻ ╻   ┏━┓┏━╸╻ ╻┏━╸┏━┓┏━┓┏━╸   ┏━┓┏━┓┏━┓╻ ╻╻ ╻ "
     echo " ┏╋┛┣┳┛┣━┫┗┳┛   ┣┳┛┣╸ ┃┏┛┣╸ ┣┳┛┗━┓┣╸    ┣━┛┣┳┛┃ ┃┏╋┛┗┳┛ "
@@ -211,8 +210,8 @@ start_installation() {
     info " $(text 6) "
     warning " apt-get update && apt-get full-upgrade -y && reboot "
     echo
-    reading " $(text 8) " answer
-    case "${answer,,}" in
+    reading " $(text 8) " ANSWER
+    case "${ANSWER,,}" in
         y)  ;;
         *)
             error " $(text 9) "
@@ -220,13 +219,14 @@ start_installation() {
     esac
 }
 
-get_test_response() {
-    testdomain=$(echo "${domain}" | rev | cut -d '.' -f 1-2 | rev)
 
-    if [[ "$cftoken" =~ [A-Z] ]]; then
-        testdomain=$(curl --silent --request GET --url https://api.cloudflare.com/client/v4/zones --header "Authorization: Bearer ${cftoken}" --header "Content-Type: application/json")
+get_test_response() {
+    testdomain=$(echo "${DOMAIN}" | rev | cut -d '.' -f 1-2 | rev)
+
+    if [[ "$CFTOKEN" =~ [A-Z] ]]; then
+        test_response=$(curl --silent --request GET --url https://api.cloudflare.com/client/v4/zones --header "Authorization: Bearer ${CFTOKEN}" --header "Content-Type: application/json")
     else
-        testdomain=$(curl --silent --request GET --url https://api.cloudflare.com/client/v4/zones --header "X-Auth-Key: ${cftoken}" --header "X-Auth-email: ${email}" --header "Content-Type: application/json")
+        test_response=$(curl --silent --request GET --url https://api.cloudflare.com/client/v4/zones --header "X-Auth-Key: ${CFTOKEN}" --header "X-Auth-Email: ${EMAIL}" --header "Content-Type: application/json")
     fi
 }
 
@@ -255,7 +255,8 @@ crop_domain() {
 
     # Проверка формата домена
     if ! [[ "$temp_value" =~ ^([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$ ]]; then
-        error " $(text 14) "
+        echo "Ошибка: введённый адрес '$temp_value' имеет неверный формат."
+        return 1
     fi
 
     # Возвращаем обработанный домен
@@ -265,83 +266,82 @@ crop_domain() {
 
 check_cf_token() {
     while true; do
-        while [[ -z $domain ]]; do
-            reading " $(text 13) " domain
+        while [[ -z $DOMAIN ]]; do
+            reading " $(text 13) " DOMAIN
             echo
         done
 
-        domain=$(crop_domain "$domain")
-
+        DOMAIN=$(crop_domain "$DOMAIN")
+        
     if [[ $? -ne 0 ]]; then
-            domain=""
+            DOMAIN=""
             continue
         fi
 
-        while [[ -z $email ]]; do
-            reading " $(text 15) " email
+        while [[ -z $EMAIL ]]; do
+            reading " $(text 15) " EMAIL
             echo
         done
 
-        while [[ -z $cftoken ]]; do
-            reading " $(text 16) " cftoken
+        while [[ -z $CFTOKEN ]]; do
+            reading " $(text 16) " CFTOKEN
             echo
         done
-        
+
         info " $(text 17) "
 
         if validate_input; then
             break
         else
             warning " $(text 18)"
-            domain=""
-            email=""
-            cftoken=""
-            echo
+            DOMAIN=""
+            EMAIL=""
+            CFTOKEN=""
         fi
     done
 }
 
 # Функция для обработки пути с циклом
 validate_path() {
-    local variable_name="$1"
-    local path_value
+    local VARIABLE_NAME="$1"
+    local PATH_VALUE
 
     # Проверка на пустое значение
     while true; do
-        case "$variable_name" in
-            cdngrpc)
-                reading " $(text 20) " path_value
+        case "$VARIABLE_NAME" in
+            CDNGRPC)
+                reading " $(text 20) " PATH_VALUE
                 ;;
-            cdnsplit)
-                reading " $(text 21) " path_value
+            CDNSPLIT)
+                reading " $(text 21) " PATH_VALUE
                 ;;
-            cdnhttpu)
-                reading " $(text 22) " path_value
+            CDNHTTPU)
+                reading " $(text 22) " PATH_VALUE
                 ;;
-            cdnws)
-                reading " $(text 23) " path_value
+            CDNWS)
+                reading " $(text 23) " PATH_VALUE
                 ;;
-            metrics)
-                reading " $(text 24) " path_value
+            METRICS)
+                reading " $(text 24) " PATH_VALUE
                 ;;
-            adguardpath)
-                reading " $(text 25) " path_value
+            ADGUARDPATH)
+                reading " $(text 25) " PATH_VALUE
                 ;;
-            webbasepath)
-                reading " $(text 26) " path_value
+            WEBBASEPATH)
+                reading " $(text 26) " PATH_VALUE
                 ;;
-            subpath)
-                reading " $(text 27) " path_value
+            SUBPATH)
+                reading " $(text 27) " PATH_VALUE
                 ;;                                
-            subjsonpath)
-                reading " $(text 28) " path_value
+            SUBJSONPATH)
+                reading " $(text 28) " PATH_VALUE
                 ;;                
         esac
 
-        if [[ -z "$path_value" ]]; then
+        if [[ -z "$PATH_VALUE" ]]; then
             warning " $(text 29) "
             echo
-        elif [[ $path_value =~ ['{}\$/\\'] ]]; then
+        elif [[ $PATH_VALUE =~ ['{}\$/\\'] ]]; then
             warning " $(text 30) "
             echo
         else
@@ -349,49 +349,49 @@ validate_path() {
         fi
     done
 
-    case "$variable_name" in
-        cdngrpc)
-            export cdngrpc="$path_value"
+    case "$VARIABLE_NAME" in
+        CDNGRPC)
+            export CDNGRPC="$PATH_VALUE"
             ;;
-        cdnsplit)
-            export cdnsplit="$path_value"
+        CDNSPLIT)
+            export CDNSPLIT="$PATH_VALUE"
             ;;
-        cdnhttpu)
-            export cdnhttpu="$path_value"
+        CDNHTTPU)
+            export CDNHTTPU="$PATH_VALUE"
             ;;
-        cdnws)
-            export cdnws="$path_value"
+        CDNWS)
+            export CDNWS="$PATH_VALUE"
             ;;
-        metrics)
-            export metrics="$path_value"
+        METRICS)
+            export METRICS="$PATH_VALUE"
             ;;
-        adguardpath)
-            export adguardpath="$path_value"
+        ADGUARDPATH)
+            export ADGUARDPATH="$PATH_VALUE"
             ;;
-        webbasepath)
-            export webbasepath="$path_value"
+        WEBBASEPATH)
+            export WEBBASEPATH="$PATH_VALUE"
             ;;
-        subpath)
-            export subpath="$path_value"
+        SUBPATH)
+            export SUBPATH="$PATH_VALUE"
             ;;
-        subjsonpath)
-            export subjsonpath="$path_value"
+        SUBJSONPATH)
+            export SUBJSONPATH="$PATH_VALUE"
             ;;
     esac
 }
 
 choise_dns () {
     while true; do
-        hint " $(text 31) \n" && reading " $(text 1) " choise
-        case $choise in
+        hint " $(text 31) \n" && reading " $(text 1) " CHOISE
+        case $CHOISE in
             1)
                 info " $(text 32) "
-                echo
+                tilda "$(text 10)"
                 break
                 ;;
             2)
                 tilda "$(text 10)"
-                validate_path adguardpath
+                validate_path ADGUARDPATH
                 echo
                 break
                 ;;
@@ -419,17 +419,17 @@ generate_port() {
 
 # Функция для проверки, занят ли порт
 is_port_free() {
-    local port=$1
-    nc -z 127.0.0.1 $port &>/dev/null
+    local PORT=$1
+    nc -z 127.0.0.1 $PORT &>/dev/null
     return $?
 }
 
 # Основной цикл для генерации и проверки порта
 port_issuance() {
     while true; do
-        port=$(generate_port)
-        if ! is_port_free $port; then  # Если порт свободен, выходим из цикла
-            echo $port
+        PORT=$(generate_port)
+        if ! is_port_free $PORT; then  # Если порт свободен, выходим из цикла
+            echo $PORT
             break
         fi
     done
@@ -438,30 +438,30 @@ port_issuance() {
 ### Ввод данных ###
 data_entry() {
     tilda "$(text 10)"
-    reading " $(text 11) " username
+    reading " $(text 11) " USERNAME
     echo
-    reading " $(text 12) " password
+    reading " $(text 12) " PASSWORD
     tilda "$(text 10)"
     check_cf_token
     tilda "$(text 10)"
-    reading " $(text 19) " reality
+    reading " $(text 19) " REALITY
     tilda "$(text 10)"
-    validate_path "cdngrpc"
+    validate_path "CDNGRPC"
     echo
-    validate_path "cdnsplit"
+    validate_path "CDNSPLIT"
     echo
-    validate_path "cdnhttpu"
+    validate_path "CDNHTTPU"
     echo
-    validate_path "cdnws"
+    validate_path "CDNWS"
     echo
-    validate_path "metrics"
+    validate_path "METRICS"
     tilda "$(text 10)"
     choise_dns
-    validate_path webbasepath
+    validate_path WEBBASEPATH
     echo
-    validate_path subpath
+    validate_path SUBPATH
     echo    
-    validate_path subjsonpath
+    validate_path SUBJSONPATH
     tilda "$(text 10)"
     if check_xuibot "$1"; then
         reading " $(text 34) " BOT_TOKEN
@@ -469,13 +469,13 @@ data_entry() {
         reading " $(text 35) " AID
         tilda "$(text 10)"
     fi
-    webPort=$(port_issuance)
-    subPort=$(port_issuance)
+    WEBPORT=$(port_issuance)
+    SUBPORT=$(port_issuance)
 
-    webCertFile=/etc/letsencrypt/live/${domain}/fullchain.pem
-    webKeyFile=/etc/letsencrypt/live/${domain}/privkey.pem
-    subURI=https://${domain}/${subpath}/
-    subJsonURI=https://${domain}/${subjsonpath}/
+    WEBCERTFILE=/etc/letsencrypt/live/${DOMAIN}/fullchain.pem
+    WEBKEYFILE=/etc/letsencrypt/live/${DOMAIN}/privkey.pem
+    SUBURI=https://${DOMAIN}/${SUBPATH}/
+    subJsonURI=https://${DOMAIN}/${SUBJSONPATH}/
 }
 
 ### Обновление системы и установка пакетов ###
@@ -533,7 +533,7 @@ dns_adguard_home() {
     tar xvf AdGuardHome_linux_amd64.tar.gz
 
     AdGuardHome/AdGuardHome -s install
-    hash=$(htpasswd -B -C 10 -n -b ${username} ${password} | cut -d ":" -f 2)
+    hash=$(htpasswd -B -C 10 -n -b ${USERNAME} ${PASSWORD} | cut -d ":" -f 2)
 
     rm -f AdGuardHome/AdGuardHome.yaml
     while ! wget -q --show-progress --timeout=30 --tries=10 --retry-connrefused "https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/main/adh/AdGuardHome.yaml" -O AdGuardHome/AdGuardHome.yaml; do
@@ -542,11 +542,11 @@ dns_adguard_home() {
     done
 
     sed -i \
-      -e "s/\${username}/username/g" \
+      -e "s/\${USERNAME}/username/g" \
       -e "s/\${hash}/hash/g" \
-      -e "s/\${username}/domain_temp/g" \
-      -e "s/\${webCertFile}/fullchain.pem/g" \
-      -e "s/\${webKeyFile}/privkey.pem/g" \
+      -e "s/\${USERNAME}/domain_temp/g" \
+      -e "s/\${WEBCERTFILE}/fullchain.pem/g" \
+      -e "s/\${WEBKEYFILE}/privkey.pem/g" \
       AdGuardHome/AdGuardHome.yaml
 
     AdGuardHome/AdGuardHome -s restart
@@ -569,16 +569,20 @@ EOF
 dns_encryption() {
     info " $(text 37) "
     dns_systemd_resolved
-    case $choise in
+    case $CHOISE in
         1)
-            comment_agh="location /${adguardpath}/ {
+        COMMENT_AGH=""
+        tilda "$(text 10)"
+        ;;
+        2)
+            COMMENT_AGH="location /${ADGUARDPATH}/ {
         proxy_set_header Host \$host;
         proxy_set_header X-Real-IP \$remote_addr;
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
         proxy_set_header X-Real-IP \$remote_addr;
         proxy_set_header Range \$http_range;
         proxy_set_header If-Range \$http_if_range;
-        proxy_redirect /login.html /${adguardpath}/login.html;
+        proxy_redirect /login.html /${ADGUARDPATH}/login.html;
         proxy_pass http://127.0.0.1:8081/;
         break;
     }"
@@ -586,12 +590,9 @@ dns_encryption() {
             dns_systemd_resolved_for_adguard
             tilda "$(text 10)"
             ;;
-        2)
-            comment_agh=""
-            tilda "$(text 10)"
-            ;;
         *)
-            error " $(text 3)"
+
+            warning " $(text 33)"
             dns_encryption
             ;;
     esac
@@ -600,14 +601,14 @@ dns_encryption() {
 ### Добавление пользователя ###
 add_user() {
     info " $(text 39) "
-    useradd -m -s $(which bash) -G sudo ${username}
-    echo "${username}:${password}" | chpasswd
-    mkdir -p /home/${username}/.ssh/
-    touch /home/${username}/.ssh/authorized_keys
-    chown ${username}: /home/${username}/.ssh
-    chmod 700 /home/${username}/.ssh
-    chown ${username}:${username} /home/${username}/.ssh/authorized_keys
-    echo ${username}
+    useradd -m -s $(which bash) -G sudo ${USERNAME}
+    echo "${USERNAME}:${PASSWORD}" | chpasswd
+    mkdir -p /home/${USERNAME}/.ssh/
+    touch /home/${USERNAME}/.ssh/authorized_keys
+    chown ${USERNAME}: /home/${USERNAME}/.ssh
+    chmod 700 /home/${USERNAME}/.ssh
+    chown ${USERNAME}:${USERNAME} /home/${USERNAME}/.ssh/authorized_keys
+    echo ${USERNAME}
     tilda "$(text 10)"
 }
 
@@ -668,19 +669,21 @@ warp() {
 ### СЕРТИФИКАТЫ ###
 issuance_of_certificates() {
     info " $(text 44) "
+    echo $DOMAIN
+    echo $EMAIL
     touch cloudflare.credentials
     chown root:root cloudflare.credentials
     chmod 600 cloudflare.credentials
-    if [[ "$cftoken" =~ [A-Z] ]]
+    if [[ "$CFTOKEN" =~ [A-Z] ]]
     then
-        echo "dns_cloudflare_api_token = ${cftoken}" >> /root/cloudflare.credentials
+        echo "dns_cloudflare_api_token = ${CFTOKEN}" >> /root/cloudflare.credentials
     else
-        echo "dns_cloudflare_email = ${email}" >> /root/cloudflare.credentials
-        echo "dns_cloudflare_api_key = ${cftoken}" >> /root/cloudflare.credentials
+        echo "dns_cloudflare_email = ${EMAIL}" >> /root/cloudflare.credentials
+        echo "dns_cloudflare_api_key = ${CFTOKEN}" >> /root/cloudflare.credentials
     fi
-    certbot certonly --dns-cloudflare --dns-cloudflare-credentials /root/cloudflare.credentials --dns-cloudflare-propagation-seconds 30 --rsa-key-size 4096 -d ${domain},*.${domain} --agree-tos -m ${email} --no-eff-email --non-interactive
+    certbot certonly --dns-cloudflare --dns-cloudflare-credentials /root/cloudflare.credentials --dns-cloudflare-propagation-seconds 30 --rsa-key-size 4096 -d ${DOMAIN},*.${DOMAIN} --agree-tos -m ${EMAIL} --no-eff-email --non-interactive
     { crontab -l; echo "0 5 1 */2 * certbot -q renew"; } | crontab -
-    echo "renew_hook = systemctl reload nginx" >> /etc/letsencrypt/renewal/${domain}.conf
+    echo "renew_hook = systemctl reload nginx" >> /etc/letsencrypt/renewal/${DOMAIN}.conf
     tilda "$(text 10)"
 }
 
@@ -689,13 +692,14 @@ nginx_setup() {
     info " $(text 45) "
     mkdir -p /etc/nginx/stream-enabled/
     touch /etc/nginx/.htpasswd
-    htpasswd -nb "$username" "$password" >> /etc/nginx/.htpasswd
+    htpasswd -nb "$USERNAME" "$PASSWORD" >> /etc/nginx/.htpasswd
 
     nginx_conf
     stream_conf
     local_conf
     random_site
 
+    sudo systemctl restart nginx
     nginx -s reload
     tilda "$(text 10)"
 }
@@ -772,9 +776,9 @@ map \$ssl_preread_protocol \$backend {
     "" ssh;
 }
 map \$ssl_preread_server_name \$https {
-    ${domain}      web;
-    ${reality}     reality;
-    www.${domain}  xtls;
+    ${DOMAIN}      web;
+    ${REALITY}     reality;
+    www.${DOMAIN}  xtls;
 }
 upstream web             { server 127.0.0.1:7443; }
 #upstream web             { server 127.0.0.1:46076; }
@@ -796,7 +800,7 @@ server {
      listen 9090 default_server;
      server_name _;
      location / {
-         return 301  https://${domain}\$request_uri;
+         return 301  https://${DOMAIN}\$request_uri;
      }
 }
 # Main
@@ -809,16 +813,17 @@ server {
     ssl_session_cache           shared:SSL:10m;
 }
 server {
-#    listen                      46076 ssl http2;
-    listen                      46076 ssl http2 proxy_protocol;
+#    listen                      46076 ssl;
+    listen                      46076 ssl proxy_protocol;
+    http2                       on;
     set_real_ip_from            127.0.0.1;
     real_ip_header              proxy_protocol;
-    server_name                 ${domain} www.${domain};
+    server_name                 ${DOMAIN} www.${DOMAIN};
 
     # SSL
-    ssl_certificate             ${webCertFile};
-    ssl_certificate_key         ${webKeyFile};
-    ssl_trusted_certificate     /etc/letsencrypt/live/${domain}/chain.pem;
+    ssl_certificate             ${WEBCERTFILE};
+    ssl_certificate_key         ${WEBKEYFILE};
+    ssl_trusted_certificate     /etc/letsencrypt/live/${DOMAIN}/chain.pem;
 
     index index.html index.htm index.php index.nginx-debian.html;
     root /var/www/html/;
@@ -829,14 +834,14 @@ server {
     add_header Referrer-Policy           "no-referrer-when-downgrade" always;
 #    add_header Content-Security-Policy   "default-src https:; script-src https: 'unsafe-inline' 'unsafe-eval'; style-src https: 'unsafe-inline';" always;
     add_header Permissions-Policy        "interest-cohort=()" always;
-    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDOMAINs; preload" always;
     add_header X-Frame-Options           "SAMEORIGIN";
     proxy_hide_header X-Powered-By;
 
     # Security
-    if (\$host !~* ^(.+\.)?${domain}\$ ){return 444;}
+    if (\$host !~* ^(.+\.)?${DOMAIN}\$ ){return 444;}
     if (\$scheme ~* https) {set \$safe 1;}
-    if (\$ssl_server_name !~* ^(.+\.)?${domain}\$ ) {set \$safe "\${safe}0"; }
+    if (\$ssl_server_name !~* ^(.+\.)?${DOMAIN}\$ ) {set \$safe "\${safe}0"; }
     if (\$safe = 10){return 444;}
     if (\$request_uri ~ "(\"|'|\`|~|,|:|--|;|%|\\$|&&|\?\?|0x00|0X00|\||\\|\{|\}|\[|\]|<|>|\.\.\.|\.\.\/|\/\/\/)"){set \$hack 1;}
     error_page 400 401 402 403 500 501 502 503 504 =404 /404;
@@ -851,10 +856,10 @@ server {
 #        auth_basic "Restricted Content";
 #        auth_basic_user_file /etc/nginx/.htpasswd;
 #    }
-     location /${node_metrics} {
+     location /${METRICS} {
         auth_basic "Restricted Content";
         auth_basic_user_file /etc/nginx/.htpasswd;
-        proxy_pass http://127.0.0.1:9100/metrics;
+        proxy_pass http://127.0.0.1:9100/METRICS;
         proxy_set_header Host \$host;
         proxy_set_header X-Real-IP \$remote_addr;
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
@@ -871,7 +876,7 @@ server {
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
     }
     # X-ui Admin panel
-    location /${webbasepath} {
+    location /${WEBBASEPATH} {
         proxy_redirect off;
         proxy_set_header Host \$host;
         proxy_set_header X-Real-IP \$remote_addr;
@@ -879,30 +884,30 @@ server {
         proxy_set_header X-Real-IP \$remote_addr;
         proxy_set_header Range \$http_range;
         proxy_set_header If-Range \$http_if_range;
-        proxy_pass https://127.0.0.1:${webPort}/${webbasepath};
+        proxy_pass https://127.0.0.1:${WEBPORT}/${WEBBASEPATH};
         break;
     }
     # Subscription
-    location /${subpath} {
+    location /${SUBPATH} {
         if (\$hack = 1) {return 404;}
         proxy_redirect off;
         proxy_set_header Host \$host;
         proxy_set_header X-Real-IP \$remote_addr;
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-        proxy_pass https://127.0.0.1:${subPort}/${subpath};
+        proxy_pass https://127.0.0.1:${SUBPORT}/${SUBPATH};
         break;
     }
     # Subscription json
-    location /${subjsonpath} {
+    location /${SUBJSONPATH} {
         if (\$hack = 1) {return 404;}
         proxy_redirect off;
         proxy_set_header Host \$host;
         proxy_set_header X-Real-IP \$remote_addr;
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-        proxy_pass https://127.0.0.1:${subPort}/${subjsonpath};
+        proxy_pass https://127.0.0.1:${SUBPORT}/${SUBJSONPATH};
         break;
     }
-    location /${cdnsplit} {
+    location /${CDNSPLIT} {
         proxy_pass http://127.0.0.1:2063;
         proxy_http_version 1.1;
         proxy_redirect off;
@@ -938,7 +943,7 @@ server {
         }
     }
     # Adguard home
-    ${comment_agh}
+    ${COMMENT_AGH}
 }
 EOF
 }
@@ -953,12 +958,12 @@ monitoring() {
 
 generate_keys() {
     # Генерация пары ключей X25519 с использованием xray
-    local key_pair=$(/usr/local/x-ui/bin/xray-linux-amd64 x25519)
-    local private_key=$(echo "$key_pair" | grep "Private key:" | awk '{print $3}')
-    local public_key=$(echo "$key_pair" | grep "Public key:" | awk '{print $3}')
+    local KEY_PAIR=$(/usr/local/x-ui/bin/xray-linux-amd64 x25519)
+    local PRIVATE_KEY=$(echo "$KEY_PAIR" | grep "Private key:" | awk '{print $3}')
+    local PUBLIC_KEY=$(echo "$KEY_PAIR" | grep "Public key:" | awk '{print $3}')
 
     # Возвращаем ключи в виде строки, разделенной пробелом
-    echo "$private_key $public_key"
+    echo "$PRIVATE_KEY $PUBLIC_KEY"
 }
 
 ### Изменение базы данных ###
@@ -970,14 +975,14 @@ stream_settings_grpc() {
   "externalProxy": [
     {
       "forceTls": "same",
-      "dest": "${domain}",
+      "dest": "${DOMAIN}",
       "port": 443,
       "remark": ""
     }
   ],
   "grpcSettings": {
-    "serviceName": "/2053/${cdngrpc}",
-    "authority": "${domain}",
+    "serviceName": "/2053/${CDNGRPC}",
+    "authority": "${DOMAIN}",
     "multiMode": false
   }
 }
@@ -993,13 +998,13 @@ stream_settings_split() {
   "externalProxy": [
     {
       "forceTls": "same",
-      "dest": "${domain}",
+      "dest": "${DOMAIN}",
       "port": 443,
       "remark": ""
     }
   ],
   "splithttpSettings": {
-    "path": "/${cdnsplit}",
+    "path": "/${CDNSPLIT}",
     "host": "",
     "headers": {},
     "scMaxConcurrentPosts": "100-200",
@@ -1027,7 +1032,7 @@ stream_settings_httpu() {
   "externalProxy": [
     {
       "forceTls": "same",
-      "dest": "${domain}",
+      "dest": "${DOMAIN}",
       "port": 443,
       "remark": ""
     }
@@ -1042,8 +1047,8 @@ stream_settings_httpu() {
     "enableSessionResumption": false,
     "certificates": [
       {
-        "certificateFile": "${webCertFile}",
-        "keyFile": "${webKeyFile}",
+        "certificateFile": "${WEBCERTFILE}",
+        "keyFile": "${WEBKEYFILE}",
         "ocspStapling": 3600,
         "oneTimeLoading": false,
         "usage": "encipherment",
@@ -1058,8 +1063,8 @@ stream_settings_httpu() {
   },
   "httpupgradeSettings": {
     "acceptProxyProtocol": false,
-    "path": "/2073/${cdnhttpu}",
-    "host": "${domain}",
+    "path": "/2073/${CDNHTTPU}",
+    "host": "${DOMAIN}",
     "headers": {}
   }
 }
@@ -1075,13 +1080,13 @@ stream_settings_ws() {
   "externalProxy": [
     {
       "forceTls": "same",
-      "dest": "${domain}",
+      "dest": "${DOMAIN}",
       "port": 443,
       "remark": ""
     }
   ],
   "tlsSettings": {
-    "serverName": "${domain}",
+    "serverName": "${DOMAIN}",
     "minVersion": "1.2",
     "maxVersion": "1.3",
     "cipherSuites": "",
@@ -1090,8 +1095,8 @@ stream_settings_ws() {
     "enableSessionResumption": false,
     "certificates": [
       {
-        "certificateFile": "${webCertFile}",
-        "keyFile": "${webKeyFile}",
+        "certificateFile": "${WEBCERTFILE}",
+        "keyFile": "${WEBKEYFILE}",
         "ocspStapling": 3600,
         "oneTimeLoading": false,
         "usage": "encipherment",
@@ -1106,8 +1111,8 @@ stream_settings_ws() {
   },
   "wsSettings": {
     "acceptProxyProtocol": false,
-    "path": "/2083/${cdnws}",
-    "host": "${domain}",
+    "path": "/2083/${CDNWS}",
+    "host": "${DOMAIN}",
     "headers": {}
   }
 }
@@ -1116,7 +1121,7 @@ EOF
 }
 
 stream_settings_steal() {
-    read private_key public_key <<< "$(generate_keys)"
+    read PRIVATE_KEY PUBLIC_KEY <<< "$(generate_keys)"
 
     stream_settings_steal=$(cat <<EOF
 {
@@ -1125,7 +1130,7 @@ stream_settings_steal() {
   "externalProxy": [
     {
       "forceTls": "same",
-      "dest": "www.${domain}",
+      "dest": "www.${DOMAIN}",
       "port": 443,
       "remark": ""
     }
@@ -1135,9 +1140,9 @@ stream_settings_steal() {
     "xver": 2,
     "dest": "46076",
     "serverNames": [
-      "${domain}"
+      "${DOMAIN}"
     ],
-    "privateKey": "${private_key}",
+    "privateKey": "${PRIVATE_KEY}",
     "minClient": "",
     "maxClient": "",
     "maxTimediff": 0,
@@ -1152,7 +1157,7 @@ stream_settings_steal() {
       "bc85"
     ],
     "settings": {
-      "publicKey": "${public_key}",
+      "publicKey": "${PUBLIC_KEY}",
       "fingerprint": "randomized",
       "serverName": "",
       "spiderX": "/"
@@ -1170,7 +1175,7 @@ EOF
 }
 
 stream_settings_reality() {
-    read private_key public_key <<< "$(generate_keys)"
+    read PRIVATE_KEY PUBLIC_KEY <<< "$(generate_keys)"
 
     stream_settings_reality=$(cat <<EOF
 {
@@ -1179,7 +1184,7 @@ stream_settings_reality() {
   "externalProxy": [
     {
       "forceTls": "same",
-      "dest": "www.${domain}",
+      "dest": "www.${DOMAIN}",
       "port": 443,
       "remark": ""
     }
@@ -1187,11 +1192,11 @@ stream_settings_reality() {
   "realitySettings": {
     "show": false,
     "xver": 2,
-    "dest": "${reality}:443",
+    "dest": "${REALITY}:443",
     "serverNames": [
-      "${reality}"
+      "${REALITY}"
     ],
-    "privateKey": "${private_key}",
+    "privateKey": "${PRIVATE_KEY}",
     "minClient": "",
     "maxClient": "",
     "maxTimediff": 0,
@@ -1206,7 +1211,7 @@ stream_settings_reality() {
       "6696"
     ],
     "settings": {
-      "publicKey": "${public_key}",
+      "publicKey": "${PUBLIC_KEY}",
       "fingerprint": "randomized",
       "serverName": "",
       "spiderX": "/"
@@ -1231,13 +1236,13 @@ stream_settings_xtls() {
   "externalProxy": [
     {
       "forceTls": "same",
-      "dest": "www.${domain}",
+      "dest": "www.${DOMAIN}",
       "port": 443,
       "remark": ""
     }
   ],
   "tlsSettings": {
-    "serverName": "www.${domain}",
+    "serverName": "www.${DOMAIN}",
     "minVersion": "1.3",
     "maxVersion": "1.3",
     "cipherSuites": "",
@@ -1246,8 +1251,8 @@ stream_settings_xtls() {
     "enableSessionResumption": false,
     "certificates": [
       {
-        "certificateFile": "${webCertFile}",
-        "keyFile": "${webKeyFile}",
+        "certificateFile": "${WEBCERTFILE}",
+        "keyFile": "${WEBKEYFILE}",
         "ocspStapling": 3600,
         "oneTimeLoading": false,
         "usage": "encipherment",
@@ -1281,7 +1286,7 @@ stream_settings_mkcp() {
   "externalProxy": [
     {
       "forceTls": "same",
-      "dest": "www.${domain}",
+      "dest": "www.${DOMAIN}",
       "port": 9999,
       "remark": ""
     }
@@ -1308,8 +1313,8 @@ database_change() {
     DB_PATH="x-ui.db"
 
     sqlite3 $DB_PATH <<EOF
-UPDATE users SET username = '$username' WHERE id = 1;
-UPDATE users SET password = '$password' WHERE id = 1;
+UPDATE users SET username = '$USERNAME' WHERE id = 1;
+UPDATE users SET password = '$PASSWORD' WHERE id = 1;
 
 UPDATE inbounds SET stream_settings = '$stream_settings_grpc' WHERE remark = '☁gRPC';
 UPDATE inbounds SET stream_settings = '$stream_settings_split' WHERE remark = '☁Split';
@@ -1320,17 +1325,17 @@ UPDATE inbounds SET stream_settings = '$stream_settings_reality' WHERE remark = 
 UPDATE inbounds SET stream_settings = '$stream_settings_xtls' WHERE remark = '✖️XTLS';
 UPDATE inbounds SET stream_settings = '$stream_settings_mkcp' WHERE remark = '📲MKCP';
 
-UPDATE settings SET value = '${webPort}' WHERE key = 'webPort';
-UPDATE settings SET value = '/${webbasepath}/' WHERE key = 'webbasepath';
-UPDATE settings SET value = '${webCertFile}' WHERE key = 'webCertFile';
-UPDATE settings SET value = '${webKeyFile}' WHERE key = 'webKeyFile';
-UPDATE settings SET value = '${subPort}' WHERE key = 'subPort';
-UPDATE settings SET value = '/${subpath}/' WHERE key = 'subpath';
-UPDATE settings SET value = '${webCertFile}' WHERE key = 'subCertFile';
-UPDATE settings SET value = '${webKeyFile}' WHERE key = 'subKeyFile';
-UPDATE settings SET value = '${subURI}' WHERE key = 'subURI';
-UPDATE settings SET value = '/${subjsonpath}/' WHERE key = 'subjsonpath';
-UPDATE settings SET value = '${subJsonURI}' WHERE key = 'subJsonURI';
+UPDATE settings SET value = '${WEBPORT}' WHERE key = 'webPort';
+UPDATE settings SET value = '/${WEBBASEPATH}/' WHERE key = 'webbasepath';
+UPDATE settings SET value = '${WEBCERTFILE}' WHERE key = 'webCertFile';
+UPDATE settings SET value = '${WEBKEYFILE}' WHERE key = 'webKeyFile';
+UPDATE settings SET value = '${SUBPORT}' WHERE key = 'subPort';
+UPDATE settings SET value = '/${SUBPATH}/' WHERE key = 'subpath';
+UPDATE settings SET value = '${WEBCERTFILE}' WHERE key = 'subCertFile';
+UPDATE settings SET value = '${WEBKEYFILE}' WHERE key = 'subKeyFile';
+UPDATE settings SET value = '${SUBURI}' WHERE key = 'subURI';
+UPDATE settings SET value = '/${SUBJSONPATH}/' WHERE key = 'subjsonpath';
+UPDATE settings SET value = '${SUBJSONURI}' WHERE key = 'subJsonURI';
 EOF
 }
 
@@ -1344,7 +1349,7 @@ panel_installation() {
         sleep 3
     done
     
-    echo ${password} | gpg --batch --yes --passphrase-fd 0 -d x-ui.gpg > x-ui.db
+    echo ${PASSWORD} | gpg --batch --yes --passphrase-fd 0 -d x-ui.gpg > x-ui.db
     echo -e "n" | bash <(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh) > /dev/null 2>&1
 
     stream_settings_grpc
@@ -1360,6 +1365,7 @@ panel_installation() {
     x-ui stop
     
     rm -rf x-ui.gpg
+    rm -rf /etc/x-ui/x-ui.db.backup
     [ -f /etc/x-ui/x-ui.db ] && mv /etc/x-ui/x-ui.db /etc/x-ui/x-ui.db.backup
     mv x-ui.db /etc/x-ui/
     
@@ -1389,8 +1395,8 @@ ssh_setup() {
     info " $(text 50) "
     info " $(text 51) "
     tilda "$(text 10)"
-    out_data " $(text 52)" "type \$env:USERPROFILE\.ssh\id_rsa.pub | ssh -p 22 ${username}@${IP4} \"cat >> ~/.ssh/authorized_keys\""
-    out_data " $(text 53)" "ssh-copy-id -p 22 ${username}@${IP4}"
+    out_data " $(text 52)" "type \$env:USERPROFILE\.ssh\id_rsa.pub | ssh -p 22 ${USERNAME}@${IP4} \"cat >> ~/.ssh/authorized_keys\""
+    out_data " $(text 53)" "ssh-copy-id -p 22 ${USERNAME}@${IP4}"
     tilda "$(text 10)"
     while true; do
         reading " $(text 54) " answer_ssh
@@ -1402,7 +1408,7 @@ ssh_setup() {
         esac
         
         if [[ $? -eq 0 ]]; then
-            if [[ ! -s /home/${username}/.ssh/id_rsa.pub && ! -s /root/.ssh/id_rsa.pub ]]; then
+            if [[ ! -s /home/${USERNAME}/.ssh/id_rsa.pub && ! -s /root/.ssh/id_rsa.pub ]]; then
                 warning " $(text 55) "
                 info " $(text 56) "
                 echo
@@ -1470,31 +1476,30 @@ EOF
 
 # Установока xui бота
 install_xuibot() {
-    info " $(text 57) "
     if [[ "$1" == "-bot" ]]; then
-         bash <(curl -Ls https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/main/xui-rp-install-bot.sh) "$BOT_TOKEN" "$AID" "$domain"
+        info " $(text 57) "
+        bash <(curl -Ls https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/main/xui-rp-install-bot.sh) "$BOT_TOKEN" "$AID" "$DOMAIN"
     fi
 }
 
 ### Окончание ###
 data_output() {
     info " $(text 58) "
-    msg_err "PLEASE SAVE THIS SCREEN!"
     printf '0\n' | x-ui | grep --color=never -i ':'
     tilda "$(text 10)"
-    out_data " $(text 59) " "https://${domain}/${webbasepath}/"
-    out_data " $(text 60) " "${subURI}user"
+    out_data " $(text 59) " "https://${DOMAIN}/${WEBBASEPATH}/"
+    out_data " $(text 60) " "${SUBURI}cortez"
     if [[ $choise = "1" ]]; then
-        out_data " $(text 61) " "https://${domain}/${adguardPath}/login.html"
+        out_data " $(text 61) " "https://${DOMAIN}/${ADGUARDPATH}/login.html"
         
     fi
     tilda "$(text 10)"
-    out_data " $(text 62) " "ssh -p 36079 ${username}@${IP4}"
+    out_data " $(text 62) " "ssh -p 36079 ${USERNAME}@${IP4}"
     tilda "$(text 10)"
-    out_data " $(text 63) " "$username"
-    out_data " $(text 64) " "$password"
+    out_data " $(text 63) " "$USERNAME"
+    out_data " $(text 64) " "$PASSWORD"
     tilda "$(text 10)"
-    out_data " $(text 64) " "$LOGFILE"
+    out_data " $(text 65) " "$LOGFILE"
     tilda "$(text 10)"
 }
 
@@ -1538,9 +1543,16 @@ main_script_repeat() {
     banner_1
     start_installation
     data_entry "$1"
-    dns_encryption
-    nginx_setup
-    panel_installation
+#    dns_encryption
+#    add_user
+#   unattended_upgrade
+#    enable_bbr
+#    disable_ipv6
+#    warp
+#    issuance_of_certificates
+#    monitoring
+#    nginx_setup
+#    panel_installation
     enabling_security
     ssh_setup
     install_xuibot "$1"
