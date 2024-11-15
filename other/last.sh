@@ -866,7 +866,7 @@ server {
      location /${METRICS} {
         auth_basic "Restricted Content";
         auth_basic_user_file /etc/nginx/.htpasswd;
-        proxy_pass http://127.0.0.1:9100/METRICS;
+        proxy_pass http://127.0.0.1:9100/metrics;
         proxy_set_header Host \$host;
         proxy_set_header X-Real-IP \$remote_addr;
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
@@ -1547,10 +1547,9 @@ main_script_repeat() {
     start_installation
     data_entry "$1"
     warp
-#    dns_encryption
-#    nginx_setup
-#    panel_installation
-#    enabling_security
+    dns_encryption
+    nginx_setup
+    panel_installation
     ssh_setup
     install_xuibot "$1"
     data_output
