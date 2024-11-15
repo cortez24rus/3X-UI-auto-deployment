@@ -1,5 +1,7 @@
 #!/bin/bash
 
+export DEBIAN_FRONTEND=noninteractive
+
 ### INFO ###
 out_data()   { echo -e "\e[1;33m$1\033[0m \033[1;37m$2\033[0m"; }
 tilda()      { echo -e "\033[31m\033[38;5;214m$*\033[0m"; }
@@ -28,7 +30,6 @@ E[6]="It is recommended to perform the following actions before running the scri
 R[6]="Перед запуском скрипта рекомендуется выполнить следующие действия"
 E[7]=""
 R[7]=""
-C[7]=""
 E[8]="Start the XRAY installation? Choose option [y/N]:"
 R[8]="Начать установку XRAY? Выберите опцию [y/N]:"
 E[9]="CANCEL"
