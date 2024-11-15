@@ -7,12 +7,14 @@
 
 export DEBIAN_FRONTEND=noninteractive
 
+mkdir -p /usr/local/xui-rp/
+
 # Скачиваем и устанавливаем пакет Cloudflare WARP
-wget https://pkg.cloudflareclient.com/pool/$(grep "VERSION_CODENAME=" /etc/os-release | cut -d "=" -f 2)/main/c/cloudflare-warp/cloudflare-warp_2024.6.497-1_amd64.deb -O /tmp/cloudflare-warp_2024.6.497-1_amd64.deb > /dev/null 2>&1
-apt install -y /tmp/cloudflare-warp_2024.6.497-1_amd64.deb
+wget https://pkg.cloudflareclient.com/pool/$(grep "VERSION_CODENAME=" /etc/os-release | cut -d "=" -f 2)/main/c/cloudflare-warp/cloudflare-warp_2024.6.497-1_amd64.deb -O /usr/local/xui-rp/cloudflare-warp_2024.6.497-1_amd64.deb > /dev/null 2>&1
+apt install -y /usr/local/xui-rp/cloudflare-warp_2024.6.497-1_amd64.deb
 
 # Удаление временных файлов
-rm -rf /tmp/cloudflare-warp_*
+rm -rf /usr/local/xui-rp//cloudflare-warp_*
 
 # Создание директории для конфигурации
 mkdir -p /etc/systemd/system/warp-svc.service.d
