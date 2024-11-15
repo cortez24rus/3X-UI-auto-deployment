@@ -38,8 +38,15 @@ sleep 5  # Ожидание запуска демона
 
 systemctl status warp-svc || echo "Служба warp-svc не найдена или не запустилась."
 
-# Запуск команд с соглашением об условиях
-warp-cli --accept-tos registration new
+
+# Удаление старых данных и сброс регистрации
+warp-cli --accept-tos disconnect || true
+warp-cli --accept-tos registration delete || true
+
+# Регистрация с автоматическим подтверждением
+script -q -c "echo y | warp-cli registration new"
+
+# Настройка прокси-режима
 warp-cli --accept-tos mode proxy
 warp-cli --accept-tos proxy port 40000
 warp-cli --accept-tos connect
