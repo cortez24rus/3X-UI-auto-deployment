@@ -146,6 +146,8 @@ E[64]="Password:"
 R[64]="Пароль:"
 E[65]="Log file path:"
 R[65]="Путь к лог файлу:"
+E[65]="Ptometheus monitor."
+R[65]="Мониторинг Prometheus."
 
 log_entry() {
     mkdir -p /usr/local/xui-rp/
@@ -677,12 +679,18 @@ issuance_of_certificates() {
     then
         echo "dns_cloudflare_api_token = ${CFTOKEN}" >> /root/cloudflare.credentials
     else
-        echo "dns_cloudflare_email = ${EMAIL}" >> /root/cloudflare.credentials
+        echo "dns_kcloudflare_email = ${EMAIL}" >> /root/cloudflare.credentials
         echo "dns_cloudflare_api_key = ${CFTOKEN}" >> /root/cloudflare.credentials
     fi
     certbot certonly --dns-cloudflare --dns-cloudflare-credentials /root/cloudflare.credentials --dns-cloudflare-propagation-seconds 30 --rsa-key-size 4096 -d ${DOMAIN},*.${DOMAIN} --agree-tos -m ${EMAIL} --no-eff-email --non-interactive
     { crontab -l; echo "0 5 1 */2 * certbot -q renew"; } | crontab -
     echo "renew_hook = systemctl reload nginx" >> /etc/letsencrypt/renewal/${DOMAIN}.conf
+    tilda "$(text 10)"
+}
+
+monitoring() {
+    info " $(text 66) "
+    bash <(curl -Ls https://github.com/cortez24rus/grafana-prometheus/raw/refs/heads/main/prometheus_node_exporter.sh)
     tilda "$(text 10)"
 }
 
@@ -949,10 +957,6 @@ EOF
 
 random_site() {
     bash <(curl -Ls https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/main/xui-rp-random-site.sh)
-}
-
-monitoring() {
-    bash <(curl -Ls https://github.com/cortez24rus/grafana-prometheus/raw/refs/heads/main/prometheus_node_exporter.sh)
 }
 
 generate_keys() {
@@ -1542,10 +1546,11 @@ main_script_repeat() {
     banner_1
     start_installation
     data_entry "$1"
-    dns_encryption
-    nginx_setup
-    panel_installation
-    enabling_security
+    warp
+#    dns_encryption
+#    nginx_setup
+#    panel_installation
+#    enabling_security
     ssh_setup
     install_xuibot "$1"
     data_output
