@@ -699,7 +699,7 @@ nginx_setup() {
     info " $(text 45) "
     mkdir -p /etc/nginx/stream-enabled/
     touch /etc/nginx/.htpasswd
-    htpasswd -nb "$USERNAME" "$PASSWORD" >> /etc/nginx/.htpasswd
+    htpasswd -nb "$USERNAME" "$PASSWORD" > /etc/nginx/.htpasswd
 
     nginx_conf
     stream_conf
