@@ -669,8 +669,6 @@ warp() {
 ### СЕРТИФИКАТЫ ###
 issuance_of_certificates() {
     info " $(text 44) "
-    echo $DOMAIN
-    echo $EMAIL
     touch cloudflare.credentials
     chown root:root cloudflare.credentials
     chmod 600 cloudflare.credentials
@@ -834,7 +832,7 @@ server {
     add_header Referrer-Policy           "no-referrer-when-downgrade" always;
 #    add_header Content-Security-Policy   "default-src https:; script-src https: 'unsafe-inline' 'unsafe-eval'; style-src https: 'unsafe-inline';" always;
     add_header Permissions-Policy        "interest-cohort=()" always;
-    add_header Strict-Transport-Security "max-age=31536000; includeSubDOMAINs; preload" always;
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;
     add_header X-Frame-Options           "SAMEORIGIN";
     proxy_hide_header X-Powered-By;
 
@@ -1543,16 +1541,9 @@ main_script_repeat() {
     banner_1
     start_installation
     data_entry "$1"
-#    dns_encryption
-#    add_user
-#   unattended_upgrade
-#    enable_bbr
-#    disable_ipv6
-#    warp
-#    issuance_of_certificates
-#    monitoring
-#    nginx_setup
-#    panel_installation
+    dns_encryption
+    nginx_setup
+    panel_installation
     enabling_security
     ssh_setup
     install_xuibot "$1"
@@ -1575,25 +1566,3 @@ main_choise() {
 }
 
 main_choise "$1"
-
-
-
-
-#location /adguard-home/ {
-#    proxy_pass http://127.0.0.1:8081/;
-#    proxy_redirect / /adguard-home/;
-#    proxy_cookie_path / /adguard-home/;
-#}
-
-
-#location ~* /(admin|api|dashboard|openapi.json|statics|docs) {
-#    proxy_redirect off;
-#    proxy_http_version 1.1;
-#    proxy_set_header Upgrade \$http_upgrade;
-#    proxy_set_header Connection "upgrade";
-#    proxy_pass http://127.0.0.1:8081/;
-
-#    proxy_set_header Host \$host;
-#    proxy_set_header X-Real-IP \$remote_addr;
-#    proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-#}
