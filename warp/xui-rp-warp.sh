@@ -16,10 +16,12 @@ mkdir -p /usr/local/xui-rp/
     done
     echo "Скачивание завершено успешно."
 
-apt install -y ./usr/local/xui-rp/cloudflare-warp_2024.6.497-1_amd64.deb
-
+cd /usr/local/xui-rp/
+apt install -y .cloudflare-warp_2024.6.497-1_amd64.deb
+rm -rf cloudflare-warp_*
+cd ~/
 # Удаление временных файлов
-rm -rf /usr/local/xui-rp//cloudflare-warp_*
+
 
 # Создание директории для конфигурации
 mkdir -p /etc/systemd/system/warp-svc.service.d
@@ -46,12 +48,9 @@ warp-cli --accept-tos connect
 echo
 sleep 5
 warp-cli tunnel stats
-curl -x socks5h://localhost:40000 https://2ip.io
-echo
 
-# Проверка кода возврата
-if [ $? -eq 0 ]; then
+if curl -x socks5h://localhost:40000 https://2ip.io; then
     echo "Настройка завершена: WARP подключен и работает."
 else
-    echo "Ошибка: не удалось подключиться к WARP через прокси. Пожалуйста, проверьте настройки."
+    echo "Ошибка: не удалось подключиться к WARP через прокси. Проверьте настройки."
 fi
