@@ -392,12 +392,12 @@ choise_dns () {
                 tilda "$(text 10)"
                 break
                 ;;
-            2)
-                tilda "$(text 10)"
-                validate_path ADGUARDPATH
-                echo
-                break
-                ;;
+#            2)
+#                tilda "$(text 10)"
+#                validate_path ADGUARDPATH
+#                echo
+#                break
+#                ;;
             *)
                 info " $(text )"
                 ;;
