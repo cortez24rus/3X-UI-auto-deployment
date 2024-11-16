@@ -1406,7 +1406,7 @@ ssh_setup() {
         case "${answer_ssh,,}" in
             y)  ;;
             *)
-                error " $(text 9) "
+                warning " $(text 9) "
                 ;;
         esac
         
