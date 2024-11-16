@@ -1329,15 +1329,15 @@ UPDATE inbounds SET stream_settings = '$stream_settings_xtls' WHERE remark = 'âœ
 UPDATE inbounds SET stream_settings = '$stream_settings_mkcp' WHERE remark = 'ðŸ“²MKCP';
 
 UPDATE settings SET value = '${WEBPORT}' WHERE key = 'webPort';
-UPDATE settings SET value = '/${WEBBASEPATH}/' WHERE key = 'webbasepath';
+UPDATE settings SET value = '/${WEBBASEPATH}/' WHERE key = 'webBasePath';
 UPDATE settings SET value = '${WEBCERTFILE}' WHERE key = 'webCertFile';
 UPDATE settings SET value = '${WEBKEYFILE}' WHERE key = 'webKeyFile';
 UPDATE settings SET value = '${SUBPORT}' WHERE key = 'subPort';
-UPDATE settings SET value = '/${SUBPATH}/' WHERE key = 'subpath';
+UPDATE settings SET value = '/${SUBPATH}/' WHERE key = 'subPath';
 UPDATE settings SET value = '${WEBCERTFILE}' WHERE key = 'subCertFile';
 UPDATE settings SET value = '${WEBKEYFILE}' WHERE key = 'subKeyFile';
 UPDATE settings SET value = '${SUBURI}' WHERE key = 'subURI';
-UPDATE settings SET value = '/${SUBJSONPATH}/' WHERE key = 'subjsonpath';
+UPDATE settings SET value = '/${SUBJSONPATH}/' WHERE key = 'subJsonPath';
 UPDATE settings SET value = '${SUBJSONURI}' WHERE key = 'subJsonURI';
 EOF
 }
