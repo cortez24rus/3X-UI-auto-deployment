@@ -536,7 +536,7 @@ dns_adguard_home() {
     tar xvf AdGuardHome_linux_amd64.tar.gz
 
     AdGuardHome/AdGuardHome -s install
-    hash=$(htpasswd -B -C 10 -n -b ${USERNAME} ${PASSWORD} | cut -d ":" -f 2)
+    HASH=$(htpasswd -B -C 10 -n -b ${USERNAME} ${PASSWORD} | cut -d ":" -f 2)
 
     rm -f AdGuardHome/AdGuardHome.yaml
     while ! wget -q --show-progress --timeout=30 --tries=10 --retry-connrefused "https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/main/adh/AdGuardHome.yaml" -O AdGuardHome/AdGuardHome.yaml; do
@@ -546,7 +546,7 @@ dns_adguard_home() {
 
     sed -i \
       -e "s/\${USERNAME}/username/g" \
-      -e "s/\${hash}/hash/g" \
+      -e "s/\${HASH}/hash/g" \
       -e "s/\${USERNAME}/domain_temp/g" \
       -e "s/\${WEBCERTFILE}/fullchain.pem/g" \
       -e "s/\${WEBKEYFILE}/privkey.pem/g" \
