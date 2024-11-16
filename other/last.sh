@@ -1407,30 +1407,33 @@ ssh_setup() {
             y)  ;;
             *)
                 warning " $(text 9) "
+                return 0;
                 ;;
         esac
         
-        if [[ $? -eq 0 ]]; then
-            if [[ ! -s /home/${USERNAME}/.ssh/id_rsa.pub && ! -s /root/.ssh/id_rsa.pub ]]; then
-                warning " $(text 55) "
-                info " $(text 56) "
-                echo
-            else
-                # Если ключи найдены, продолжаем настройку SSH
-                sed -i -e "
-                    s/#Port/Port/g;
-                    s/Port 22/Port 36079/g;
-                    s/#PermitRootLogin/PermitRootLogin/g;
-                    s/PermitRootLogin yes/PermitRootLogin prohibit-password/g;
-                    s/#PubkeyAuthentication/PubkeyAuthentication/g;
-                    s/PubkeyAuthentication no/PubkeyAuthentication yes/g;
-                    s/#PasswordAuthentication/PasswordAuthentication/g;
-                    s/PasswordAuthentication yes/PasswordAuthentication no/g;
-                    s/#PermitEmptyPasswords/PermitEmptyPasswords/g;
-                    s/PermitEmptyPasswords yes/PermitEmptyPasswords no/g;
-                " /etc/ssh/sshd_config
-                
-                cat > /etc/motd <<EOF
+        # Проверяем наличие SSH-ключей
+        if [[ ! -s "/home/${USERNAME}/.ssh/id_rsa.pub" && ! -s "/root/.ssh/id_rsa.pub" ]]; then
+            warning " $(text 55) "
+            info " $(text 56) "
+            return 1 # Сообщаем о проблеме и выходим из функции
+        fi
+
+        # Если ключ найден, продолжаем настройку SSH
+        sed -i -e "
+            s/#Port/Port/g;
+            s/Port 22/Port 36079/g;
+            s/#PermitRootLogin/PermitRootLogin/g;
+            s/PermitRootLogin yes/PermitRootLogin prohibit-password/g;
+            s/#PubkeyAuthentication/PubkeyAuthentication/g;
+            s/PubkeyAuthentication no/PubkeyAuthentication yes/g;
+            s/#PasswordAuthentication/PasswordAuthentication/g;
+            s/PasswordAuthentication yes/PasswordAuthentication no/g;
+            s/#PermitEmptyPasswords/PermitEmptyPasswords/g;
+            s/PermitEmptyPasswords yes/PermitEmptyPasswords no/g;
+        " /etc/ssh/sshd_config
+
+        # Настройка баннера
+        cat > /etc/motd <<EOF
 
 ################################################################################
                          WARNING: AUTHORIZED ACCESS ONLY
@@ -1466,12 +1469,8 @@ to the fullest extent of the law.
 
 
 EOF
-                systemctl restart ssh.service
-                break
-            fi
-        else
-            break
-        fi
+        systemctl restart ssh.service
+        break
     done
 
     tilda "$(text 10)"
