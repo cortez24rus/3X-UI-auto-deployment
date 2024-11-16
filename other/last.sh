@@ -1397,7 +1397,7 @@ ssh_setup() {
     echo
     out_data " $(text 50) "
     out_data " $(text 51) "
-    tilda "$(text 10)"
+    echo
     out_data " $(text 52)" "type \$env:USERPROFILE\.ssh\id_rsa.pub | ssh -p 22 ${USERNAME}@${IP4} \"cat >> ~/.ssh/authorized_keys\""
     out_data " $(text 53)" "ssh-copy-id -p 22 ${USERNAME}@${IP4}"
     echo
@@ -1487,19 +1487,19 @@ data_output() {
     tilda "$(text 10)"
     info " $(text 58) "
     printf '0\n' | x-ui | grep --color=never -i ':'
-    tilda "$(text 10)"
+    echo
     out_data " $(text 59) " "https://${DOMAIN}/${WEBBASEPATH}/"
     out_data " $(text 60) " "${SUBURI}cortez"
     if [[ $choise = "1" ]]; then
         out_data " $(text 61) " "https://${DOMAIN}/${ADGUARDPATH}/login.html"
         
     fi
-    tilda "$(text 10)"
+    echo
     out_data " $(text 62) " "ssh -p 36079 ${USERNAME}@${IP4}"
-    tilda "$(text 10)"
+    echo
     out_data " $(text 63) " "$USERNAME"
     out_data " $(text 64) " "$PASSWORD"
-    tilda "$(text 10)"
+    echo
     out_data " $(text 65) " "$LOGFILE"
     tilda "$(text 10)"
 }
