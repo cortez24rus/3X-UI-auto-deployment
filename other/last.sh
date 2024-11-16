@@ -116,8 +116,8 @@ E[49]="Generate a key for your OS (ssh-keygen)."
 R[49]="Сгенерируйте ключ для своей ОС (ssh-keygen)."
 E[50]="In Windows, install the openSSH package and enter the command in PowerShell (recommended to research key generation online)."
 R[50]="В Windows нужно установить пакет openSSH и ввести команду в PowerShell (рекомендуется изучить генерацию ключей в интернете)."
-E[51]="If you are on Linux, you probably know what to do :C"
-R[51]="Если у вас Linux, то вы сами все умеете :С"
+E[51]="If you are on Linux, you probably know what to do C:"
+R[51]="Если у вас Linux, то вы сами все умеете C:"
 E[52]="Command for Windows:"
 R[52]="Команда для Windows:"
 E[53]="Command for Linux:"
@@ -1393,14 +1393,14 @@ enabling_security() {
 ssh_setup() {
     exec > /dev/tty 2>&1
     info " $(text 48) "
-    info " $(text 49) "
+    out_data " $(text 49) "
     echo
-    info " $(text 50) "
-    info " $(text 51) "
+    out_data " $(text 50) "
+    out_data " $(text 51) "
     tilda "$(text 10)"
     out_data " $(text 52)" "type \$env:USERPROFILE\.ssh\id_rsa.pub | ssh -p 22 ${USERNAME}@${IP4} \"cat >> ~/.ssh/authorized_keys\""
     out_data " $(text 53)" "ssh-copy-id -p 22 ${USERNAME}@${IP4}"
-    tilda "$(text 10)"
+    echo
     while true; do
         reading " $(text 54) " answer_ssh
         case "${answer_ssh,,}" in
@@ -1472,8 +1472,6 @@ EOF
         systemctl restart ssh.service
         break
     done
-
-    tilda "$(text 10)"
 }
 
 # Установока xui бота
@@ -1486,6 +1484,7 @@ install_xuibot() {
 
 ### Окончание ###
 data_output() {
+    tilda "$(text 10)"
     info " $(text 58) "
     printf '0\n' | x-ui | grep --color=never -i ':'
     tilda "$(text 10)"
