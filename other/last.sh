@@ -146,8 +146,8 @@ E[64]="Password:"
 R[64]="Пароль:"
 E[65]="Log file path:"
 R[65]="Путь к лог файлу:"
-E[65]="Ptometheus monitor."
-R[65]="Мониторинг Prometheus."
+E[66]="Ptometheus monitor."
+R[66]="Мониторинг Prometheus."
 
 log_entry() {
     mkdir -p /usr/local/xui-rp/
