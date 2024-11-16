@@ -478,7 +478,7 @@ data_entry() {
     WEBCERTFILE=/etc/letsencrypt/live/${DOMAIN}/fullchain.pem
     WEBKEYFILE=/etc/letsencrypt/live/${DOMAIN}/privkey.pem
     SUBURI=https://${DOMAIN}/${SUBPATH}/
-    subJsonURI=https://${DOMAIN}/${SUBJSONPATH}/
+    SUBJSONURI=https://${DOMAIN}/${SUBJSONPATH}/
 }
 
 ### Обновление системы и установка пакетов ###
