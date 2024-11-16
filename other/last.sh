@@ -783,20 +783,20 @@ map \$ssl_preread_protocol \$backend {
     "" ssh;
 }
 map \$ssl_preread_server_name \$https {
-    ${DOMAIN}      web;
-    ${REALITY}     reality;
-    www.${DOMAIN}  xtls;
+    ${DOMAIN}                   web;
+    ${REALITY}                  reality;
+    www.${DOMAIN}               xtls;
 }
-upstream web             { server 127.0.0.1:7443; }
-#upstream web             { server 127.0.0.1:46076; }
-upstream reality         { server 127.0.0.1:8443; }
-upstream xtls            { server 127.0.0.1:9443; }
-#upstream ssh             { server 127.0.0.1:36079; }
+upstream web                    { server 127.0.0.1:7443; }
+#upstream web                   { server 127.0.0.1:46076; }
+upstream reality                { server 127.0.0.1:8443; }
+upstream xtls                   { server 127.0.0.1:9443; }
+#upstream ssh                   { server 127.0.0.1:36079; }
 
 server {
-    listen 443           reuseport;
-    ssl_preread          on;
-    proxy_pass           \$backend;
+    listen 443                  reuseport;
+    ssl_preread                 on;
+    proxy_pass                  \$backend;
 }
 EOF
 }
@@ -812,7 +812,7 @@ server {
 }
 # Main
 server {
-    listen                      46076 ssl default_server;
+    listen                      46076 ssl default_server proxy_protocol;
 
     # SSL
     ssl_reject_handshake        on;
