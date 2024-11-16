@@ -547,7 +547,7 @@ dns_adguard_home() {
     sed -i \
       -e "s/\${USERNAME}/username/g" \
       -e "s/\${HASH}/hash/g" \
-      -e "s/\${USERNAME}/domain_temp/g" \
+      -e "s/\${DOMAIN}/domain_temp/g" \
       -e "s/\${WEBCERTFILE}/fullchain.pem/g" \
       -e "s/\${WEBKEYFILE}/privkey.pem/g" \
       AdGuardHome/AdGuardHome.yaml
