@@ -529,7 +529,7 @@ EOF
 
 dns_adguard_home() {
     rm -rf AdGuardHome_*
-    while ! wget -q --show-progress --timeout=30 --tries=10 --retry-connrefused https://static.adguard.com/adguardhome/release/AdGuardHome_linux_amd64.tar.gz; do
+    while ! wget -q --progress=dot:mega --timeout=30 --tries=10 --retry-connrefused https://static.adguard.com/adguardhome/release/AdGuardHome_linux_amd64.tar.gz; do
         warning " $(text 38) "
         sleep 3
     done
@@ -539,7 +539,7 @@ dns_adguard_home() {
     HASH=$(htpasswd -B -C 10 -n -b ${USERNAME} ${PASSWORD} | cut -d ":" -f 2)
 
     rm -f AdGuardHome/AdGuardHome.yaml
-    while ! wget -q --show-progress --timeout=30 --tries=10 --retry-connrefused "https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/main/adh/AdGuardHome.yaml" -O AdGuardHome/AdGuardHome.yaml; do
+    while ! wget -q --progress=dot:mega --timeout=30 --tries=10 --retry-connrefused "https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/main/adh/AdGuardHome.yaml" -O AdGuardHome/AdGuardHome.yaml; do
         warning " $(text 38) "
         sleep 3
     done
@@ -1347,7 +1347,7 @@ panel_installation() {
     info " $(text 46) "
     touch /usr/local/xui-rp/reinstallation_check
 
-    while ! wget -q --show-progress --timeout=30 --tries=10 --retry-connrefused https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/main/bot/x-ui.gpg; do
+    while ! wget -q --progress=dot:mega --timeout=30 --tries=10 --retry-connrefused https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/main/bot/x-ui.gpg; do
         warning " $(text 38) "
         sleep 3
     done
