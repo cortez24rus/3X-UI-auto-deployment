@@ -146,7 +146,7 @@ E[64]="Password:"
 R[64]="Пароль:"
 E[65]="Log file path:"
 R[65]="Путь к лог файлу:"
-E[66]="Ptometheus monitor."
+E[66]="Prometheus monitor."
 R[66]="Мониторинг Prometheus."
 
 log_entry() {
@@ -447,18 +447,6 @@ data_entry() {
     tilda "$(text 10)"
     check_cf_token
     tilda "$(text 10)"
-    reading " $(text 19) " REALITY
-    tilda "$(text 10)"
-    validate_path "CDNGRPC"
-    echo
-    validate_path "CDNSPLIT"
-    echo
-    validate_path "CDNHTTPU"
-    echo
-    validate_path "CDNWS"
-    echo
-    validate_path "METRICS"
-    tilda "$(text 10)"
     choise_dns
     validate_path WEBBASEPATH
     echo
@@ -688,18 +676,11 @@ issuance_of_certificates() {
     tilda "$(text 10)"
 }
 
-monitoring() {
-    info " $(text 66) "
-    bash <(curl -Ls https://github.com/cortez24rus/grafana-prometheus/raw/refs/heads/main/prometheus_node_exporter.sh)
-    tilda "$(text 10)"
-}
-
 ### NGINX ###
 nginx_setup() {
     info " $(text 45) "
     mkdir -p /etc/nginx/stream-enabled/
     touch /etc/nginx/.htpasswd
-    htpasswd -nb "$USERNAME" "$PASSWORD" > /etc/nginx/.htpasswd
 
     nginx_conf
     stream_conf
@@ -778,25 +759,20 @@ EOF
 
 stream_conf() {
     cat > /etc/nginx/stream-enabled/stream.conf <<EOF
-map \$ssl_preread_protocol \$backend {
-    default \$https;
-    "" ssh;
+map \$ssl_preread_server_name \$backend {
+    ${domain}           web;
+    www.${domain}       xtls;
+#   domain_reality      reality;
 }
-map \$ssl_preread_server_name \$https {
-    ${DOMAIN}                   web;
-    ${REALITY}                  reality;
-    www.${DOMAIN}               xtls;
-}
-upstream web                    { server 127.0.0.1:7443; }
-#upstream web                   { server 127.0.0.1:46076; }
-upstream reality                { server 127.0.0.1:8443; }
-upstream xtls                   { server 127.0.0.1:9443; }
-#upstream ssh                   { server 127.0.0.1:36079; }
+#upstream web             { server 127.0.0.1:36076; }
+upstream web             { server 127.0.0.1:7443; }
+#upstream reality         { server 127.0.0.1:8443; }
+upstream xtls            { server 127.0.0.1:9443; }
 
 server {
-    listen 443                  reuseport;
-    ssl_preread                 on;
-    proxy_pass                  \$backend;
+    listen 443          reuseport;
+    ssl_preread         on;
+    proxy_pass          \$backend;
 }
 EOF
 }
@@ -812,7 +788,7 @@ server {
 }
 # Main
 server {
-    listen                      46076 ssl default_server proxy_protocol;
+    listen                      46076 ssl default_server;
 
     # SSL
     ssl_reject_handshake        on;
@@ -820,11 +796,8 @@ server {
     ssl_session_cache           shared:SSL:10m;
 }
 server {
-#    listen                      46076 ssl;
-    listen                      46076 ssl proxy_protocol;
+    listen                      46076 ssl;
     http2                       on;
-    set_real_ip_from            127.0.0.1;
-    real_ip_header              proxy_protocol;
     server_name                 ${DOMAIN} www.${DOMAIN};
 
     # SSL
@@ -835,25 +808,6 @@ server {
     index index.html index.htm index.php index.nginx-debian.html;
     root /var/www/html/;
 
-    # Security headers
-    add_header X-XSS-Protection          "1; mode=block" always;
-    add_header X-Content-Type-Options    "nosniff" always;
-    add_header Referrer-Policy           "no-referrer-when-downgrade" always;
-#    add_header Content-Security-Policy   "default-src https:; script-src https: 'unsafe-inline' 'unsafe-eval'; style-src https: 'unsafe-inline';" always;
-    add_header Permissions-Policy        "interest-cohort=()" always;
-    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;
-    add_header X-Frame-Options           "SAMEORIGIN";
-    proxy_hide_header X-Powered-By;
-
-    # Security
-    if (\$host !~* ^(.+\.)?${DOMAIN}\$ ){return 444;}
-    if (\$scheme ~* https) {set \$safe 1;}
-    if (\$ssl_server_name !~* ^(.+\.)?${DOMAIN}\$ ) {set \$safe "\${safe}0"; }
-    if (\$safe = 10){return 444;}
-    if (\$request_uri ~ "(\"|'|\`|~|,|:|--|;|%|\\$|&&|\?\?|0x00|0X00|\||\\|\{|\}|\[|\]|<|>|\.\.\.|\.\.\/|\/\/\/)"){set \$hack 1;}
-    error_page 400 401 402 403 500 501 502 503 504 =404 /404;
-    proxy_intercept_errors on;
-
     # Disable direct IP access
     if (\$host = ${IP4}) {
         return 444;
@@ -863,25 +817,6 @@ server {
 #        auth_basic "Restricted Content";
 #        auth_basic_user_file /etc/nginx/.htpasswd;
 #    }
-     location /${METRICS} {
-        auth_basic "Restricted Content";
-        auth_basic_user_file /etc/nginx/.htpasswd;
-        proxy_pass http://127.0.0.1:9100/metrics;
-        proxy_set_header Host \$host;
-        proxy_set_header X-Real-IP \$remote_addr;
-        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto \$scheme;
-    }
-    location ~* /(sub|dashboard|api|docs|redoc|openapi.json|statics) {
-        proxy_redirect off;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade \$http_upgrade;
-        proxy_set_header Connection "upgrade";
-        proxy_pass https://127.0.0.1:8000;
-        proxy_set_header Host \$host;
-        proxy_set_header X-Real-IP \$remote_addr;
-        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-    }
     # X-ui Admin panel
     location /${WEBBASEPATH} {
         proxy_redirect off;
@@ -914,41 +849,6 @@ server {
         proxy_pass https://127.0.0.1:${SUBPORT}/${SUBJSONPATH};
         break;
     }
-    location /${CDNSPLIT} {
-        proxy_pass http://127.0.0.1:2063;
-        proxy_http_version 1.1;
-        proxy_redirect off;
-    }
-    # Xray Config
-    location ~ ^/(?<fwdport>\d+)/(?<fwdpath>.*)\$ {
-        if (\$hack = 1) {return 404;}
-        client_max_body_size 0;
-        client_body_timeout 1d;
-        grpc_read_timeout 1d;
-        grpc_socket_keepalive on;
-        proxy_read_timeout 1d;
-        proxy_http_version 1.1;
-        proxy_buffering off;
-        proxy_request_buffering off;
-        proxy_socket_keepalive on;
-        proxy_set_header Upgrade \$http_upgrade;
-        proxy_set_header Connection "upgrade";
-        proxy_set_header Host \$host;
-        proxy_set_header X-Real-IP \$remote_addr;
-        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-        if (\$content_type ~* "GRPC") {
-            grpc_pass grpc://127.0.0.1:\$fwdport\$is_args\$args;
-            break;
-        }
-        if (\$http_upgrade ~* "(WEBSOCKET|WS)") {
-            proxy_pass https://127.0.0.1:\$fwdport\$is_args\$args;
-            break;
-            }
-        if (\$request_method ~* ^(PUT|POST|GET)\$) {
-            proxy_pass http://127.0.0.1:\$fwdport\$is_args\$args;
-            break;
-        }
-    }
     # Adguard home
     ${COMMENT_AGH}
 }
@@ -970,282 +870,21 @@ generate_keys() {
 }
 
 ### Изменение базы данных ###
-stream_settings_grpc() {
-    stream_settings_grpc=$(cat <<EOF
-{
-  "network": "grpc",
-  "security": "none",
-  "externalProxy": [
-    {
-      "forceTls": "same",
-      "dest": "${DOMAIN}",
-      "port": 443,
-      "remark": ""
-    }
-  ],
-  "grpcSettings": {
-    "serviceName": "/2053/${CDNGRPC}",
-    "authority": "${DOMAIN}",
-    "multiMode": false
-  }
-}
-EOF
-)
-}
-
-stream_settings_split() {
-    stream_settings_split=$(cat <<EOF
-{
-  "network": "splithttp",
-  "security": "none",
-  "externalProxy": [
-    {
-      "forceTls": "same",
-      "dest": "${DOMAIN}",
-      "port": 443,
-      "remark": ""
-    }
-  ],
-  "splithttpSettings": {
-    "path": "/${CDNSPLIT}",
-    "host": "",
-    "headers": {},
-    "scMaxConcurrentPosts": "100-200",
-    "scMaxEachPostBytes": "1000000-2000000",
-    "scMinPostsIntervalMs": "10-50",
-    "noSSEHeader": false,
-    "xPaddingBytes": "100-1000",
-    "xmux": {
-      "maxConcurrency": "16-32",
-      "maxConnections": 0,
-      "cMaxReuseTimes": "64-128",
-      "cMaxLifetimeMs": 0
-    }
-  }
-}
-EOF
-)
-}
-
-stream_settings_httpu() {
-    stream_settings_httpu=$(cat <<EOF
-{
-  "network": "httpupgrade",
-  "security": "tls",
-  "externalProxy": [
-    {
-      "forceTls": "same",
-      "dest": "${DOMAIN}",
-      "port": 443,
-      "remark": ""
-    }
-  ],
-  "tlsSettings": {
-    "serverName": "",
-    "minVersion": "1.2",
-    "maxVersion": "1.3",
-    "cipherSuites": "",
-    "rejectUnknownSni": false,
-    "disableSystemRoot": false,
-    "enableSessionResumption": false,
-    "certificates": [
-      {
-        "certificateFile": "${WEBCERTFILE}",
-        "keyFile": "${WEBKEYFILE}",
-        "ocspStapling": 3600,
-        "oneTimeLoading": false,
-        "usage": "encipherment",
-        "buildChain": false
-      }
-    ],
-    "alpn": [],
-    "settings": {
-      "allowInsecure": false,
-      "fingerprint": "randomized"
-    }
-  },
-  "httpupgradeSettings": {
-    "acceptProxyProtocol": false,
-    "path": "/2073/${CDNHTTPU}",
-    "host": "${DOMAIN}",
-    "headers": {}
-  }
-}
-EOF
-)
-}
-
-stream_settings_ws() {
-    stream_settings_ws=$(cat <<EOF
-{
-  "network": "ws",
-  "security": "tls",
-  "externalProxy": [
-    {
-      "forceTls": "same",
-      "dest": "${DOMAIN}",
-      "port": 443,
-      "remark": ""
-    }
-  ],
-  "tlsSettings": {
-    "serverName": "${DOMAIN}",
-    "minVersion": "1.2",
-    "maxVersion": "1.3",
-    "cipherSuites": "",
-    "rejectUnknownSni": false,
-    "disableSystemRoot": false,
-    "enableSessionResumption": false,
-    "certificates": [
-      {
-        "certificateFile": "${WEBCERTFILE}",
-        "keyFile": "${WEBKEYFILE}",
-        "ocspStapling": 3600,
-        "oneTimeLoading": false,
-        "usage": "encipherment",
-        "buildChain": false
-      }
-    ],
-    "alpn": [],
-    "settings": {
-      "allowInsecure": false,
-      "fingerprint": "randomized"
-    }
-  },
-  "wsSettings": {
-    "acceptProxyProtocol": false,
-    "path": "/2083/${CDNWS}",
-    "host": "${DOMAIN}",
-    "headers": {}
-  }
-}
-EOF
-)
-}
-
-stream_settings_steal() {
-    read PRIVATE_KEY PUBLIC_KEY <<< "$(generate_keys)"
-
-    stream_settings_steal=$(cat <<EOF
-{
-  "network": "tcp",
-  "security": "reality",
-  "externalProxy": [
-    {
-      "forceTls": "same",
-      "dest": "www.${DOMAIN}",
-      "port": 443,
-      "remark": ""
-    }
-  ],
-  "realitySettings": {
-    "show": false,
-    "xver": 2,
-    "dest": "46076",
-    "serverNames": [
-      "${DOMAIN}"
-    ],
-    "privateKey": "${PRIVATE_KEY}",
-    "minClient": "",
-    "maxClient": "",
-    "maxTimediff": 0,
-    "shortIds": [
-      "22dff0",
-      "0041e9ca",
-      "49afaa139d",
-      "89",
-      "1addf92cc1bd50",
-      "6e122954e9df",
-      "8d93026df5de065c",
-      "bc85"
-    ],
-    "settings": {
-      "publicKey": "${PUBLIC_KEY}",
-      "fingerprint": "randomized",
-      "serverName": "",
-      "spiderX": "/"
-    }
-  },
-  "tcpSettings": {
-    "acceptProxyProtocol": false,
-    "header": {
-      "type": "none"
-    }
-  }
-}
-EOF
-)
-}
-
-stream_settings_reality() {
-    read PRIVATE_KEY PUBLIC_KEY <<< "$(generate_keys)"
-
-    stream_settings_reality=$(cat <<EOF
-{
-  "network": "tcp",
-  "security": "reality",
-  "externalProxy": [
-    {
-      "forceTls": "same",
-      "dest": "www.${DOMAIN}",
-      "port": 443,
-      "remark": ""
-    }
-  ],
-  "realitySettings": {
-    "show": false,
-    "xver": 2,
-    "dest": "${REALITY}:443",
-    "serverNames": [
-      "${REALITY}"
-    ],
-    "privateKey": "${PRIVATE_KEY}",
-    "minClient": "",
-    "maxClient": "",
-    "maxTimediff": 0,
-    "shortIds": [
-      "cd95c9",
-      "eeed8008",
-      "f2e26eba6c9432cf",
-      "0d6a8b47988f0d",
-      "c1",
-      "1b60e7369779",
-      "7fb9d5f9d8",
-      "6696"
-    ],
-    "settings": {
-      "publicKey": "${PUBLIC_KEY}",
-      "fingerprint": "randomized",
-      "serverName": "",
-      "spiderX": "/"
-    }
-  },
-  "tcpSettings": {
-    "acceptProxyProtocol": false,
-    "header": {
-      "type": "none"
-    }
-  }
-}
-EOF
-)
-}
-
-stream_settings_xtls() {
-    stream_settings_xtls=$(cat <<EOF
+stream_settings_id1() {
+stream_settings_id1=$(cat <<EOF
 {
   "network": "tcp",
   "security": "tls",
   "externalProxy": [
     {
       "forceTls": "same",
-      "dest": "www.${DOMAIN}",
+      "dest": "www.${domain}",
       "port": 443,
       "remark": ""
     }
   ],
   "tlsSettings": {
-    "serverName": "www.${DOMAIN}",
+    "serverName": "www.${domain}",
     "minVersion": "1.3",
     "maxVersion": "1.3",
     "cipherSuites": "",
@@ -1254,8 +893,8 @@ stream_settings_xtls() {
     "enableSessionResumption": false,
     "certificates": [
       {
-        "certificateFile": "${WEBCERTFILE}",
-        "keyFile": "${WEBKEYFILE}",
+        "certificateFile": "/etc/letsencrypt/live/${domain}/fullchain.pem",
+        "keyFile": "/etc/letsencrypt/live/${domain}/privkey.pem",
         "ocspStapling": 3600,
         "oneTimeLoading": false,
         "usage": "encipherment",
@@ -1281,16 +920,70 @@ EOF
 )
 }
 
-stream_settings_mkcp() {
-    stream_settings_mkcp=$(cat <<EOF
+stream_settings_id2() {
+    read private_key public_key <<< "$(generate_keys)"
+    
+    stream_settings_id2=$(cat <<EOF
+{
+  "network": "tcp",
+  "security": "reality",
+  "externalProxy": [
+    {
+      "forceTls": "same",
+      "dest": "www.${domain}",
+      "port": 443,
+      "remark": ""
+    }
+  ],
+  "realitySettings": {
+    "show": false,
+    "xver": 0,
+    "dest": "36076",
+    "serverNames": [
+      "${domain}"
+    ],
+    "privateKey": "${private_key}",
+    "minClient": "",
+    "maxClient": "",
+    "maxTimediff": 0,
+    "shortIds": [
+      "22dff0",
+      "0041e9ca",
+      "49afaa139d",
+      "89",
+      "1addf92cc1bd50",
+      "6e122954e9df",
+      "8d93026df5de065c",
+      "bc85"
+    ],
+    "settings": {
+      "publicKey": "${public_key}",
+      "fingerprint": "randomized",
+      "serverName": "",
+      "spiderX": "/"
+    }
+  },
+  "tcpSettings": {
+    "acceptProxyProtocol": false,
+    "header": {
+      "type": "none"
+    }
+  }
+}
+EOF
+)
+}
+
+stream_settings_id3() {
+stream_settings_id3=$(cat <<EOF
 {
   "network": "kcp",
   "security": "none",
   "externalProxy": [
     {
       "forceTls": "same",
-      "dest": "www.${DOMAIN}",
-      "port": 9999,
+      "dest": "www.${domain}",
+      "port": 2091,
       "remark": ""
     }
   ],
@@ -1305,7 +998,7 @@ stream_settings_mkcp() {
     "header": {
       "type": "srtp"
     },
-    "seed": "iTsaMjully"
+    "seed": "x2aYTWwqUE"
   }
 }
 EOF
@@ -1319,14 +1012,9 @@ database_change() {
 UPDATE users SET username = '$USERNAME' WHERE id = 1;
 UPDATE users SET password = '$PASSWORD' WHERE id = 1;
 
-UPDATE inbounds SET stream_settings = '$stream_settings_grpc' WHERE remark = '☁gRPC';
-UPDATE inbounds SET stream_settings = '$stream_settings_split' WHERE remark = '☁Split';
-UPDATE inbounds SET stream_settings = '$stream_settings_httpu' WHERE remark = '☁HttpU';
-UPDATE inbounds SET stream_settings = '$stream_settings_ws' WHERE remark = '☁WS';
-UPDATE inbounds SET stream_settings = '$stream_settings_steal' WHERE remark = '🥷🏻Steal';
-UPDATE inbounds SET stream_settings = '$stream_settings_reality' WHERE remark = '🥷🏻Whatsapp';
-UPDATE inbounds SET stream_settings = '$stream_settings_xtls' WHERE remark = '✖️XTLS';
-UPDATE inbounds SET stream_settings = '$stream_settings_mkcp' WHERE remark = '📲MKCP';
+UPDATE inbounds SET stream_settings = '$stream_settings_id1' WHERE remark = '✖️XTLS';
+UPDATE inbounds SET stream_settings = '$stream_settings_id2' WHERE remark = '🥷🏻Steal';
+UPDATE inbounds SET stream_settings = '$stream_settings_id3' WHERE remark = '📲MKCP';
 
 UPDATE settings SET value = '${WEBPORT}' WHERE key = 'webPort';
 UPDATE settings SET value = '/${WEBBASEPATH}/' WHERE key = 'webBasePath';
@@ -1347,33 +1035,25 @@ panel_installation() {
     info " $(text 46) "
     touch /usr/local/xui-rp/reinstallation_check
 
-    while ! wget -q --progress=dot:mega --timeout=30 --tries=10 --retry-connrefused https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/main/bot/x-ui.gpg; do
+    while ! wget -q --progress=dot:mega --timeout=30 --tries=10 --retry-connrefused https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/main/database/x-ui.db; do
         warning " $(text 38) "
         sleep 3
     done
     
-    echo ${PASSWORD} | gpg --batch --yes --passphrase-fd 0 -d x-ui.gpg > x-ui.db
     echo -e "n" | bash <(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh) > /dev/null 2>&1
 
-    stream_settings_grpc
-    stream_settings_split
-    stream_settings_httpu
-    stream_settings_ws
-    stream_settings_steal
-    stream_settings_reality
-    stream_settings_xtls
-    stream_settings_mkcp
+    stream_settings_id1
+    stream_settings_id2
+    stream_settings_id3
     database_change
 
     x-ui stop
     
-    rm -rf x-ui.gpg
     rm -rf /etc/x-ui/x-ui.db.backup
     [ -f /etc/x-ui/x-ui.db ] && mv /etc/x-ui/x-ui.db /etc/x-ui/x-ui.db.backup
     mv x-ui.db /etc/x-ui/
     
     x-ui start
-    echo -e "20\n1" | x-ui > /dev/null 2>&1
     tilda "$(text 10)"
 }
 
@@ -1381,8 +1061,8 @@ panel_installation() {
 enabling_security() {
     info " $(text 47) "
     ufw --force reset
-    ufw allow 36079/tcp
     ufw allow 443/tcp
+    ufw allow 80/tcp
     ufw allow 22/tcp
     ufw insert 1 deny from $(echo ${IP4} | cut -d '.' -f 1-3).0/22
     ufw --force enable
@@ -1420,8 +1100,6 @@ ssh_setup() {
 
         # Если ключ найден, продолжаем настройку SSH
         sed -i -e "
-            s/#Port/Port/g;
-            s/Port 22/Port 36079/g;
             s/#PermitRootLogin/PermitRootLogin/g;
             s/PermitRootLogin yes/PermitRootLogin prohibit-password/g;
             s/#PubkeyAuthentication/PubkeyAuthentication/g;

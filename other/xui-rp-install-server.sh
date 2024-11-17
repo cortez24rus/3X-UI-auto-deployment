@@ -146,7 +146,7 @@ E[64]="Password:"
 R[64]="Пароль:"
 E[65]="Log file path:"
 R[65]="Путь к лог файлу:"
-E[66]="Ptometheus monitor."
+E[66]="Prometheus monitor."
 R[66]="Мониторинг Prometheus."
 
 log_entry() {
