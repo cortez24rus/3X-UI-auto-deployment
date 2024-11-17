@@ -760,8 +760,8 @@ EOF
 stream_conf() {
     cat > /etc/nginx/stream-enabled/stream.conf <<EOF
 map \$ssl_preread_server_name \$backend {
-    ${domain}           web;
-    www.${domain}       xtls;
+    ${DOMAIN}           web;
+    www.${DOMAIN}       xtls;
 #   domain_reality      reality;
 }
 #upstream web             { server 127.0.0.1:36076; }
@@ -788,7 +788,7 @@ server {
 }
 # Main
 server {
-    listen                      46076 ssl default_server;
+    listen                      36076 ssl default_server;
 
     # SSL
     ssl_reject_handshake        on;
@@ -796,7 +796,7 @@ server {
     ssl_session_cache           shared:SSL:10m;
 }
 server {
-    listen                      46076 ssl;
+    listen                      36076 ssl;
     http2                       on;
     server_name                 ${DOMAIN} www.${DOMAIN};
 
@@ -831,7 +831,6 @@ server {
     }
     # Subscription
     location /${SUBPATH} {
-        if (\$hack = 1) {return 404;}
         proxy_redirect off;
         proxy_set_header Host \$host;
         proxy_set_header X-Real-IP \$remote_addr;
@@ -841,7 +840,6 @@ server {
     }
     # Subscription json
     location /${SUBJSONPATH} {
-        if (\$hack = 1) {return 404;}
         proxy_redirect off;
         proxy_set_header Host \$host;
         proxy_set_header X-Real-IP \$remote_addr;
