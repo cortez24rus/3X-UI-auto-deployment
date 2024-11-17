@@ -1165,7 +1165,7 @@ data_output() {
     printf '0\n' | x-ui | grep --color=never -i ':'
     echo
     out_data " $(text 59) " "https://${DOMAIN}/${WEBBASEPATH}/"
-    out_data " $(text 60) " "${SUBURI}cortez"
+    out_data " $(text 60) " "${SUBURI}user"
     if [[ $choise = "1" ]]; then
         out_data " $(text 61) " "https://${DOMAIN}/${ADGUARDPATH}/login.html"
         
