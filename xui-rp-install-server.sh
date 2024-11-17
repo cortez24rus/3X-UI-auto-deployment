@@ -878,23 +878,23 @@ stream_settings_id1=$(cat <<EOF
   "externalProxy": [
     {
       "forceTls": "same",
-      "dest": "www.${domain}",
+      "dest": "www.${DOMAIN}",
       "port": 443,
       "remark": ""
     }
   ],
   "tlsSettings": {
-    "serverName": "www.${domain}",
+    "serverName": "www.${DOMAIN}",
     "minVersion": "1.3",
     "maxVersion": "1.3",
     "cipherSuites": "",
-    "rejectUnknownSni": false,
+    "rejectUnknownSni": false,  
     "disableSystemRoot": false,
     "enableSessionResumption": false,
     "certificates": [
       {
-        "certificateFile": "/etc/letsencrypt/live/${domain}/fullchain.pem",
-        "keyFile": "/etc/letsencrypt/live/${domain}/privkey.pem",
+        "certificateFile": "/etc/letsencrypt/live/${DOMAIN}/fullchain.pem",
+        "keyFile": "/etc/letsencrypt/live/${DOMAIN}/privkey.pem",
         "ocspStapling": 3600,
         "oneTimeLoading": false,
         "usage": "encipherment",
@@ -921,7 +921,7 @@ EOF
 }
 
 stream_settings_id2() {
-    read private_key public_key <<< "$(generate_keys)"
+    read PRIVATE_KEY PUBLIC_KEY <<< "$(generate_keys)"
     
     stream_settings_id2=$(cat <<EOF
 {
@@ -930,7 +930,7 @@ stream_settings_id2() {
   "externalProxy": [
     {
       "forceTls": "same",
-      "dest": "www.${domain}",
+      "dest": "www.${DOMAIN}",
       "port": 443,
       "remark": ""
     }
@@ -940,9 +940,9 @@ stream_settings_id2() {
     "xver": 0,
     "dest": "36076",
     "serverNames": [
-      "${domain}"
+      "${DOMAIN}"
     ],
-    "privateKey": "${private_key}",
+    "privateKey": "${PRIVATE_KEY}",
     "minClient": "",
     "maxClient": "",
     "maxTimediff": 0,
@@ -957,7 +957,7 @@ stream_settings_id2() {
       "bc85"
     ],
     "settings": {
-      "publicKey": "${public_key}",
+      "publicKey": "${PUBLIC_KEY}",
       "fingerprint": "randomized",
       "serverName": "",
       "spiderX": "/"
@@ -982,7 +982,7 @@ stream_settings_id3=$(cat <<EOF
   "externalProxy": [
     {
       "forceTls": "same",
-      "dest": "www.${domain}",
+      "dest": "www.${DOMAIN}",
       "port": 2091,
       "remark": ""
     }
