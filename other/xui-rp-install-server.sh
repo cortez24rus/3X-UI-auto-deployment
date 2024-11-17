@@ -679,7 +679,7 @@ issuance_of_certificates() {
     then
         echo "dns_cloudflare_api_token = ${CFTOKEN}" >> /root/cloudflare.credentials
     else
-        echo "dns_kcloudflare_email = ${EMAIL}" >> /root/cloudflare.credentials
+        echo "dns_cloudflare_email = ${EMAIL}" >> /root/cloudflare.credentials
         echo "dns_cloudflare_api_key = ${CFTOKEN}" >> /root/cloudflare.credentials
     fi
     certbot certonly --dns-cloudflare --dns-cloudflare-credentials /root/cloudflare.credentials --dns-cloudflare-propagation-seconds 30 --rsa-key-size 4096 -d ${DOMAIN},*.${DOMAIN} --agree-tos -m ${EMAIL} --no-eff-email --non-interactive
