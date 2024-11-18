@@ -34,7 +34,7 @@ This script is designed to quickly and easily set up a hidden proxy server, with
 
 ### Includes:
   
-1. 3X-UI Xray server configuration:
+1. Xray server configuration with 3X-UI:
    - VLESS-TCP-XTLS-Vision и VLESS-TCP-REALITY (Steal from yourself).
    - Connection of subscription and JSON subscription for automatic configuration updates.
 2. Configuring NGINX reverse proxy on port 443.
@@ -46,26 +46,26 @@ This script is designed to quickly and easily set up a hidden proxy server, with
 7. Configuring UFW (Uncomplicated Firewall) for access control.
 8. Configuring SSH, to provide the minimum required security.
 9. Disabling IPv6 to prevent possible vulnerabilities.
-10. Encrypt DNS queries using systemd-resolved or AdGuard Home (DNS over TLS or DNS over HTTPS).
+10. Encrypting DNS queries using systemd-resolved or AdGuard Home (Temporarily removed).
 11. Generating a random website to add an extra layer of privacy and complexity for traffic analysis.
 
 -----
 
-### Usage XUI-RP install:
+### Installation of XUI-RP:
 
 To begin configuring the server, simply run the following command in a terminal:
 ```sh
 bash <(curl -Ls https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/main/xui-rp-install-server.sh)
 ```
 
-### Tg-bot:
+### Installing the bot:
 
-In order to install a bot on the server, it is enough to configure the launch of the base script with the -bot switch:
+To install the bot on the server, just run the base script with the -bot flag:
 ```sh
 bash <(https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/main/xui-rp-install-server.sh) -bot
 ```
 
-### Random web site:
+### Generating a random website:
 ```sh
 bash <(curl -Ls https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/main/xui-rp-random-site.sh)
 ```
@@ -76,4 +76,4 @@ The script will then prompt you for the necessary configuration information:
 
 ### Note: 
 - Once the configuration is complete, the script will display all the necessary links and login information for the XUI administration panel.
-- All configurations will be able to be modified as needed due to the flexibility of the settings.
+- All configurations can be modified as needed due to the flexibility of the settings.
