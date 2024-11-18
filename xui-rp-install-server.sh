@@ -891,8 +891,8 @@ stream_settings_id1=$(cat <<EOF
     "enableSessionResumption": false,
     "certificates": [
       {
-        "certificateFile": "/etc/letsencrypt/live/${DOMAIN}/fullchain.pem",
-        "keyFile": "/etc/letsencrypt/live/${DOMAIN}/privkey.pem",
+        "certificateFile": "${WEBCERTFILE}",
+        "keyFile": "${WEBKEYFILE}",
         "ocspStapling": 3600,
         "oneTimeLoading": false,
         "usage": "encipherment",
