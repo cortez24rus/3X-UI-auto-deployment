@@ -812,7 +812,7 @@ server {
 }
 # Main
 server {
-    listen                      46076 ssl default_server proxy_protocol;
+    listen                      46076 ssl default_server;
 
     # SSL
     ssl_reject_handshake        on;
