@@ -1007,8 +1007,9 @@ database_change() {
     DB_PATH="x-ui.db"
 
     sqlite3 $DB_PATH <<EOF
-UPDATE users SET username = '$USERNAME' WHERE id = 1;
-UPDATE users SET password = '$PASSWORD' WHERE id = 1;
+UPDATE users 
+SET username = '$USERNAME', password = '$PASSWORD' 
+WHERE id = 1;
 
 UPDATE inbounds SET stream_settings = '$stream_settings_id1' WHERE remark = '✖️XTLS';
 UPDATE inbounds SET stream_settings = '$stream_settings_id2' WHERE remark = '🥷🏻Steal';
