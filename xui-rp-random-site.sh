@@ -33,7 +33,7 @@ if [[ ! -d "simple-web-templates-main" ]]; then
         msg_err "Скачивание не удалось, пробуем снова..."
         sleep 3
     done
-    unzip -q main.zip && rm -f main.zip
+    unzip -q main.zip &>/dev/null && rm -f main.zip
 fi
 
 cd simple-web-templates-main || { msg_err "Не удалось перейти в папку с шаблонами"; exit 1; }
@@ -41,12 +41,13 @@ cd simple-web-templates-main || { msg_err "Не удалось перейти в
 msg_inf "Удаляем ненужные файлы..."
 rm -rf assets ".gitattributes" "README.md" "_config.yml"
 
-RandomHTML=$(for i in *; do echo "$i"; done | shuf -n1 2>&1)
+RandomHTML=$(ls -d */ | shuf -n1)  # Обновил для выбора случайного подкаталога
 msg_inf "Random template name: ${RandomHTML}"
 
+# Если шаблон существует, копируем его в /var/www/html
 if [[ -d "${RandomHTML}" && -d "/var/www/html/" ]]; then
     msg_inf "Копируем шаблон в /var/www/html/..."
-    rm -rf /var/www/html/*
+    rm -rf /var/www/html/*  # Очищаем старую папку
     cp -a "${RandomHTML}/." /var/www/html/ || { msg_err "Ошибка при копировании шаблона"; exit 1; }
     msg_ok "Шаблон успешно извлечен и установлен!"
 else
