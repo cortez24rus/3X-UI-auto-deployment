@@ -65,7 +65,7 @@ To install the bot on the server, just run the base script with the -bot flag:
 bash <(https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/main/xui-rp-install-server.sh) -bot
 ```
 
-### Generating a random website:
+### Выбор и установка случайного шаблона для веб-сайта:
 ```sh
 bash <(curl -Ls https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/main/xui-rp-random-site.sh)
 ```
