@@ -868,8 +868,8 @@ generate_keys() {
 }
 
 ### Изменение базы данных ###
-stream_settings_id1() {
-stream_settings_id1=$(cat <<EOF
+stream_settings_xtls() {
+stream_settings_xtls=$(cat <<EOF
 {
   "network": "tcp",
   "security": "tls",
@@ -918,10 +918,10 @@ EOF
 )
 }
 
-stream_settings_id2() {
+stream_settings_steal() {
     read PRIVATE_KEY PUBLIC_KEY <<< "$(generate_keys)"
     
-    stream_settings_id2=$(cat <<EOF
+    stream_settings_steal=$(cat <<EOF
 {
   "network": "tcp",
   "security": "reality",
@@ -972,8 +972,8 @@ EOF
 )
 }
 
-stream_settings_id3() {
-stream_settings_id3=$(cat <<EOF
+stream_settings_mkcp() {
+stream_settings_mkcp=$(cat <<EOF
 {
   "network": "kcp",
   "security": "none",
@@ -1011,8 +1011,8 @@ UPDATE users
 SET username = '$USERNAME', password = '$PASSWORD' 
 WHERE id = 1;
 
-UPDATE inbounds SET stream_settings = '$stream_settings_steal' WHERE LOWER(remark) LIKE '%steal%';
 UPDATE inbounds SET stream_settings = '$stream_settings_xtls' WHERE LOWER(remark) LIKE '%xtls%';
+UPDATE inbounds SET stream_settings = '$stream_settings_steal' WHERE LOWER(remark) LIKE '%steal%';
 UPDATE inbounds SET stream_settings = '$stream_settings_mkcp' WHERE LOWER(remark) LIKE '%mkcp%';
 
 UPDATE settings SET value = '${WEBPORT}' WHERE LOWER(key) LIKE 'webport';
@@ -1041,9 +1041,9 @@ panel_installation() {
     
     echo -e "n" | bash <(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh) > /dev/null 2>&1
 
-    stream_settings_id1
-    stream_settings_id2
-    stream_settings_id3
+    stream_settings_xtls
+    stream_settings_steal
+    stream_settings_mkcp
     database_change
 
     x-ui stop
