@@ -1,7 +1,5 @@
-[RUSSIAN](/README_RU.md)
-<p align="center"><a href="#"><img src="./media/3X-UI.png" alt="Image" width="400" height="200"></a></p>
-
-# XUI-REVERSE-PROXY
+# XUI-REVERSE-PROXY ([Russian](/README_RU.md))
+<p align="center"><a href="#"><img src="./media/3X-UI.png" alt="Image"></a></p>
 
 -----
 
