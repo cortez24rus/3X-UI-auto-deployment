@@ -1320,26 +1320,27 @@ UPDATE users
 SET username = '$USERNAME', password = '$PASSWORD' 
 WHERE id = 1;
 
-UPDATE inbounds SET stream_settings = '$stream_settings_grpc' WHERE remark = '☁gRPC';
-UPDATE inbounds SET stream_settings = '$stream_settings_split' WHERE remark = '☁Split';
-UPDATE inbounds SET stream_settings = '$stream_settings_httpu' WHERE remark = '☁HttpU';
-UPDATE inbounds SET stream_settings = '$stream_settings_ws' WHERE remark = '☁WS';
-UPDATE inbounds SET stream_settings = '$stream_settings_steal' WHERE remark = '🥷🏻Steal';
-UPDATE inbounds SET stream_settings = '$stream_settings_reality' WHERE remark = '🥷🏻Whatsapp';
-UPDATE inbounds SET stream_settings = '$stream_settings_xtls' WHERE remark = '✖️XTLS';
-UPDATE inbounds SET stream_settings = '$stream_settings_mkcp' WHERE remark = '📲MKCP';
+UPDATE inbounds SET stream_settings = '$stream_settings_grpc' WHERE LOWER(remark) LIKE '%grpc%';
+UPDATE inbounds SET stream_settings = '$stream_settings_split' WHERE LOWER(remark) LIKE '%split%';
+UPDATE inbounds SET stream_settings = '$stream_settings_httpu' WHERE LOWER(remark) LIKE '%httpu%';
+UPDATE inbounds SET stream_settings = '$stream_settings_ws' WHERE LOWER(remark) LIKE '%ws%';
+UPDATE inbounds SET stream_settings = '$stream_settings_steal' WHERE LOWER(remark) LIKE '%steal%';
+UPDATE inbounds SET stream_settings = '$stream_settings_reality' WHERE LOWER(remark) LIKE '%whatsapp%';
+UPDATE inbounds SET stream_settings = '$stream_settings_xtls' WHERE LOWER(remark) LIKE '%xtls%';
+UPDATE inbounds SET stream_settings = '$stream_settings_mkcp' WHERE LOWER(remark) LIKE '%mkcp%';
 
-UPDATE settings SET value = '${WEBPORT}' WHERE key = 'webPort';
-UPDATE settings SET value = '/${WEBBASEPATH}/' WHERE key = 'webBasePath';
-UPDATE settings SET value = '${WEBCERTFILE}' WHERE key = 'webCertFile';
-UPDATE settings SET value = '${WEBKEYFILE}' WHERE key = 'webKeyFile';
-UPDATE settings SET value = '${SUBPORT}' WHERE key = 'subPort';
-UPDATE settings SET value = '/${SUBPATH}/' WHERE key = 'subPath';
-UPDATE settings SET value = '${WEBCERTFILE}' WHERE key = 'subCertFile';
-UPDATE settings SET value = '${WEBKEYFILE}' WHERE key = 'subKeyFile';
-UPDATE settings SET value = '${SUBURI}' WHERE key = 'subURI';
-UPDATE settings SET value = '/${SUBJSONPATH}/' WHERE key = 'subJsonPath';
-UPDATE settings SET value = '${SUBJSONURI}' WHERE key = 'subJsonURI';
+UPDATE settings SET value = '${WEBPORT}' WHERE LOWER(key) LIKE 'webport';
+UPDATE settings SET value = '/${WEBBASEPATH}/' WHERE LOWER(key) LIKE 'webbasepath';
+UPDATE settings SET value = '${WEBCERTFILE}' WHERE LOWER(key) LIKE 'webcertfile';
+UPDATE settings SET value = '${WEBKEYFILE}' WHERE LOWER(key) LIKE 'webkeyfile';
+UPDATE settings SET value = '${SUBPORT}' WHERE LOWER(key) LIKE 'subport';
+UPDATE settings SET value = '/${SUBPATH}/' WHERE LOWER(key) LIKE 'subpath';
+UPDATE settings SET value = '${WEBCERTFILE}' WHERE LOWER(key) LIKE 'subcertfile';
+UPDATE settings SET value = '${WEBKEYFILE}' WHERE LOWER(key) LIKE 'subkeyfile';
+UPDATE settings SET value = '${SUBURI}' WHERE LOWER(key) LIKE 'suburi';
+UPDATE settings SET value = '/${SUBJSONPATH}/' WHERE LOWER(key) LIKE 'subjsonpath';
+UPDATE settings SET value = '${SUBJSONURI}' WHERE LOWER(key) LIKE 'subjsonuri';
+
 EOF
 }
 
