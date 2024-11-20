@@ -1011,21 +1011,21 @@ UPDATE users
 SET username = '$USERNAME', password = '$PASSWORD' 
 WHERE id = 1;
 
-UPDATE inbounds SET stream_settings = '$stream_settings_id1' WHERE remark = '✖️XTLS';
-UPDATE inbounds SET stream_settings = '$stream_settings_id2' WHERE remark = '🥷🏻Steal';
-UPDATE inbounds SET stream_settings = '$stream_settings_id3' WHERE remark = '📲MKCP';
+UPDATE inbounds SET stream_settings = '$stream_settings_steal' WHERE LOWER(remark) LIKE '%steal%';
+UPDATE inbounds SET stream_settings = '$stream_settings_xtls' WHERE LOWER(remark) LIKE '%xtls%';
+UPDATE inbounds SET stream_settings = '$stream_settings_mkcp' WHERE LOWER(remark) LIKE '%mkcp%';
 
-UPDATE settings SET value = '${WEBPORT}' WHERE key = 'webPort';
-UPDATE settings SET value = '/${WEBBASEPATH}/' WHERE key = 'webBasePath';
-UPDATE settings SET value = '${WEBCERTFILE}' WHERE key = 'webCertFile';
-UPDATE settings SET value = '${WEBKEYFILE}' WHERE key = 'webKeyFile';
-UPDATE settings SET value = '${SUBPORT}' WHERE key = 'subPort';
-UPDATE settings SET value = '/${SUBPATH}/' WHERE key = 'subPath';
-UPDATE settings SET value = '${WEBCERTFILE}' WHERE key = 'subCertFile';
-UPDATE settings SET value = '${WEBKEYFILE}' WHERE key = 'subKeyFile';
-UPDATE settings SET value = '${SUBURI}' WHERE key = 'subURI';
-UPDATE settings SET value = '/${SUBJSONPATH}/' WHERE key = 'subJsonPath';
-UPDATE settings SET value = '${SUBJSONURI}' WHERE key = 'subJsonURI';
+UPDATE settings SET value = '${WEBPORT}' WHERE LOWER(key) LIKE 'webport';
+UPDATE settings SET value = '/${WEBBASEPATH}/' WHERE LOWER(key) LIKE 'webbasepath';
+UPDATE settings SET value = '${WEBCERTFILE}' WHERE LOWER(key) LIKE 'webcertfile';
+UPDATE settings SET value = '${WEBKEYFILE}' WHERE LOWER(key) LIKE 'webkeyfile';
+UPDATE settings SET value = '${SUBPORT}' WHERE LOWER(key) LIKE 'subport';
+UPDATE settings SET value = '/${SUBPATH}/' WHERE LOWER(key) LIKE 'subpath';
+UPDATE settings SET value = '${WEBCERTFILE}' WHERE LOWER(key) LIKE 'subcertfile';
+UPDATE settings SET value = '${WEBKEYFILE}' WHERE LOWER(key) LIKE 'subkeyfile';
+UPDATE settings SET value = '${SUBURI}' WHERE LOWER(key) LIKE 'suburi';
+UPDATE settings SET value = '/${SUBJSONPATH}/' WHERE LOWER(key) LIKE 'subjsonpath';
+UPDATE settings SET value = '${SUBJSONURI}' WHERE LOWER(key) LIKE 'subjsonuri';
 EOF
 }
 
