@@ -47,7 +47,7 @@ This script is designed to quickly and easily set up a hidden proxy server, with
 8. Configuring SSH, to provide the minimum required security.
 9. Disabling IPv6 to prevent possible vulnerabilities.
 10. Encrypting DNS queries using systemd-resolved or AdGuard Home (Temporarily removed).
-11. Generating a random website to add an extra layer of privacy and complexity for traffic analysis.
+11. Selecting a random website from an array to add an extra layer of privacy and complexity for traffic analysis.
 
 -----
 
