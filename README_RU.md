@@ -77,5 +77,5 @@ bash <(curl -Ls https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/
 - После завершения настройки скрипт отобразит все необходимые ссылки и данные для входа в административную панель XUI.
 - Все конфигурации можно будет изменять по мере необходимости, благодаря гибкости настроек.
 
-## Stargazers over time
+## Количество звезд по времени
 [![Stargazers over time](https://starchart.cc/cortez24rus/xui-reverse-proxy.svg?variant=adaptive)](https://starchart.cc/cortez24rus/xui-reverse-proxy)
