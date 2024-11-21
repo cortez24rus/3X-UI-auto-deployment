@@ -40,7 +40,7 @@ pip install requests python-telegram-bot || { echo "Ошибка установ�
 deactivate
 
 # Загрузка файла с проверкой с помощью wget
-while ! wget -q --progress=dot:mega --timeout=30 --tries=10 --retry-connrefused https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/test/bot/xui-rp-bot.py -O /usr/local/xui-rp/xui-rp-bot.py; do
+while ! wget -q --progress=dot:mega --timeout=30 --tries=10 --retry-connrefused https://raw.githubusercontent.com/cortez24rus/xui-reverse-proxy/refs/heads/main/bot/xui-rp-bot.py -O /usr/local/xui-rp/xui-rp-bot.py; do
     echo "Скачивание не удалось, пробуем снова..."
     sleep 3
 done
