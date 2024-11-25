@@ -473,11 +473,13 @@ data_entry() {
 installation_of_utilities() {
     info " $(text 36) "
     apt-get update && apt-get upgrade -y && apt-get install -y \
+        jq \
         ufw \
         zip \
         wget \
         sudo \
         curl \
+        screen \
         gnupg2 \
         sqlite3 \
         certbot \
@@ -486,18 +488,29 @@ installation_of_utilities() {
         unattended-upgrades \
         python3-certbot-dns-cloudflare
     
+    # Установка ключей репозиториев
+    if grep -Eqi "(bullseye|bookworm)" /etc/os-release; then
+        apt install debian-archive-keyring -y
+    else
+        apt install ubuntu-keyring -y
+    fi
+
+    if [ ! -d /usr/share/keyrings ]
+    then
+        mkdir /usr/share/keyrings
+    fi
+
     curl https://nginx.org/keys/nginx_signing.key | gpg --dearmor | tee /usr/share/keyrings/nginx-archive-keyring.gpg >/dev/null
     gpg --dry-run --quiet --no-keyring --import --import-options import-show /usr/share/keyrings/nginx-archive-keyring.gpg
-    if grep -q "bullseye" /etc/os-release || grep -q "bookworm" /etc/os-release; then
-        echo "deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] http://nginx.org/packages/debian `lsb_release -cs` nginx" | tee /etc/apt/sources.list.d/nginx.list
-    else
-        echo "deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] http://nginx.org/packages/ubuntu `lsb_release -cs` nginx" | tee /etc/apt/sources.list.d/nginx.list
+    
+    if grep -q "Ubuntu" /etc/os-release; then
+        echo "deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] http://nginx.org/packages/ubuntu $(lsb_release -cs) nginx" | tee /etc/apt/sources.list.d/nginx.list
+    elif grep -q "Debian" /etc/os-release; then
+        echo "deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] http://nginx.org/packages/debian $(lsb_release -cs) nginx" | tee /etc/apt/sources.list.d/nginx.list
     fi
     echo -e "Package: *\nPin: origin nginx.org\nPin: release o=nginx\nPin-Priority: 900\n" | tee /etc/apt/preferences.d/99nginx
     
-    apt-get update && apt-get install -y \
-        nginx \
-        systemd-resolved
+    apt-get update && apt-get install -y nginx systemd-resolved
 
     tilda "$(text 10)"
 }
