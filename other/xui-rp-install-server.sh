@@ -400,7 +400,6 @@ data_entry() {
     check_cf_token
     tilda "$(text 10)"
     reading " $(text 70) " SECRET_PASSWORD
-    echo
     tilda "$(text 10)"
     reading " $(text 19) " REALITY
     tilda "$(text 10)"
