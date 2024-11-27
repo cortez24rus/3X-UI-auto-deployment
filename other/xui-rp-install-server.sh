@@ -711,6 +711,7 @@ monitoring() {
 nginx_setup() {
     info " $(text 45) "
     mkdir -p /etc/nginx/stream-enabled/
+    rm -rf /etc/nginx/conf.d/default.conf
     touch /etc/nginx/.htpasswd
     htpasswd -nb "$USERNAME" "$PASSWORD" > /etc/nginx/.htpasswd
 
@@ -735,15 +736,18 @@ include                           /etc/nginx/modules-enabled/*.conf;
 
 events {
     multi_accept                  on;
-    worker_connections            65535;
+    worker_connections            1024;
 }
 
 http {
-    log_format  main  '\$remote_addr - \$remote_user [\$time_local] "\$request" '
-                      '\$status \$body_bytes_sent "\$http_referer" '
-                      '"\$http_user_agent" "\$http_x_forwarded_for"';
+    log_format proxy '\$proxy_protocol_addr [\$time_local] '
+                        '"\$request" \$status \$body_bytes_sent '
+                        '"\$http_referer" "\$http_user_agent"';
+#    log_format proxy '\$proxy_protocol_addr - \$remote_user [\$time_local] '
+#                        '"\$request" \$status \$body_bytes_sent '
+#                        '"\$http_referer" "\$http_user_agent"';
 
-#   access_log                    /var/log/nginx/access.log  main;
+    access_log                    /var/log/nginx/access.log proxy;
     sendfile                      on;
     tcp_nopush                    on;
     tcp_nodelay                   on;
@@ -752,37 +756,24 @@ http {
     types_hash_max_size           2048;
     types_hash_bucket_size        64;
     client_max_body_size          16M;
-
-    # timeout
-    keepalive_timeout             60s;
+    keepalive_timeout             75s;
     keepalive_requests            1000;
     reset_timedout_connection     on;
-
-    # MIME
     include                       /etc/nginx/mime.types;
     default_type                  application/octet-stream;
-
-    # SSL
     ssl_session_timeout           1d;
-    ssl_session_cache             shared:SSL:10m;
+    ssl_session_cache             shared:SSL:1m;
     ssl_session_tickets           off;
-
-    # Mozilla Intermediate configuration
-    ssl_prefer_server_ciphers on;
+    ssl_prefer_server_ciphers     on;
     ssl_protocols                 TLSv1.2 TLSv1.3;
     ssl_ciphers                   TLS13_AES_128_GCM_SHA256:TLS13_AES_256_GCM_SHA384:TLS13_CHACHA20_POLY1305_SHA256:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305;
-
-    # OCSP Stapling
     ssl_stapling                  on;
     ssl_stapling_verify           on;
-    resolver                      1.1.1.1 valid=60s;
+    resolver                      127.0.0.1 valid=60s;
     resolver_timeout              2s;
-
     gzip                          on;
-
     include                       /etc/nginx/conf.d/*.conf;
 }
-
 stream {
     include /etc/nginx/stream-enabled/stream.conf;
 }
@@ -791,24 +782,28 @@ EOF
 
 stream_conf() {
     cat > /etc/nginx/stream-enabled/stream.conf <<EOF
-map \$ssl_preread_protocol \$backend {
-    default \$https;
-    "" ssh;
-}
-map \$ssl_preread_server_name \$https {
+map \$ssl_preread_server_name \$backend {
     ${DOMAIN}                   web;
-    ${REALITY}                  reality;
     www.${DOMAIN}               xtls;
+    ${REALITY}                  reality;
+    default                     block;
 }
-upstream web                    { server 127.0.0.1:7443; }
-#upstream web                   { server 127.0.0.1:46076; }
-upstream reality                { server 127.0.0.1:8443; }
-upstream xtls                   { server 127.0.0.1:9443; }
-#upstream ssh                   { server 127.0.0.1:36079; }
-
+upstream block {
+    server 127.0.0.1:36076;
+}
+upstream web {
+    server 127.0.0.1:7443;
+}
+upstream reality {
+    server 127.0.0.1:8443;
+}
+upstream xtls {
+    server 127.0.0.1:9443;
+}
 server {
     listen 443                  reuseport;
     ssl_preread                 on;
+    proxy_protocol              on;
     proxy_pass                  \$backend;
 }
 EOF
@@ -825,19 +820,12 @@ server {
 }
 # Main
 server {
-    listen                      46076 ssl default_server;
-
-    # SSL
+    listen                      36076 ssl proxy_protocol;
     ssl_reject_handshake        on;
-    ssl_session_timeout         1h;
-    ssl_session_cache           shared:SSL:10m;
 }
 server {
-#    listen                      46076 ssl;
-    listen                      46076 ssl proxy_protocol;
+    listen                      36077 ssl proxy_protocol;
     http2                       on;
-    set_real_ip_from            127.0.0.1;
-    real_ip_header              proxy_protocol;
     server_name                 ${DOMAIN} www.${DOMAIN};
 
     # SSL
@@ -845,14 +833,16 @@ server {
     ssl_certificate_key         ${WEBKEYFILE};
     ssl_trusted_certificate     /etc/letsencrypt/live/${DOMAIN}/chain.pem;
 
+    # Diffie-Hellman parameter for DHE ciphersuites
+    ssl_dhparam                          /etc/nginx/dhparam.pem;
+
     index index.html index.htm index.php index.nginx-debian.html;
     root /var/www/html/;
 
     # Security headers
-    add_header X-XSS-Protection          "1; mode=block" always;
+    add_header X-XSS-Protection          "0" always;
     add_header X-Content-Type-Options    "nosniff" always;
     add_header Referrer-Policy           "no-referrer-when-downgrade" always;
-#    add_header Content-Security-Policy   "default-src https:; script-src https: 'unsafe-inline' 'unsafe-eval'; style-src https: 'unsafe-inline';" always;
     add_header Permissions-Policy        "interest-cohort=()" always;
     add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;
     add_header X-Frame-Options           "SAMEORIGIN";
@@ -885,16 +875,6 @@ server {
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto \$scheme;
     }
-    location ~* /(sub|dashboard|api|docs|redoc|openapi.json|statics) {
-        proxy_redirect off;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade \$http_upgrade;
-        proxy_set_header Connection "upgrade";
-        proxy_pass https://127.0.0.1:8000;
-        proxy_set_header Host \$host;
-        proxy_set_header X-Real-IP \$remote_addr;
-        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-    }
     # X-ui Admin panel
     location /${WEBBASEPATH} {
         proxy_redirect off;
@@ -904,7 +884,7 @@ server {
         proxy_set_header X-Real-IP \$remote_addr;
         proxy_set_header Range \$http_range;
         proxy_set_header If-Range \$http_if_range;
-        proxy_pass https://127.0.0.1:${WEBPORT}/${WEBBASEPATH};
+        proxy_pass http://127.0.0.1:36075/${WEBBASEPATH};
         break;
     }
     # Subscription
@@ -914,7 +894,7 @@ server {
         proxy_set_header Host \$host;
         proxy_set_header X-Real-IP \$remote_addr;
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-        proxy_pass https://127.0.0.1:${SUBPORT}/${SUBPATH};
+        proxy_pass http://127.0.0.1:36074/${SUBPATH};
         break;
     }
     # Subscription json
@@ -924,7 +904,7 @@ server {
         proxy_set_header Host \$host;
         proxy_set_header X-Real-IP \$remote_addr;
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-        proxy_pass https://127.0.0.1:${SUBPORT}/${SUBJSONPATH};
+        proxy_pass http://127.0.0.1:36074/${SUBJSONPATH};
         break;
     }
     location /${CDNSPLIT} {
@@ -1154,7 +1134,7 @@ stream_settings_steal() {
   "realitySettings": {
     "show": false,
     "xver": 2,
-    "dest": "46076",
+    "dest": "36077",
     "serverNames": [
       "${DOMAIN}"
     ],
