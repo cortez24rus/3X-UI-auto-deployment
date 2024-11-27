@@ -213,8 +213,8 @@ start_installation() {
     info " $(text 6) "
     warning " apt-get update && apt-get full-upgrade -y && reboot "
     echo
-    reading " $(text 8) " ANSWER
-    case "${ANSWER,,}" in
+    reading " $(text 8) " ANSWER_START
+    case "${ANSWER_START,,}" in
         y)  ;;
         *)
             error " $(text 9) "
@@ -222,7 +222,23 @@ start_installation() {
     esac
 }
 
+# Функция для обрезки домена (удаление http://, https:// и www)
+crop_domain() {
+    local input_value="$1"
+    local temp_value
+    # Удаление префиксов и www
+    temp_value=$(echo "$input_value" | sed -e 's|https\?://||' -e 's|^www\.||' -e 's|/.*$||')
+    # Проверка формата домена
+    if ! [[ "$temp_value" =~ ^([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$ ]]; then
+        echo "Ошибка: введённый адрес '$temp_value' имеет неверный формат."
+        return 1
+    fi
+    # Возвращаем обработанный домен
+    echo "$temp_value"
+    return 0
+}
 
+# Запрос и ответ от API Cloudflare
 get_test_response() {
     testdomain=$(echo "${DOMAIN}" | rev | cut -d '.' -f 1-2 | rev)
 
@@ -233,42 +249,11 @@ get_test_response() {
     fi
 }
 
-# Функция для проверки правильности ответа от API Cloudflare
-validate_input() {
-    get_test_response
-
-    # Проверка, содержит ли ответ нужные данные
-    if [[ "$test_response" =~ "\"${testdomain}\"" && \
-          "$test_response" =~ "\"#dns_records:edit\"" && \
-          "$test_response" =~ "\"#dns_records:read\"" && \
-          "$test_response" =~ "\"#zone:read\"" ]]; then
-        return 0
-    else
-        return 1
-    fi
-}
-
-# Функция для обрезки домена (удаление http://, https:// и www)
-crop_domain() {
-    local input_value="$1"   # Считываем переданный домен или reality
-    local temp_value          # Временная переменная для обработки
-
-    # Удаление префиксов и www
-    temp_value=$(echo "$input_value" | sed -e 's|https\?://||' -e 's|^www\.||' -e 's|/.*$||')
-
-    # Проверка формата домена
-    if ! [[ "$temp_value" =~ ^([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$ ]]; then
-        echo "Ошибка: введённый адрес '$temp_value' имеет неверный формат."
-        return 1
-    fi
-
-    # Возвращаем обработанный домен
-    echo "$temp_value"
-    return 0
-}
-
 check_cf_token() {
-    while true; do
+    while [[ -z $(echo $test_response | grep "\"${testdomain}\"") ]] || [[ -z $(echo $test_response | grep "\"#dns_records:edit\"") ]] || [[ -z $(echo $test_response | grep "\"#dns_records:read\"") ]] || [[ -z $(echo $test_response | grep "\"#zone:read\"") ]]; do
+        DOMAIN=""
+        EMAIL=""
+        CFTOKEN=""
         while [[ -z $DOMAIN ]]; do
             reading " $(text 13) " DOMAIN
             echo
@@ -276,7 +261,7 @@ check_cf_token() {
 
         DOMAIN=$(crop_domain "$DOMAIN")
         
-    if [[ $? -ne 0 ]]; then
+        if [[ $? -ne 0 ]]; then
             DOMAIN=""
             continue
         fi
@@ -290,17 +275,8 @@ check_cf_token() {
             reading " $(text 16) " CFTOKEN
             echo
         done
-
+        get_test_response
         info " $(text 17) "
-
-        if validate_input; then
-            break
-        else
-            warning " $(text 18)"
-            DOMAIN=""
-            EMAIL=""
-            CFTOKEN=""
-        fi
     done
 }
 
@@ -386,55 +362,23 @@ validate_path() {
 choise_dns () {
     while true; do
         hint " $(text 31) \n" && reading " $(text 1) " CHOISE
-        case $CHOISE in
+        case $CHOISE in 
             1)
                 info " $(text 32) "
                 tilda "$(text 10)"
                 break
                 ;;
-#            2)
-#                tilda "$(text 10)"
-#                validate_path ADGUARDPATH
-#                echo
-#                break
-#                ;;
+            2)
+                info " $(text 25) "
+                tilda "$(text 10)"
+                validate_path ADGUARDPATH
+                echo
+                break
+                ;;
             *)
-                info " $(text )"
+                info " $(text 33) "
                 ;;
         esac
-    done
-}
-
-# Функция проверки xuibot
-check_xuibot() {
-    # Если был передан параметр -bot, возвращаем true
-    if [[ "$1" == "-bot" ]]; then
-        return 0
-    else
-        return 1
-    fi
-}
-
-# Функция для генерации случайного порта
-generate_port() {
-    echo $(( ((RANDOM<<15)|RANDOM) % 49152 + 10000 ))
-}
-
-# Функция для проверки, занят ли порт
-is_port_free() {
-    local PORT=$1
-    nc -z 127.0.0.1 $PORT &>/dev/null
-    return $?
-}
-
-# Основной цикл для генерации и проверки порта
-port_issuance() {
-    while true; do
-        PORT=$(generate_port)
-        if ! is_port_free $PORT; then  # Если порт свободен, выходим из цикла
-            echo $PORT
-            break
-        fi
     done
 }
 
@@ -446,6 +390,9 @@ data_entry() {
     reading " $(text 12) " PASSWORD
     tilda "$(text 10)"
     check_cf_token
+    tilda "$(text 10)"
+    reading " $(text 60) " SECRET_PASSWORD
+    echo
     tilda "$(text 10)"
     reading " $(text 19) " REALITY
     tilda "$(text 10)"
@@ -466,7 +413,7 @@ data_entry() {
     echo    
     validate_path SUBJSONPATH
     tilda "$(text 10)"
-    if check_xuibot "$1"; then
+    if [[ "$1" == "-bot" ]]; then
         reading " $(text 34) " BOT_TOKEN
         echo
         reading " $(text 35) " AID
@@ -560,9 +507,6 @@ dns_adguard_home() {
     sed -i \
       -e "s/\${USERNAME}/username/g" \
       -e "s/\${HASH}/hash/g" \
-      -e "s/\${DOMAIN}/domain_temp/g" \
-      -e "s/\${WEBCERTFILE}/fullchain.pem/g" \
-      -e "s/\${WEBKEYFILE}/privkey.pem/g" \
       AdGuardHome/AdGuardHome.yaml
 
     AdGuardHome/AdGuardHome -s restart
@@ -688,6 +632,7 @@ issuance_of_certificates() {
     touch cloudflare.credentials
     chown root:root cloudflare.credentials
     chmod 600 cloudflare.credentials
+    
     if [[ "$CFTOKEN" =~ [A-Z] ]]
     then
         echo "dns_cloudflare_api_token = ${CFTOKEN}" >> /root/cloudflare.credentials
@@ -695,9 +640,31 @@ issuance_of_certificates() {
         echo "dns_cloudflare_email = ${EMAIL}" >> /root/cloudflare.credentials
         echo "dns_cloudflare_api_key = ${CFTOKEN}" >> /root/cloudflare.credentials
     fi
-    certbot certonly --dns-cloudflare --dns-cloudflare-credentials /root/cloudflare.credentials --dns-cloudflare-propagation-seconds 30 --rsa-key-size 4096 -d ${DOMAIN},*.${DOMAIN} --agree-tos -m ${EMAIL} --no-eff-email --non-interactive
+    
+    while true; do
+        certbot certonly --dns-cloudflare --dns-cloudflare-credentials ${CF_CREDENTIALS_PATH} --dns-cloudflare-propagation-seconds 30 --rsa-key-size 4096 -d ${DOMAIN},*.${DOMAIN} --agree-tos -m ${EMAIL} --no-eff-email --non-interactive
+
+        if [ $? -eq 0 ]; then
+            break
+        else
+            sleep 5
+        fi
+    done
+
     { crontab -l; echo "0 5 1 */2 * certbot -q renew"; } | crontab -
-    echo "renew_hook = systemctl reload nginx" >> /etc/letsencrypt/renewal/${DOMAIN}.conf
+
+    nginx_or_haproxy=1
+    if [[ "${nginx_or_haproxy}" == "1" ]]
+    then
+        echo "renew_hook = systemctl reload nginx" >> /etc/letsencrypt/renewal/${domain}.conf
+        echo ""
+        openssl dhparam -out /etc/nginx/dhparam.pem 2048
+    else
+        echo "renew_hook = cat /etc/letsencrypt/live/${domain}/fullchain.pem /etc/letsencrypt/live/${domain}/privkey.pem > /etc/haproxy/certs/${domain}.pem && systemctl restart haproxy" >> /etc/letsencrypt/renewal/${domain}.conf
+        echo ""
+        openssl dhparam -out /etc/haproxy/dhparam.pem 2048
+    fi
+    
     tilda "$(text 10)"
 }
 
@@ -743,10 +710,6 @@ http {
     log_format proxy '\$proxy_protocol_addr [\$time_local] '
                         '"\$request" \$status \$body_bytes_sent '
                         '"\$http_referer" "\$http_user_agent"';
-#    log_format proxy '\$proxy_protocol_addr - \$remote_user [\$time_local] '
-#                        '"\$request" \$status \$body_bytes_sent '
-#                        '"\$http_referer" "\$http_user_agent"';
-
     access_log                    /var/log/nginx/access.log proxy;
     sendfile                      on;
     tcp_nopush                    on;
@@ -1333,7 +1296,6 @@ UPDATE settings SET value = '${WEBKEYFILE}' WHERE LOWER(key) LIKE 'subkeyfile';
 UPDATE settings SET value = '${SUBURI}' WHERE LOWER(key) LIKE 'suburi';
 UPDATE settings SET value = '/${SUBJSONPATH}/' WHERE LOWER(key) LIKE 'subjsonpath';
 UPDATE settings SET value = '${SUBJSONURI}' WHERE LOWER(key) LIKE 'subjsonuri';
-
 EOF
 }
 
@@ -1347,7 +1309,7 @@ panel_installation() {
         sleep 3
     done
     
-    echo ${PASSWORD} | gpg --batch --yes --passphrase-fd 0 -d x-ui.gpg > x-ui.db
+    echo ${SECRET_PASSWORD} | gpg --batch --yes --passphrase-fd 0 -d x-ui.gpg > x-ui.db
     echo -e "n" | bash <(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh) > /dev/null 2>&1
 
     stream_settings_grpc
