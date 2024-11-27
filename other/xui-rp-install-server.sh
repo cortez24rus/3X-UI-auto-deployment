@@ -1238,11 +1238,7 @@ UPDATE inbounds SET stream_settings = '$stream_settings_reality' WHERE LOWER(rem
 UPDATE inbounds SET stream_settings = '$stream_settings_xtls' WHERE LOWER(remark) LIKE '%xtls%';
 
 UPDATE settings SET value = '/${WEBBASEPATH}/' WHERE LOWER(key) LIKE 'webbasepath';
-UPDATE settings SET value = '${WEBCERTFILE}' WHERE LOWER(key) LIKE 'webcertfile';
-UPDATE settings SET value = '${WEBKEYFILE}' WHERE LOWER(key) LIKE 'webkeyfile';
 UPDATE settings SET value = '/${SUBPATH}/' WHERE LOWER(key) LIKE 'subpath';
-UPDATE settings SET value = '${WEBCERTFILE}' WHERE LOWER(key) LIKE 'subcertfile';
-UPDATE settings SET value = '${WEBKEYFILE}' WHERE LOWER(key) LIKE 'subkeyfile';
 UPDATE settings SET value = '${SUBURI}' WHERE LOWER(key) LIKE 'suburi';
 UPDATE settings SET value = '/${SUBJSONPATH}/' WHERE LOWER(key) LIKE 'subjsonpath';
 UPDATE settings SET value = '${SUBJSONURI}' WHERE LOWER(key) LIKE 'subjsonuri';
