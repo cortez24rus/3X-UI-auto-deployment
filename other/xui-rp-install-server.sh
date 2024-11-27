@@ -935,7 +935,7 @@ stream_settings_grpc() {
   "security": "none",
   "externalProxy": [
     {
-      "forceTls": "same",
+      "forceTls": "tls",
       "dest": "${DOMAIN}",
       "port": 443,
       "remark": ""
@@ -958,14 +958,14 @@ stream_settings_split() {
   "security": "none",
   "externalProxy": [
     {
-      "forceTls": "same",
+      "forceTls": "tls",
       "dest": "${DOMAIN}",
       "port": 443,
       "remark": ""
     }
   ],
   "splithttpSettings": {
-    "path": "/${CDNSPLIT}",
+    "path": "${CDNSPLIT}",
     "host": "",
     "headers": {},
     "scMaxConcurrentPosts": "100-200",
@@ -978,7 +978,9 @@ stream_settings_split() {
       "maxConnections": 0,
       "cMaxReuseTimes": "64-128",
       "cMaxLifetimeMs": 0
-    }
+    },
+    "mode": "auto",
+    "noGRPCHeader": false
   }
 }
 EOF
@@ -989,40 +991,16 @@ stream_settings_httpu() {
     stream_settings_httpu=$(cat <<EOF
 {
   "network": "httpupgrade",
-  "security": "tls",
+  "security": "none",
   "externalProxy": [
     {
-      "forceTls": "same",
+      "forceTls": "tls",
       "dest": "${DOMAIN}",
       "port": 443,
       "remark": ""
     }
   ],
-  "tlsSettings": {
-    "serverName": "",
-    "minVersion": "1.2",
-    "maxVersion": "1.3",
-    "cipherSuites": "",
-    "rejectUnknownSni": false,
-    "disableSystemRoot": false,
-    "enableSessionResumption": false,
-    "certificates": [
-      {
-        "certificateFile": "${WEBCERTFILE}",
-        "keyFile": "${WEBKEYFILE}",
-        "ocspStapling": 3600,
-        "oneTimeLoading": false,
-        "usage": "encipherment",
-        "buildChain": false
-      }
-    ],
-    "alpn": [],
-    "settings": {
-      "allowInsecure": false,
-      "fingerprint": "randomized"
-    }
-  },
-  "httpupgradeSettings": {
+    "httpupgradeSettings": {
     "acceptProxyProtocol": false,
     "path": "/2073/${CDNHTTPU}",
     "host": "${DOMAIN}",
@@ -1037,39 +1015,15 @@ stream_settings_ws() {
     stream_settings_ws=$(cat <<EOF
 {
   "network": "ws",
-  "security": "tls",
+  "security": "none",
   "externalProxy": [
     {
-      "forceTls": "same",
+      "forceTls": "tls",
       "dest": "${DOMAIN}",
       "port": 443,
       "remark": ""
     }
   ],
-  "tlsSettings": {
-    "serverName": "${DOMAIN}",
-    "minVersion": "1.2",
-    "maxVersion": "1.3",
-    "cipherSuites": "",
-    "rejectUnknownSni": false,
-    "disableSystemRoot": false,
-    "enableSessionResumption": false,
-    "certificates": [
-      {
-        "certificateFile": "${WEBCERTFILE}",
-        "keyFile": "${WEBKEYFILE}",
-        "ocspStapling": 3600,
-        "oneTimeLoading": false,
-        "usage": "encipherment",
-        "buildChain": false
-      }
-    ],
-    "alpn": [],
-    "settings": {
-      "allowInsecure": false,
-      "fingerprint": "randomized"
-    }
-  },
   "wsSettings": {
     "acceptProxyProtocol": false,
     "path": "/2083/${CDNWS}",
@@ -1119,13 +1073,13 @@ stream_settings_steal() {
     ],
     "settings": {
       "publicKey": "${PUBLIC_KEY}",
-      "fingerprint": "randomized",
+      "fingerprint": "random",
       "serverName": "",
       "spiderX": "/"
     }
   },
   "tcpSettings": {
-    "acceptProxyProtocol": false,
+    "acceptProxyProtocol": true,
     "header": {
       "type": "none"
     }
@@ -1152,7 +1106,7 @@ stream_settings_reality() {
   ],
   "realitySettings": {
     "show": false,
-    "xver": 2,
+    "xver": 0,
     "dest": "${REALITY}:443",
     "serverNames": [
       "${REALITY}"
@@ -1162,7 +1116,7 @@ stream_settings_reality() {
     "maxClient": "",
     "maxTimediff": 0,
     "shortIds": [
-      "cd95c9",
+      "cd95c9",е
       "eeed8008",
       "f2e26eba6c9432cf",
       "0d6a8b47988f0d",
@@ -1173,13 +1127,13 @@ stream_settings_reality() {
     ],
     "settings": {
       "publicKey": "${PUBLIC_KEY}",
-      "fingerprint": "randomized",
+      "fingerprint": "random",
       "serverName": "",
       "spiderX": "/"
     }
   },
   "tcpSettings": {
-    "acceptProxyProtocol": false,
+    "acceptProxyProtocol": true,
     "header": {
       "type": "none"
     }
@@ -1225,11 +1179,11 @@ stream_settings_xtls() {
     ],
     "settings": {
       "allowInsecure": false,
-      "fingerprint": "randomized"
+      "fingerprint": "random"
     }
   },
   "tcpSettings": {
-    "acceptProxyProtocol": false,
+    "acceptProxyProtocol": true,
     "header": {
       "type": "none"
     }
@@ -1239,6 +1193,7 @@ EOF
 )
 }
 
+#UPDATE inbounds SET stream_settings = '$stream_settings_mkcp' WHERE LOWER(remark) LIKE '%mkcp%';
 stream_settings_mkcp() {
     stream_settings_mkcp=$(cat <<EOF
 {
@@ -1285,7 +1240,6 @@ UPDATE inbounds SET stream_settings = '$stream_settings_ws' WHERE LOWER(remark) 
 UPDATE inbounds SET stream_settings = '$stream_settings_steal' WHERE LOWER(remark) LIKE '%steal%';
 UPDATE inbounds SET stream_settings = '$stream_settings_reality' WHERE LOWER(remark) LIKE '%whatsapp%';
 UPDATE inbounds SET stream_settings = '$stream_settings_xtls' WHERE LOWER(remark) LIKE '%xtls%';
-UPDATE inbounds SET stream_settings = '$stream_settings_mkcp' WHERE LOWER(remark) LIKE '%mkcp%';
 
 UPDATE settings SET value = '${WEBPORT}' WHERE LOWER(key) LIKE 'webport';
 UPDATE settings SET value = '/${WEBBASEPATH}/' WHERE LOWER(key) LIKE 'webbasepath';
