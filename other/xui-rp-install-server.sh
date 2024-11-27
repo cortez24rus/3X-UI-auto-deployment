@@ -904,14 +904,8 @@ server {
             grpc_pass grpc://127.0.0.1:\$fwdport\$is_args\$args;
             break;
         }
-        if (\$http_upgrade ~* "(WEBSOCKET|WS)") {
-            proxy_pass https://127.0.0.1:\$fwdport\$is_args\$args;
-            break;
-            }
-        if (\$request_method ~* ^(PUT|POST|GET)\$) {
-            proxy_pass http://127.0.0.1:\$fwdport\$is_args\$args;
-            break;
-        }
+		proxy_pass http://127.0.0.1:\$fwdport\$is_args\$args;
+		break;
     }
     # Adguard home
     ${COMMENT_AGH}
