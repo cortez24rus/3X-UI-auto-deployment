@@ -1233,9 +1233,6 @@ UPDATE inbounds SET stream_settings = '$stream_settings_grpc' WHERE LOWER(remark
 UPDATE inbounds SET stream_settings = '$stream_settings_split' WHERE LOWER(remark) LIKE '%split%';
 UPDATE inbounds SET stream_settings = '$stream_settings_httpu' WHERE LOWER(remark) LIKE '%httpu%';
 UPDATE inbounds SET stream_settings = '$stream_settings_ws' WHERE LOWER(remark) LIKE '%ws%';
-UPDATE inbounds SET stream_settings = '$stream_settings_steal' WHERE LOWER(remark) LIKE '%steal%';
-UPDATE inbounds SET stream_settings = '$stream_settings_reality' WHERE LOWER(remark) LIKE '%whatsapp%';
-UPDATE inbounds SET stream_settings = '$stream_settings_xtls' WHERE LOWER(remark) LIKE '%xtls%';
 
 UPDATE settings SET value = '/${WEBBASEPATH}/' WHERE LOWER(key) LIKE 'webbasepath';
 UPDATE settings SET value = '/${SUBPATH}/' WHERE LOWER(key) LIKE 'subpath';
