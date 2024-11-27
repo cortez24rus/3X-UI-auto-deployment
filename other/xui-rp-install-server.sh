@@ -1187,6 +1187,13 @@ EOF
 )
 }
 
+data_initialization() {
+    route=$(cat <<EOF
+[{"type":"field","outboundTag":"direct","domain":["keyword:xn--","keyword:ru","keyword:su","keyword:kg","keyword:by","keyword:kz","keyword:yandex","keyword:avito.","keyword:2gis.","keyword:gismeteo.","keyword:livejournal."]},{"type":"field","outboundTag":"direct","domain":["domain:ru","domain:su","domain:kg","domain:by","domain:kz"]},{"type":"field","outboundTag":"direct","domain":["geosite:category-ru","geosite:category-gov-ru","geosite:yandex","geosite:vk","geosite:whatsapp","geosite:apple","geosite:mailru","geosite:github","geosite:gitlab","geosite:duckduckgo","geosite:google","geosite:wikimedia","geosite:mozilla"]},{"type":"field","outboundTag":"direct","ip":["geoip:private","geoip:ru"]}]
+EOF
+)
+}
+
 database_change() {
     DB_PATH="x-ui.db"
 
@@ -1208,6 +1215,7 @@ UPDATE settings SET value = '/${SUBPATH}/' WHERE LOWER(key) LIKE 'subpath';
 UPDATE settings SET value = '${SUBURI}' WHERE LOWER(key) LIKE 'suburi';
 UPDATE settings SET value = '/${SUBJSONPATH}/' WHERE LOWER(key) LIKE 'subjsonpath';
 UPDATE settings SET value = '${SUBJSONURI}' WHERE LOWER(key) LIKE 'subjsonuri';
+UPDATE settings SET value = '${route}' WHERE LOWER(key) LIKE 'subjsonrules';
 EOF
 }
 
@@ -1224,6 +1232,7 @@ panel_installation() {
     echo ${SECRET_PASSWORD} | gpg --batch --yes --passphrase-fd 0 -d x-ui.gpg > x-ui.db
     echo -e "n" | bash <(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh) > /dev/null 2>&1
 
+    data_initialization
     stream_settings_grpc
     stream_settings_split
     stream_settings_httpu
