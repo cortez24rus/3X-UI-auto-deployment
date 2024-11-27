@@ -223,7 +223,7 @@ start_installation() {
     echo
     reading " $(text 8) " ANSWER_START
     case "${ANSWER_START,,}" in
-        y)  ;;
+        y|"")  ;;
         *)
             error " $(text 9) "
             ;;
