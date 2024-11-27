@@ -426,8 +426,6 @@ data_entry() {
         reading " $(text 35) " AID
         tilda "$(text 10)"
     fi
-    WEBCERTFILE=/etc/letsencrypt/live/${DOMAIN}/fullchain.pem
-    WEBKEYFILE=/etc/letsencrypt/live/${DOMAIN}/privkey.pem
     SUBURI=https://${DOMAIN}/${SUBPATH}/
     SUBJSONURI=https://${DOMAIN}/${SUBJSONPATH}/
 }
@@ -796,8 +794,8 @@ server {
     server_name                 ${DOMAIN} www.${DOMAIN};
 
     # SSL
-    ssl_certificate             ${WEBCERTFILE};
-    ssl_certificate_key         ${WEBKEYFILE};
+    ssl_certificate             /etc/letsencrypt/live/${DOMAIN}/fullchain.pem;
+    ssl_certificate_key         /etc/letsencrypt/live/${DOMAIN}/privkey.pem;
     ssl_trusted_certificate     /etc/letsencrypt/live/${DOMAIN}/chain.pem;
 
     # Diffie-Hellman parameter for DHE ciphersuites
@@ -1112,14 +1110,14 @@ stream_settings_reality() {
     "maxClient": "",
     "maxTimediff": 0,
     "shortIds": [
-      "cd95c9",е
-      "eeed8008",
-      "f2e26eba6c9432cf",
-      "0d6a8b47988f0d",
-      "c1",
-      "1b60e7369779",
-      "7fb9d5f9d8",
-      "6696"
+      "c7c487",
+      "cf",
+      "248c16289e",
+      "ae60608a67d1a367",
+      "21221b811591",
+      "648bc6ab5ba1bc",
+      "73d1",
+      "3028618d"
     ],
     "settings": {
       "publicKey": "${PUBLIC_KEY}",
@@ -1162,8 +1160,8 @@ stream_settings_xtls() {
     "enableSessionResumption": false,
     "certificates": [
       {
-        "certificateFile": "${WEBCERTFILE}",
-        "keyFile": "${WEBKEYFILE}",
+        "certificateFile": "/etc/letsencrypt/live/${DOMAIN}/fullchain.pem",
+        "keyFile": "/etc/letsencrypt/live/${DOMAIN}/privkey.pem",
         "ocspStapling": 3600,
         "oneTimeLoading": false,
         "usage": "encipherment",
@@ -1189,38 +1187,6 @@ EOF
 )
 }
 
-#UPDATE inbounds SET stream_settings = '$stream_settings_mkcp' WHERE LOWER(remark) LIKE '%mkcp%';
-stream_settings_mkcp() {
-    stream_settings_mkcp=$(cat <<EOF
-{
-  "network": "kcp",
-  "security": "none",
-  "externalProxy": [
-    {
-      "forceTls": "same",
-      "dest": "www.${DOMAIN}",
-      "port": 9999,
-      "remark": ""
-    }
-  ],
-  "kcpSettings": {
-    "mtu": 1350,
-    "tti": 20,
-    "uplinkCapacity": 50,
-    "downlinkCapacity": 100,
-    "congestion": false,
-    "readBufferSize": 1,
-    "writeBufferSize": 1,
-    "header": {
-      "type": "srtp"
-    },
-    "seed": "iTsaMjully"
-  }
-}
-EOF
-)
-}
-
 database_change() {
     DB_PATH="x-ui.db"
 
@@ -1228,6 +1194,14 @@ database_change() {
 UPDATE users 
 SET username = '$USERNAME', password = '$PASSWORD' 
 WHERE id = 1;
+
+UPDATE inbounds SET stream_settings = '$stream_settings_grpc' WHERE LOWER(remark) LIKE '%grpc%';
+UPDATE inbounds SET stream_settings = '$stream_settings_split' WHERE LOWER(remark) LIKE '%split%';
+UPDATE inbounds SET stream_settings = '$stream_settings_httpu' WHERE LOWER(remark) LIKE '%httpu%';
+UPDATE inbounds SET stream_settings = '$stream_settings_ws' WHERE LOWER(remark) LIKE '%ws%';
+UPDATE inbounds SET stream_settings = '$stream_settings_steal' WHERE LOWER(remark) LIKE '%steal%';
+UPDATE inbounds SET stream_settings = '$stream_settings_reality' WHERE LOWER(remark) LIKE '%whatsapp%';
+UPDATE inbounds SET stream_settings = '$stream_settings_xtls' WHERE LOWER(remark) LIKE '%xtls%';
 
 UPDATE settings SET value = '/${WEBBASEPATH}/' WHERE LOWER(key) LIKE 'webbasepath';
 UPDATE settings SET value = '/${SUBPATH}/' WHERE LOWER(key) LIKE 'subpath';
@@ -1257,7 +1231,6 @@ panel_installation() {
     stream_settings_steal
     stream_settings_reality
     stream_settings_xtls
-    stream_settings_mkcp
     database_change
 
     x-ui stop
