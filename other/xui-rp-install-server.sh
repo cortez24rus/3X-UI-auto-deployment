@@ -426,9 +426,6 @@ data_entry() {
         reading " $(text 35) " AID
         tilda "$(text 10)"
     fi
-    WEBPORT=$(port_issuance)
-    SUBPORT=$(port_issuance)
-
     WEBCERTFILE=/etc/letsencrypt/live/${DOMAIN}/fullchain.pem
     WEBKEYFILE=/etc/letsencrypt/live/${DOMAIN}/privkey.pem
     SUBURI=https://${DOMAIN}/${SUBPATH}/
@@ -1240,11 +1237,9 @@ UPDATE inbounds SET stream_settings = '$stream_settings_steal' WHERE LOWER(remar
 UPDATE inbounds SET stream_settings = '$stream_settings_reality' WHERE LOWER(remark) LIKE '%whatsapp%';
 UPDATE inbounds SET stream_settings = '$stream_settings_xtls' WHERE LOWER(remark) LIKE '%xtls%';
 
-UPDATE settings SET value = '${WEBPORT}' WHERE LOWER(key) LIKE 'webport';
 UPDATE settings SET value = '/${WEBBASEPATH}/' WHERE LOWER(key) LIKE 'webbasepath';
 UPDATE settings SET value = '${WEBCERTFILE}' WHERE LOWER(key) LIKE 'webcertfile';
 UPDATE settings SET value = '${WEBKEYFILE}' WHERE LOWER(key) LIKE 'webkeyfile';
-UPDATE settings SET value = '${SUBPORT}' WHERE LOWER(key) LIKE 'subport';
 UPDATE settings SET value = '/${SUBPATH}/' WHERE LOWER(key) LIKE 'subpath';
 UPDATE settings SET value = '${WEBCERTFILE}' WHERE LOWER(key) LIKE 'subcertfile';
 UPDATE settings SET value = '${WEBKEYFILE}' WHERE LOWER(key) LIKE 'subkeyfile';
