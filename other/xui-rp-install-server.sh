@@ -1229,11 +1229,6 @@ UPDATE users
 SET username = '$USERNAME', password = '$PASSWORD' 
 WHERE id = 1;
 
-UPDATE inbounds SET stream_settings = '$stream_settings_grpc' WHERE LOWER(remark) LIKE '%grpc%';
-UPDATE inbounds SET stream_settings = '$stream_settings_split' WHERE LOWER(remark) LIKE '%split%';
-UPDATE inbounds SET stream_settings = '$stream_settings_httpu' WHERE LOWER(remark) LIKE '%httpu%';
-UPDATE inbounds SET stream_settings = '$stream_settings_ws' WHERE LOWER(remark) LIKE '%ws%';
-
 UPDATE settings SET value = '/${WEBBASEPATH}/' WHERE LOWER(key) LIKE 'webbasepath';
 UPDATE settings SET value = '/${SUBPATH}/' WHERE LOWER(key) LIKE 'subpath';
 UPDATE settings SET value = '${SUBURI}' WHERE LOWER(key) LIKE 'suburi';
