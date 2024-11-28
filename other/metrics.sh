@@ -74,3 +74,37 @@ sudo systemctl status push_metrics.timer
 
 Проверьте логи, чтобы убедиться, что метрики успешно отправляются в Pushgateway:
 journalctl -u push_metrics.service -f
+
+
+
+
+
+
+
+wget https://github.com/prometheus/pushgateway/releases/download/v1.10.0/pushgateway-1.10.0.linux-amd64.tar.gz
+tar -zxvf pushgateway-1.10.0.linux-amd64.tar.gz
+mv pushgateway-1.10.0.linux-amd64/pushgateway /usr/local/bin/
+
+sudo mkdir -p /var/lib/prometheus/pushgateway
+sudo chown prometheus:prometheus /var/lib/prometheus/pushgateway
+
+sudo nano /etc/systemd/system/pushgateway.service
+[Unit]
+Description=Prometheus Pushgateway
+After=network.target
+
+[Service]
+ExecStart=/usr/local/bin/pushgateway --persistence.file=/var/lib/prometheus/pushgateway/metrics.db
+User=prometheus
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+
+sudo systemctl daemon-reload
+sudo systemctl enable pushgateway
+sudo systemctl start pushgateway
+sudo systemctl status pushgateway
+
+
+
