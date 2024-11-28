@@ -223,7 +223,8 @@ start_installation() {
     echo
     reading " $(text 8) " ANSWER_START
     case "${ANSWER_START,,}" in
-        y|"")  ;;
+        y|"")
+	    ;;
         *)
             error " $(text 9) "
             ;;
@@ -234,15 +235,25 @@ start_installation() {
 crop_domain() {
     local input_value="$1"
     local temp_value
-    # Удаление префиксов и www
-    temp_value=$(echo "$input_value" | sed -e 's|https\?://||' -e 's|^www\.||' -e 's|/.*$||')
-    # Проверка формата домена
+    temp_value=$(echo "$input_value" | sed -e 's|https\?://||' -e 's|/.*$||')
+    
     if ! [[ "$temp_value" =~ ^([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$ ]]; then
         echo "Ошибка: введённый адрес '$temp_value' имеет неверный формат."
         return 1
     fi
-    # Возвращаем обработанный домен
-    echo "$temp_value"
+
+    local multi_level_domains=("co.uk" "com.au" "gov.ru" "edu.ru" "org.uk" "net.uk" "gov.uk" "co.in" "com.br" "org.br")
+    IFS='.' read -r -a domain_parts <<< "$temp_value"
+    local domain_second_level="${domain_parts[-2]}.${domain_parts[-1]}"
+    
+    for tld in "${multi_level_domains[@]}"; do
+        if [[ "$domain_second_level" == "$tld" ]]; then
+            echo "${domain_parts[-3]}.${domain_second_level}"
+            return 0
+        fi
+    done
+
+    echo "$domain_second_level"
     return 0
 }
 
@@ -258,12 +269,13 @@ get_test_response() {
 }
 
 check_cf_token() {
-    while [[ -z $(echo $test_response | grep "\"${testdomain}\"") ]] || [[ -z $(echo $test_response | grep "\"#dns_records:edit\"") ]] || [[ -z $(echo $test_response | grep "\"#dns_records:read\"") ]] || [[ -z $(echo $test_response | grep "\"#zone:read\"") ]]; do
+    while ! echo "$test_response" | grep -qE "\"${testdomain}\"|\"#dns_records:edit\"|\"#dns_records:read\"|\"#zone:read\""; do
         DOMAIN=""
         EMAIL=""
         CFTOKEN=""
         while [[ -z $DOMAIN ]]; do
             reading " $(text 13) " DOMAIN
+	    echo ${DOMAIN}
             echo
         done
 
@@ -314,13 +326,13 @@ validate_path() {
             ADGUARDPATH)
                 reading " $(text 25) " PATH_VALUE
                 ;;
-            WEBBASEPATH)
+            WEB_BASE_PATH)
                 reading " $(text 26) " PATH_VALUE
                 ;;
-            SUBPATH)
+            SUB_PATH)
                 reading " $(text 27) " PATH_VALUE
                 ;;                                
-            SUBJSONPATH)
+            SUB_JSON_PATH)
                 reading " $(text 28) " PATH_VALUE
                 ;;                
         esac
@@ -355,14 +367,14 @@ validate_path() {
         ADGUARDPATH)
             export ADGUARDPATH="$PATH_VALUE"
             ;;
-        WEBBASEPATH)
-            export WEBBASEPATH="$PATH_VALUE"
+        WEB_BASE_PATH)
+            export WEB_BASE_PATH="$PATH_VALUE"
             ;;
-        SUBPATH)
-            export SUBPATH="$PATH_VALUE"
+        SUB_PATH)
+            export SUB_PATH="$PATH_VALUE"
             ;;
-        SUBJSONPATH)
-            export SUBJSONPATH="$PATH_VALUE"
+        SUB_JSON_PATH)
+            export SUB_JSON_PATH="$PATH_VALUE"
             ;;
     esac
 }
@@ -414,20 +426,26 @@ data_entry() {
     validate_path "METRICS"
     tilda "$(text 10)"
     choise_dns
-    validate_path WEBBASEPATH
+    validate_path WEB_BASE_PATH
     echo
-    validate_path SUBPATH
+    validate_path SUB_PATH
     echo    
-    validate_path SUBJSONPATH
+    validate_path SUB_JSON_PATH
     tilda "$(text 10)"
-    if [[ "$1" == "-bot" ]]; then
-        reading " $(text 34) " BOT_TOKEN
-        echo
-        reading " $(text 35) " AID
-        tilda "$(text 10)"
-    fi
-    SUBURI=https://${DOMAIN}/${SUBPATH}/
-    SUBJSONURI=https://${DOMAIN}/${SUBJSONPATH}/
+    reading " $(text 67) " ENABLE_BOT_CHOISE
+    case "${ENABLE_BOT_CHOISE,,}" in
+        y|"")  
+            reading " $(text 34) " BOT_TOKEN
+            echo
+            reading " $(text 35) " AID
+        ;;
+        *)
+            ;;
+    esac
+    tilda "$(text 10)"
+
+    SUB_URI=https://${DOMAIN}/${SUB_PATH}/
+    SUB_JSON_URI=https://${DOMAIN}/${SUB_JSON_PATH}/
 }
 
 ### Обновление системы и установка пакетов ###
@@ -841,7 +859,7 @@ server {
         proxy_set_header X-Forwarded-Proto \$scheme;
     }
     # X-ui Admin panel
-    location /${WEBBASEPATH} {
+    location /${WEB_BASE_PATH} {
         proxy_redirect off;
         proxy_set_header Host \$host;
         proxy_set_header X-Real-IP \$remote_addr;
@@ -849,27 +867,27 @@ server {
         proxy_set_header X-Real-IP \$remote_addr;
         proxy_set_header Range \$http_range;
         proxy_set_header If-Range \$http_if_range;
-        proxy_pass http://127.0.0.1:36075/${WEBBASEPATH};
+        proxy_pass http://127.0.0.1:36075/${WEB_BASE_PATH};
         break;
     }
     # Subscription
-    location /${SUBPATH} {
+    location /${SUB_PATH} {
         if (\$hack = 1) {return 404;}
         proxy_redirect off;
         proxy_set_header Host \$host;
         proxy_set_header X-Real-IP \$remote_addr;
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-        proxy_pass http://127.0.0.1:36074/${SUBPATH};
+        proxy_pass http://127.0.0.1:36074/${SUB_PATH};
         break;
     }
     # Subscription json
-    location /${SUBJSONPATH} {
+    location /${SUB_JSON_PATH} {
         if (\$hack = 1) {return 404;}
         proxy_redirect off;
         proxy_set_header Host \$host;
         proxy_set_header X-Real-IP \$remote_addr;
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-        proxy_pass http://127.0.0.1:36074/${SUBJSONPATH};
+        proxy_pass http://127.0.0.1:36074/${SUB_JSON_PATH};
         break;
     }
     location /${CDNSPLIT} {
@@ -1207,12 +1225,12 @@ UPDATE inbounds SET stream_settings = '$STREAM_SETTINGS_STEAL' WHERE LOWER(remar
 UPDATE inbounds SET stream_settings = '$STREAM_SETTINGS_REALITY' WHERE LOWER(remark) LIKE '%whatsapp%';
 UPDATE inbounds SET stream_settings = '$STREAM_SETTINGS_XTLS' WHERE LOWER(remark) LIKE '%xtls%';
 
-UPDATE settings SET value = '/${WEBBASEPATH}/' WHERE LOWER(key) LIKE 'webbasepath';
-UPDATE settings SET value = '/${SUBPATH}/' WHERE LOWER(key) LIKE 'subpath';
-UPDATE settings SET value = '${SUBURI}' WHERE LOWER(key) LIKE 'suburi';
-UPDATE settings SET value = '/${SUBJSONPATH}/' WHERE LOWER(key) LIKE 'subjsonpath';
-UPDATE settings SET value = '${SUBJSONURI}' WHERE LOWER(key) LIKE 'subjsonuri';
-UPDATE settings SET value = '${SUB_JSON_RULES}' WHERE LOWER(key) LIKE 'subjsonrules';
+UPDATE settings SET value = '/${WEB_BASE_PATH}/' WHERE LOWER(key) LIKE '%webbasepath%';
+UPDATE settings SET value = '/${SUB_PATH}/' WHERE LOWER(key) LIKE '%subpath%';
+UPDATE settings SET value = '${SUB_URI}' WHERE LOWER(key) LIKE '%suburi%';
+UPDATE settings SET value = '/${SUB_JSON_PATH}/' WHERE LOWER(key) LIKE '%subjsonpath%';
+UPDATE settings SET value = '${SUB_JSON_URI}' WHERE LOWER(key) LIKE '%subjsonuri%';
+UPDATE settings SET value = '${SUB_JSON_RULES}' WHERE LOWER(key) LIKE '%subjsonrules%';
 EOF
 }
 
@@ -1365,8 +1383,8 @@ data_output() {
     info " $(text 58) "
     printf '0\n' | x-ui | grep --color=never -i ':'
     echo
-    out_data " $(text 59) " "https://${DOMAIN}/${WEBBASEPATH}/"
-    out_data " $(text 60) " "${SUBURI}cortez"
+    out_data " $(text 59) " "https://${DOMAIN}/${WEB_BASE_PATH}/"
+    out_data " $(text 60) " "${SUB_URI}cortez"
     if [[ $choise = "1" ]]; then
         out_data " $(text 61) " "https://${DOMAIN}/${ADGUARDPATH}/login.html"
         
