@@ -921,9 +921,8 @@ generate_keys() {
     echo "$PRIVATE_KEY $PUBLIC_KEY"
 }
 
-### Изменение базы данных ###
-stream_settings_grpc() {
-    stream_settings_grpc=$(cat <<EOF
+settings_grpc() {
+    STREAM_SETTINGS_GRPC=$(cat <<EOF
 {
   "network": "grpc",
   "security": "none",
@@ -945,8 +944,8 @@ EOF
 )
 }
 
-stream_settings_split() {
-    stream_settings_split=$(cat <<EOF
+settings_split() {
+    STREAM_SETTINGS_SPLIT=$(cat <<EOF
 {
   "network": "splithttp",
   "security": "none",
@@ -981,8 +980,8 @@ EOF
 )
 }
 
-stream_settings_httpu() {
-    stream_settings_httpu=$(cat <<EOF
+settings_httpu() {
+    STREAM_SETTINGS_HTTPU=$(cat <<EOF
 {
   "network": "httpupgrade",
   "security": "none",
@@ -1005,8 +1004,8 @@ EOF
 )
 }
 
-stream_settings_ws() {
-    stream_settings_ws=$(cat <<EOF
+settings_ws() {
+    STREAM_SETTINGS_WS=$(cat <<EOF
 {
   "network": "ws",
   "security": "none",
@@ -1029,10 +1028,9 @@ EOF
 )
 }
 
-stream_settings_steal() {
-    read PRIVATE_KEY PUBLIC_KEY <<< "$(generate_keys)"
-
-    stream_settings_steal=$(cat <<EOF
+settings_steal() {
+    read PRIVATE_KEY0 PUBLIC_KEY0 <<< "$(generate_keys)"
+    STREAM_SETTINGS_STEAL=$(cat <<EOF
 {
   "network": "tcp",
   "security": "reality",
@@ -1051,7 +1049,7 @@ stream_settings_steal() {
     "serverNames": [
       "${DOMAIN}"
     ],
-    "privateKey": "${PRIVATE_KEY}",
+    "privateKey": "${PRIVATE_KEY0}",
     "minClient": "",
     "maxClient": "",
     "maxTimediff": 0,
@@ -1066,7 +1064,7 @@ stream_settings_steal() {
       "bc85"
     ],
     "settings": {
-      "publicKey": "${PUBLIC_KEY}",
+      "publicKey": "${PUBLIC_KEY0}",
       "fingerprint": "random",
       "serverName": "",
       "spiderX": "/"
@@ -1083,10 +1081,9 @@ EOF
 )
 }
 
-stream_settings_reality() {
-    read PRIVATE_KEY PUBLIC_KEY <<< "$(generate_keys)"
-
-    stream_settings_reality=$(cat <<EOF
+settings_reality() {
+    read PRIVATE_KEY1 PUBLIC_KEY1 <<< "$(generate_keys)"
+    STREAM_SETTINGS_REALITY=$(cat <<EOF
 {
   "network": "tcp",
   "security": "reality",
@@ -1105,7 +1102,7 @@ stream_settings_reality() {
     "serverNames": [
       "${REALITY}"
     ],
-    "privateKey": "${PRIVATE_KEY}",
+    "privateKey": "${PRIVATE_KEY1}",
     "minClient": "",
     "maxClient": "",
     "maxTimediff": 0,
@@ -1120,7 +1117,7 @@ stream_settings_reality() {
       "3028618d"
     ],
     "settings": {
-      "publicKey": "${PUBLIC_KEY}",
+      "publicKey": "${PUBLIC_KEY1}",
       "fingerprint": "random",
       "serverName": "",
       "spiderX": "/"
@@ -1137,8 +1134,8 @@ EOF
 )
 }
 
-stream_settings_xtls() {
-    stream_settings_xtls=$(cat <<EOF
+settings_xtls() {
+    STREAM_SETTINGS_XTLS=$(cat <<EOF
 {
   "network": "tcp",
   "security": "tls",
@@ -1187,8 +1184,8 @@ EOF
 )
 }
 
-data_initialization() {
-    route=$(cat <<EOF
+json_rules() {
+    SUB_JSON_RULES=$(cat <<EOF
 [{"type":"field","outboundTag":"direct","domain":["keyword:xn--","keyword:ru","keyword:su","keyword:kg","keyword:by","keyword:kz","keyword:yandex","keyword:avito.","keyword:2gis.","keyword:gismeteo.","keyword:livejournal."]},{"type":"field","outboundTag":"direct","domain":["domain:ru","domain:su","domain:kg","domain:by","domain:kz"]},{"type":"field","outboundTag":"direct","domain":["geosite:category-ru","geosite:category-gov-ru","geosite:yandex","geosite:vk","geosite:whatsapp","geosite:apple","geosite:mailru","geosite:github","geosite:gitlab","geosite:duckduckgo","geosite:google","geosite:wikimedia","geosite:mozilla"]},{"type":"field","outboundTag":"direct","ip":["geoip:private","geoip:ru"]}]
 EOF
 )
@@ -1202,20 +1199,20 @@ UPDATE users
 SET username = '$USERNAME', password = '$PASSWORD' 
 WHERE id = 1;
 
-UPDATE inbounds SET stream_settings = '$stream_settings_grpc' WHERE LOWER(remark) LIKE '%grpc%';
-UPDATE inbounds SET stream_settings = '$stream_settings_split' WHERE LOWER(remark) LIKE '%split%';
-UPDATE inbounds SET stream_settings = '$stream_settings_httpu' WHERE LOWER(remark) LIKE '%httpu%';
-UPDATE inbounds SET stream_settings = '$stream_settings_ws' WHERE LOWER(remark) LIKE '%ws%';
-UPDATE inbounds SET stream_settings = '$stream_settings_steal' WHERE LOWER(remark) LIKE '%steal%';
-UPDATE inbounds SET stream_settings = '$stream_settings_reality' WHERE LOWER(remark) LIKE '%whatsapp%';
-UPDATE inbounds SET stream_settings = '$stream_settings_xtls' WHERE LOWER(remark) LIKE '%xtls%';
+UPDATE inbounds SET stream_settings = '$STREAM_SETTINGS_GRPC' WHERE LOWER(remark) LIKE '%grpc%';
+UPDATE inbounds SET stream_settings = '$STREAM_SETTINGS_SPLIT' WHERE LOWER(remark) LIKE '%split%';
+UPDATE inbounds SET stream_settings = '$STREAM_SETTINGS_HTTPU' WHERE LOWER(remark) LIKE '%httpu%';
+UPDATE inbounds SET stream_settings = '$STREAM_SETTINGS_WS' WHERE LOWER(remark) LIKE '%ws%';
+UPDATE inbounds SET stream_settings = '$STREAM_SETTINGS_STEAL' WHERE LOWER(remark) LIKE '%steal%';
+UPDATE inbounds SET stream_settings = '$STREAM_SETTINGS_REALITY' WHERE LOWER(remark) LIKE '%whatsapp%';
+UPDATE inbounds SET stream_settings = '$STREAM_SETTINGS_XTLS' WHERE LOWER(remark) LIKE '%xtls%';
 
 UPDATE settings SET value = '/${WEBBASEPATH}/' WHERE LOWER(key) LIKE 'webbasepath';
 UPDATE settings SET value = '/${SUBPATH}/' WHERE LOWER(key) LIKE 'subpath';
 UPDATE settings SET value = '${SUBURI}' WHERE LOWER(key) LIKE 'suburi';
 UPDATE settings SET value = '/${SUBJSONPATH}/' WHERE LOWER(key) LIKE 'subjsonpath';
 UPDATE settings SET value = '${SUBJSONURI}' WHERE LOWER(key) LIKE 'subjsonuri';
-UPDATE settings SET value = '${route}' WHERE LOWER(key) LIKE 'subjsonrules';
+UPDATE settings SET value = '${SUB_JSON_RULES}' WHERE LOWER(key) LIKE 'subjsonrules';
 EOF
 }
 
@@ -1232,14 +1229,14 @@ panel_installation() {
     echo ${SECRET_PASSWORD} | gpg --batch --yes --passphrase-fd 0 -d x-ui.gpg > x-ui.db
     echo -e "n" | bash <(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh) > /dev/null 2>&1
 
-    data_initialization
-    stream_settings_grpc
-    stream_settings_split
-    stream_settings_httpu
-    stream_settings_ws
-    stream_settings_steal
-    stream_settings_reality
-    stream_settings_xtls
+    settings_grpc
+    settings_split
+    settings_httpu
+    settings_ws
+    settings_steal
+    settings_reality
+    settings_xtls
+    json_rules
     database_change
 
     x-ui stop
