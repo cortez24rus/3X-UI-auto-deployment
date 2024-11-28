@@ -9,16 +9,14 @@ systemd — для управления периодическим запуск�
 
 Для Debian/Ubuntu:
 
-bash
-Копировать код
+
 sudo apt update
 sudo apt install prometheus-node-exporter
 Установите Pushgateway:
 
 Для Debian/Ubuntu:
 
-bash
-Копировать код
+
 sudo apt install prometheus-pushgateway
 Или можно скачать и запустить последнюю версию с официального сайта Prometheus.
 
@@ -27,13 +25,11 @@ sudo apt install prometheus-pushgateway
 
 Откройте редактор и создайте скрипт:
 
-bash
-Копировать код
+
 sudo nano /usr/local/bin/push_metrics.sh
 Вставьте следующий код в скрипт:
 
-bash
-Копировать код
+
 #!/bin/bash
 
 # Сбор метрик (например, с node_exporter)
@@ -43,14 +39,12 @@ curl -s http://localhost:9100/metrics > /tmp/node_metrics.txt
 curl -X POST --data @/tmp/node_metrics.txt http://localhost:9091/metrics/job/node_exporter
 Сделайте скрипт исполнимым:
 
-bash
-Копировать код
+
 sudo chmod +x /usr/local/bin/push_metrics.sh
 4. Создание юнита systemd для скрипта
 Создайте файл юнита для systemd, чтобы запускать скрипт.
 
-bash
-Копировать код
+
 sudo nano /etc/systemd/system/push_metrics.service
 Вставьте следующее содержимое:
 
@@ -72,16 +66,14 @@ LimitNOFILE=4096
 WantedBy=multi-user.target
 Перезагрузите systemd, чтобы применить изменения:
 
-bash
-Копировать код
+
 sudo systemctl daemon-reload
 5. Настройка таймера systemd для запуска каждые 10 секунд
 Создайте таймер для запуска скрипта каждые 10 секунд.
 
 Создайте файл таймера:
 
-bash
-Копировать код
+
 sudo nano /etc/systemd/system/push_metrics.timer
 Вставьте следующее содержимое:
 
@@ -98,22 +90,19 @@ OnUnitActiveSec=10sec
 Unit=push_metrics.service
 Перезагрузите systemd и активируйте таймер:
 
-bash
-Копировать код
+
 sudo systemctl daemon-reload
 sudo systemctl enable push_metrics.timer
 sudo systemctl start push_metrics.timer
 6. Проверка работы
 Проверьте, что сервис и таймер работают корректно:
 
-bash
-Копировать код
+
 sudo systemctl status push_metrics.service
 sudo systemctl status push_metrics.timer
 Проверьте логи, чтобы убедиться, что метрики успешно отправляются в Pushgateway:
 
-bash
-Копировать код
+
 journalctl -u push_metrics.service -f
 7. Резюме
 Теперь у вас настроен скрипт, который каждые 10 секунд будет собирать метрики с node_exporter и отправлять их в Pushgateway. Мы настроили его с использованием systemd и systemd.timer, чтобы запускать скрипт каждые 10 секунд.
@@ -131,6 +120,8 @@ scrape_configs:
     honor_labels: true
     static_configs:
       - targets: ['localhost:9091']  # Адрес вашего Pushgateway
-
+    basic_auth:
+      username: "yourusername"  # Имя пользователя для базовой аутентификации
+      password: "yourpassword"  # Пароль для базовой аутентификации
 
 
