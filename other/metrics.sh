@@ -122,3 +122,15 @@ journalctl -u push_metrics.service -f
 
 
 
+global:
+  scrape_interval: 15s  # Интервал опроса метрик
+
+scrape_configs:
+  # Сбор метрик с Pushgateway
+  - job_name: 'pushgateway'
+    honor_labels: true
+    static_configs:
+      - targets: ['localhost:9091']  # Адрес вашего Pushgateway
+
+
+
