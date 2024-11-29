@@ -1,9 +1,21 @@
 #!/bin/bash
 
 history_file="/var/log/apt/history.log"
-last_upgrade_date=$(grep "Start-Date:" $history_file | head -n 1 | awk '{print $2, $3, $4}')
-last_upgrade_timestamp=$(date -d "$last_upgrade_date" +%s)
+# Извлекаем последнюю дату обновления
+last_upgrade_date=$(grep "Start-Date:" $history_file | tail -n 1 | awk '{print $2, $3}')
+last_upgrade_time=$(grep "Start-Date:" $history_file | tail -n 1 | awk '{print $4}')
+
+# Преобразуем дату и время в timestamp
+last_upgrade_timestamp=$(date -d "${last_upgrade_date} ${last_upgrade_time}" +%s 2>/dev/null)
+if [ -z "$last_upgrade_timestamp" ]; then
+    echo "Не удалось извлечь дату последнего обновления."
+    exit 1
+fi
+
+# Текущая дата в timestamp
 current_timestamp=$(date +%s)
+
+# Разница в днях
 days_diff=$(( (current_timestamp - last_upgrade_timestamp) / 86400 ))
 
 if [ $days_diff -le 3 ]; then
