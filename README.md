@@ -3,7 +3,7 @@
 
 -----
 
-### Proxy using VLESS-TCP-XTLS-Vision and VLESS-TCP-REALITY (Steal from yourself) behind reverse-proxy NGINX
+### Proxy using VLESS-TCP-XTLS-Vision and VLESS-TCP-REALITY (Steal oneself) behind reverse-proxy NGINX
 This script is designed to quickly and easily set up a hidden proxy server, with masking via NGINX. In this variant, all incoming requests are handled by NGINX, and the server acts as a proxy server only if the request contains the correct path (URI). This increases security and helps to hide the true purpose of the server.
 
 > [!IMPORTANT]
@@ -33,7 +33,7 @@ This script is designed to quickly and easily set up a hidden proxy server, with
 ### Includes:
   
 1. Xray server configuration with 3X-UI:
-   - VLESS-TCP-XTLS-Vision и VLESS-TCP-REALITY (Steal from yourself).
+   - VLESS-TCP-XTLS-Vision и VLESS-TCP-REALITY (Steal oneself).
    - Connection of subscription and JSON subscription for automatic configuration updates.
 2. Configuring NGINX reverse proxy on port 443.
 3. providing security:
@@ -54,13 +54,6 @@ This script is designed to quickly and easily set up a hidden proxy server, with
 To begin configuring the server, simply run the following command in a terminal:
 ```sh
 bash <(curl -Ls https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/main/xui-rp-install-server.sh)
-```
-
-### Installing the bot:
-
-To install the bot on the server, just run the base script with the -bot flag:
-```sh
-bash <(https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/main/xui-rp-install-server.sh) -bot
 ```
 
 ### Selecting and installing a random template for the website:
