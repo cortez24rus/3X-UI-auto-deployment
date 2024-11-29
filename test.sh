@@ -411,20 +411,20 @@ data_entry() {
     tilda "$(text 10)"
     check_cf_token
     tilda "$(text 10)"
-    reading " $(text 70) " SECRET_PASSWORD
-    tilda "$(text 10)"
-    reading " $(text 19) " REALITY
-    tilda "$(text 10)"
-    validate_path "CDNGRPC"
-    echo
-    validate_path "CDNSPLIT"
-    echo
-    validate_path "CDNHTTPU"
-    echo
-    validate_path "CDNWS"
-    echo
-    validate_path "METRICS"
-    tilda "$(text 10)"
+#    reading " $(text 70) " SECRET_PASSWORD
+#    tilda "$(text 10)"
+#    reading " $(text 19) " REALITY
+#    tilda "$(text 10)"
+#    validate_path "CDNGRPC"
+#    echo
+#    validate_path "CDNSPLIT"
+#    echo
+#    validate_path "CDNHTTPU"
+#    echo
+#    validate_path "CDNWS"
+#    echo
+#    validate_path "METRICS"
+#    tilda "$(text 10)"
     choise_dns
     validate_path WEB_BASE_PATH
     echo
@@ -606,7 +606,7 @@ enable_bbr() {
     if [[ ! "$(sysctl net.core.default_qdisc)" == *"= fq" ]]; then
         echo "net.core.default_qdisc = fq" >> /etc/sysctl.conf
     fi
-
+    
     if [[ ! "$(sysctl net.ipv4.tcp_congestion_control)" == *"bbr" ]]; then
         echo "net.ipv4.tcp_congestion_control = bbr" >> /etc/sysctl.conf
     fi
@@ -626,7 +626,7 @@ disable_ipv6() {
     if [[ ! "$(sysctl net.ipv6.conf.lo.disable_ipv6)" == *"= 1" ]]; then
         echo "net.ipv6.conf.lo.disable_ipv6 = 1" >> /etc/sysctl.conf
     fi
-
+    
     if [[ ! "$(sysctl net.ipv6.conf.$interface_name.disable_ipv6)" == *"= 1" ]]; then
         echo "net.ipv6.conf.$interface_name.disable_ipv6 = 1" >> /etc/sysctl.conf
     fi
@@ -680,19 +680,13 @@ issuance_of_certificates() {
     tilda "$(text 10)"
 }
 
-monitoring() {
-    info " $(text 66) "
-    bash <(curl -Ls https://github.com/cortez24rus/grafana-prometheus/raw/refs/heads/main/prometheus_node_exporter.sh)
-    tilda "$(text 10)"
-}
-
 ### NGINX ###
 nginx_setup() {
     info " $(text 45) "
     mkdir -p /etc/nginx/stream-enabled/
     rm -rf /etc/nginx/conf.d/default.conf
     touch /etc/nginx/.htpasswd
-    htpasswd -nb "$USERNAME" "$PASSWORD" > /etc/nginx/.htpasswd
+#    htpasswd -nb "$USERNAME" "$PASSWORD" > /etc/nginx/.htpasswd
 
     nginx_conf
     stream_conf
@@ -841,15 +835,6 @@ server {
 #        auth_basic "Restricted Content";
 #        auth_basic_user_file /etc/nginx/.htpasswd;
 #    }
-    location /${METRICS} {
-        auth_basic "Restricted Content";
-        auth_basic_user_file /etc/nginx/.htpasswd;
-        proxy_pass http://127.0.0.1:9100/metrics;
-        proxy_set_header Host \$host;
-        proxy_set_header X-Real-IP \$remote_addr;
-        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto \$scheme;
-    }
     # X-ui Admin panel
     location /${WEB_BASE_PATH} {
         proxy_redirect off;
@@ -931,113 +916,6 @@ generate_keys() {
     echo "$PRIVATE_KEY $PUBLIC_KEY"
 }
 
-settings_grpc() {
-    STREAM_SETTINGS_GRPC=$(cat <<EOF
-{
-  "network": "grpc",
-  "security": "none",
-  "externalProxy": [
-    {
-      "forceTls": "tls",
-      "dest": "${DOMAIN}",
-      "port": 443,
-      "remark": ""
-    }
-  ],
-  "grpcSettings": {
-    "serviceName": "/2053/${CDNGRPC}",
-    "authority": "${DOMAIN}",
-    "multiMode": false
-  }
-}
-EOF
-    )
-}
-
-settings_split() {
-    STREAM_SETTINGS_SPLIT=$(cat <<EOF
-{
-  "network": "splithttp",
-  "security": "none",
-  "externalProxy": [
-    {
-      "forceTls": "tls",
-      "dest": "${DOMAIN}",
-      "port": 443,
-      "remark": ""
-    }
-  ],
-  "splithttpSettings": {
-    "path": "${CDNSPLIT}",
-    "host": "",
-    "headers": {},
-    "scMaxConcurrentPosts": "100-200",
-    "scMaxEachPostBytes": "1000000-2000000",
-    "scMinPostsIntervalMs": "10-50",
-    "noSSEHeader": false,
-    "xPaddingBytes": "100-1000",
-    "xmux": {
-      "maxConcurrency": "16-32",
-      "maxConnections": 0,
-      "cMaxReuseTimes": "64-128",
-      "cMaxLifetimeMs": 0
-    },
-    "mode": "auto",
-    "noGRPCHeader": false
-  }
-}
-EOF
-    )
-}
-
-settings_httpu() {
-    STREAM_SETTINGS_HTTPU=$(cat <<EOF
-{
-  "network": "httpupgrade",
-  "security": "none",
-  "externalProxy": [
-    {
-      "forceTls": "tls",
-      "dest": "${DOMAIN}",
-      "port": 443,
-      "remark": ""
-    }
-  ],
-    "httpupgradeSettings": {
-    "acceptProxyProtocol": false,
-    "path": "/2073/${CDNHTTPU}",
-    "host": "${DOMAIN}",
-    "headers": {}
-  }
-}
-EOF
-    )
-}
-
-settings_ws() {
-    STREAM_SETTINGS_WS=$(cat <<EOF
-{
-  "network": "ws",
-  "security": "none",
-  "externalProxy": [
-    {
-      "forceTls": "tls",
-      "dest": "${DOMAIN}",
-      "port": 443,
-      "remark": ""
-    }
-  ],
-  "wsSettings": {
-    "acceptProxyProtocol": false,
-    "path": "/2083/${CDNWS}",
-    "host": "${DOMAIN}",
-    "headers": {}
-  }
-}
-EOF
-    )
-}
-
 settings_steal() {
     read PRIVATE_KEY0 PUBLIC_KEY0 <<< "$(generate_keys)"
     STREAM_SETTINGS_STEAL=$(cat <<EOF
@@ -1075,59 +953,6 @@ settings_steal() {
     ],
     "settings": {
       "publicKey": "${PUBLIC_KEY0}",
-      "fingerprint": "random",
-      "serverName": "",
-      "spiderX": "/"
-    }
-  },
-  "tcpSettings": {
-    "acceptProxyProtocol": true,
-    "header": {
-      "type": "none"
-    }
-  }
-}
-EOF
-    )
-}
-
-settings_reality() {
-    read PRIVATE_KEY1 PUBLIC_KEY1 <<< "$(generate_keys)"
-    STREAM_SETTINGS_REALITY=$(cat <<EOF
-{
-  "network": "tcp",
-  "security": "reality",
-  "externalProxy": [
-    {
-      "forceTls": "same",
-      "dest": "www.${DOMAIN}",
-      "port": 443,
-      "remark": ""
-    }
-  ],
-  "realitySettings": {
-    "show": false,
-    "xver": 0,
-    "dest": "${REALITY}:443",
-    "serverNames": [
-      "${REALITY}"
-    ],
-    "privateKey": "${PRIVATE_KEY1}",
-    "minClient": "",
-    "maxClient": "",
-    "maxTimediff": 0,
-    "shortIds": [
-      "c7c487",
-      "cf",
-      "248c16289e",
-      "ae60608a67d1a367",
-      "21221b811591",
-      "648bc6ab5ba1bc",
-      "73d1",
-      "3028618d"
-    ],
-    "settings": {
-      "publicKey": "${PUBLIC_KEY1}",
       "fingerprint": "random",
       "serverName": "",
       "spiderX": "/"
@@ -1209,12 +1034,7 @@ UPDATE users
 SET username = '$USERNAME', password = '$PASSWORD' 
 WHERE id = 1;
 
-UPDATE inbounds SET stream_settings = '$STREAM_SETTINGS_GRPC' WHERE LOWER(remark) LIKE '%grpc%';
-UPDATE inbounds SET stream_settings = '$STREAM_SETTINGS_SPLIT' WHERE LOWER(remark) LIKE '%split%';
-UPDATE inbounds SET stream_settings = '$STREAM_SETTINGS_HTTPU' WHERE LOWER(remark) LIKE '%httpu%';
-UPDATE inbounds SET stream_settings = '$STREAM_SETTINGS_WS' WHERE LOWER(remark) LIKE '%ws%';
 UPDATE inbounds SET stream_settings = '$STREAM_SETTINGS_STEAL' WHERE LOWER(remark) LIKE '%steal%';
-UPDATE inbounds SET stream_settings = '$STREAM_SETTINGS_REALITY' WHERE LOWER(remark) LIKE '%whatsapp%';
 UPDATE inbounds SET stream_settings = '$STREAM_SETTINGS_XTLS' WHERE LOWER(remark) LIKE '%xtls%';
 
 UPDATE settings SET value = '/${WEB_BASE_PATH}/' WHERE LOWER(key) LIKE '%webbasepath%';
@@ -1231,27 +1051,20 @@ panel_installation() {
     info " $(text 46) "
     touch /usr/local/xui-rp/reinstallation_check
 
-    while ! wget -q --progress=dot:mega --timeout=30 --tries=10 --retry-connrefused https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/main/other/x-ui.gpg; do
+    while ! wget -q --progress=dot:mega --timeout=30 --tries=10 --retry-connrefused https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/main/database/x-ui.db; do
         warning " $(text 38) "
         sleep 3
     done
     
-    echo ${SECRET_PASSWORD} | gpg --batch --yes --passphrase-fd 0 -d x-ui.gpg > x-ui.db
     echo -e "n" | bash <(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh) > /dev/null 2>&1
 
-    settings_grpc
-    settings_split
-    settings_httpu
-    settings_ws
     settings_steal
-    settings_reality
     settings_xtls
     json_rules
     database_change
 
     x-ui stop
     
-    rm -rf x-ui.gpg
     rm -rf /etc/x-ui/x-ui.db.backup
     [ -f /etc/x-ui/x-ui.db ] && mv /etc/x-ui/x-ui.db /etc/x-ui/x-ui.db.backup
     mv x-ui.db /etc/x-ui/
@@ -1265,7 +1078,6 @@ panel_installation() {
 enabling_security() {
     info " $(text 47) "
     ufw --force reset
-    ufw allow 36079/tcp
     ufw allow 443/tcp
     ufw allow 22/tcp
     ufw insert 1 deny from $(echo ${IP4} | cut -d '.' -f 1-3).0/22
@@ -1305,8 +1117,6 @@ ssh_setup() {
         done
         # Если ключ найден, продолжаем настройку SSH
         sed -i -e "
-            s/#Port/Port/g;
-            s/Port 22/Port 36079/g;
             s/#PermitRootLogin/PermitRootLogin/g;
             s/PermitRootLogin yes/PermitRootLogin prohibit-password/g;
             s/#PubkeyAuthentication/PubkeyAuthentication/g;
@@ -1379,14 +1189,14 @@ data_output() {
     info " $(text 58) "
     printf '0\n' | x-ui | grep --color=never -i ':'
     echo
-    out_data " $(text 59) " "https://${DOMAIN}/${WEB_BASE_PATH}/"
-    out_data " $(text 60) " "${SUB_URI}user"
+    out_data " $(text 59) " "https://${DOMAIN}/${WEBBASEPATH}/"
+    out_data " $(text 60) " "${SUBURI}user"
     if [[ $CHOISE_DNS = "2" ]]; then
         out_data " $(text 61) " "https://${DOMAIN}/${ADGUARDPATH}/login.html"
         
     fi
     echo
-    out_data " $(text 62) " "ssh -p 36079 ${USERNAME}@${IP4}"
+    out_data " $(text 62) " "ssh -p 22 ${USERNAME}@${IP4}"
     echo
     out_data " $(text 63) " "$USERNAME"
     out_data " $(text 64) " "$PASSWORD"
