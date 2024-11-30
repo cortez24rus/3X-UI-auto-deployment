@@ -645,18 +645,20 @@ warp() {
 issuance_of_certificates() {
     info " $(text 44) "
     touch cloudflare.credentials
+    CF_CREDENTIALS_PATH="/root/cloudflare.credentials"
     chown root:root cloudflare.credentials
     chmod 600 cloudflare.credentials
-    
+
     if [[ "$CFTOKEN" =~ [A-Z] ]]; then
-        echo "dns_cloudflare_api_token = ${CFTOKEN}" >> /root/cloudflare.credentials
+        echo "dns_cloudflare_api_token = ${CFTOKEN}" >> ${CF_CREDENTIALS_PATH}
     else
-        echo "dns_cloudflare_email = ${EMAIL}" >> /root/cloudflare.credentials
-        echo "dns_cloudflare_api_key = ${CFTOKEN}" >> /root/cloudflare.credentials
+        echo "dns_cloudflare_email = ${EMAIL}" >> ${CF_CREDENTIALS_PATH}
+        echo "dns_cloudflare_api_key = ${CFTOKEN}" >> ${CF_CREDENTIALS_PATH}
     fi
-    
+
     while true; do
         certbot certonly --dns-cloudflare --dns-cloudflare-credentials ${CF_CREDENTIALS_PATH} --dns-cloudflare-propagation-seconds 30 --rsa-key-size 4096 -d ${DOMAIN},*.${DOMAIN} --agree-tos -m ${EMAIL} --no-eff-email --non-interactive
+
         if [ $? -eq 0 ]; then
             break
         else
@@ -668,11 +670,11 @@ issuance_of_certificates() {
 
     nginx_or_haproxy=1
     if [[ "${nginx_or_haproxy}" == "1" ]]; then
-        echo "renew_hook = systemctl reload nginx" >> /etc/letsencrypt/renewal/${domain}.conf
+        echo "renew_hook = systemctl reload nginx" >> /etc/letsencrypt/renewal/${DOMAIN}.conf
         echo ""
         openssl dhparam -out /etc/nginx/dhparam.pem 2048
     else
-        echo "renew_hook = cat /etc/letsencrypt/live/${domain}/fullchain.pem /etc/letsencrypt/live/${domain}/privkey.pem > /etc/haproxy/certs/${domain}.pem && systemctl restart haproxy" >> /etc/letsencrypt/renewal/${domain}.conf
+        echo "renew_hook = cat /etc/letsencrypt/live/${DOMAIN}/fullchain.pem /etc/letsencrypt/live/${DOMAIN}/privkey.pem > /etc/haproxy/certs/${DOMAIN}.pem && systemctl restart haproxy" >> /etc/letsencrypt/renewal/${DOMAIN}.conf
         echo ""
         openssl dhparam -out /etc/haproxy/dhparam.pem 2048
     fi
