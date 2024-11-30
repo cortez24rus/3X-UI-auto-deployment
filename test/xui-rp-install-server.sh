@@ -1191,8 +1191,8 @@ data_output() {
     info " $(text 58) "
     printf '0\n' | x-ui | grep --color=never -i ':'
     echo
-    out_data " $(text 59) " "https://${DOMAIN}/${WEBBASEPATH}/"
-    out_data " $(text 60) " "${SUBURI}user"
+    out_data " $(text 59) " "https://${DOMAIN}/${WEB_BASE_PATH}/"
+    out_data " $(text 60) " "${SUB_URI}user"
     if [[ $CHOISE_DNS = "2" ]]; then
         out_data " $(text 61) " "https://${DOMAIN}/${ADGUARDPATH}/login.html"
         
