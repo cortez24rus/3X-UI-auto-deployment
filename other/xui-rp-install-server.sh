@@ -721,9 +721,9 @@ events {
 }
 
 http {
-    log_format proxy '\$proxy_protocol_addr [\$time_local] '
-                        '"\$request" \$status \$body_bytes_sent '
-                        '"\$http_referer" "\$http_user_agent"';
+    log_format proxy '$time_local | $http_x_forwarded_for | $proxy_protocol_addr | '
+                     '$request_method $status | $http_user_agent | '
+                     '$http_referer | $cleaned_request_uri'
     access_log                    /var/log/nginx/access.log proxy;
     sendfile                      on;
     tcp_nopush                    on;
