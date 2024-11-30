@@ -762,7 +762,7 @@ stream_conf() {
 map \$ssl_preread_server_name \$backend {
     ${DOMAIN}                   web;
     www.${DOMAIN}               xtls;
-    ${REALITY}                  reality;
+#    reality_domain              reality;
     default                     block;
 }
 upstream block {
@@ -771,9 +771,9 @@ upstream block {
 upstream web {
     server 127.0.0.1:7443;
 }
-upstream reality {
-    server 127.0.0.1:8443;
-}
+#upstream reality {
+#    server 127.0.0.1:8443;
+#}
 upstream xtls {
     server 127.0.0.1:9443;
 }
