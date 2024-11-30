@@ -670,11 +670,11 @@ issuance_of_certificates() {
 
     nginx_or_haproxy=1
     if [[ "${nginx_or_haproxy}" == "1" ]]; then
-        echo "renew_hook = systemctl reload nginx" >> /etc/letsencrypt/renewal/${domain}.conf
+        echo "renew_hook = systemctl reload nginx" >> /etc/letsencrypt/renewal/${DOMAIN}.conf
         echo ""
         openssl dhparam -out /etc/nginx/dhparam.pem 2048
     else
-        echo "renew_hook = cat /etc/letsencrypt/live/${domain}/fullchain.pem /etc/letsencrypt/live/${domain}/privkey.pem > /etc/haproxy/certs/${domain}.pem && systemctl restart haproxy" >> /etc/letsencrypt/renewal/${domain}.conf
+        echo "renew_hook = cat /etc/letsencrypt/live/${DOMAIN}/fullchain.pem /etc/letsencrypt/live/${DOMAIN}/privkey.pem > /etc/haproxy/certs/${DOMAIN}.pem && systemctl restart haproxy" >> /etc/letsencrypt/renewal/${DOMAIN}.conf
         echo ""
         openssl dhparam -out /etc/haproxy/dhparam.pem 2048
     fi
