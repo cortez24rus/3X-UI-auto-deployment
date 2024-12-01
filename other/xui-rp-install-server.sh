@@ -721,10 +721,25 @@ events {
 }
 
 http {
-    log_format proxy '$time_local | $http_x_forwarded_for | $proxy_protocol_addr | '
-                     '$request_method $status | $http_user_agent | '
-                     '$http_referer | $cleaned_request_uri'
-    access_log                    /var/log/nginx/access.log proxy;
+    map \$request_uri \$cleaned_request_uri {
+        default \$request_uri;
+        "~^(.*?)(\?x_padding=[^ ]*)$" $1;
+    }
+    log_format json_analytics escape=json '{'
+        '$time_local, '
+        '$http_x_forwarded_for, '
+        '$proxy_protocol_addr, '
+        '$request_method '
+        '$status, '
+        '$http_user_agent, '
+        '$cleaned_request_uri, '
+        '$http_referer, '
+        '$geoip_country_code'
+        '}';
+    set_real_ip_from              127.0.0.1;
+    real_ip_header                X-Forwarded-For;
+    real_ip_recursive             on;
+    access_log                    /var/log/nginx/access.log json_analytics;
     sendfile                      on;
     tcp_nopush                    on;
     tcp_nodelay                   on;
@@ -762,7 +777,7 @@ stream_conf() {
 map \$ssl_preread_server_name \$backend {
     ${DOMAIN}                   web;
     www.${DOMAIN}               xtls;
-#    reality_domain              reality;
+    reality_domain              reality;
     default                     block;
 }
 upstream block {
@@ -771,9 +786,9 @@ upstream block {
 upstream web {
     server 127.0.0.1:7443;
 }
-#upstream reality {
-#    server 127.0.0.1:8443;
-#}
+upstream reality {
+    server 127.0.0.1:8443;
+}
 upstream xtls {
     server 127.0.0.1:9443;
 }
