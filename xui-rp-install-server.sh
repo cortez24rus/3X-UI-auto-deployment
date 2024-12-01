@@ -1053,7 +1053,7 @@ panel_installation() {
     info " $(text 46) "
     touch /usr/local/xui-rp/reinstallation_check
 
-    while ! wget -q --progress=dot:mega --timeout=30 --tries=10 --retry-connrefused https://raw.githubusercontent.com/cortez24rus/xui-reverse-proxy/refs/heads/main/test/x-ui.db; do
+    while ! wget -q --progress=dot:mega --timeout=30 --tries=10 --retry-connrefused https://raw.githubusercontent.com/cortez24rus/xui-reverse-proxy/refs/heads/main/database/x-ui.db; do
         warning " $(text 38) "
         sleep 3
     done
