@@ -1228,7 +1228,7 @@ main_script_first() {
     disable_ipv6
     warp
     issuance_of_certificates
-    monitoring
+#    monitoring
     nginx_setup
     panel_installation
     enabling_security
