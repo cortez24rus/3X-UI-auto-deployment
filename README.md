@@ -44,7 +44,7 @@ This script is designed to quickly and easily set up a hidden proxy server, with
 7. Configuring UFW (Uncomplicated Firewall) for access control.
 8. Configuring SSH, to provide the minimum required security.
 9. Disabling IPv6 to prevent possible vulnerabilities.
-10. Encrypting DNS queries using systemd-resolved or AdGuard Home.
+10. Encrypting DNS queries using systemd-resolved (DoT) or AdGuard Home (Dot, DoH).
 11. Selecting a random website from an array to add an extra layer of privacy and complexity for traffic analysis.
 
 -----
