@@ -156,6 +156,11 @@ E[69]="Enter the Telegram bot token for IP limit, Torrent ban:"
 R[69]="Введите токен Telegram бота для IP limit, Torrent ban:"
 E[70]="Secret key:"
 R[70]="Секретный ключ:"
+E[71]=":"
+R[71]="Введите первую доменную запись:"
+E[72]=":"
+R[72]="Введите вторую доменную запись:"
+
 
 log_entry() {
     mkdir -p /usr/local/xui-rp/
@@ -270,17 +275,21 @@ get_test_response() {
 
 check_cf_token() {
     while ! echo "$test_response" | grep -qE "\"${testdomain}\"|\"#dns_records:edit\"|\"#dns_records:read\"|\"#zone:read\""; do
-        DOMAIN=""
         EMAIL=""
         CFTOKEN=""
-        while [[ -z $DOMAIN ]]; do
-            reading " $(text 13) " DOMAIN
-	    echo ${DOMAIN}
+        DOMAIN_FIRST=""
+        DOMAIN_SECOND=""
+
+        while [[ -z $DOMAIN_FIRST ]]; do
+            reading " $(text 71) " DOMAIN_FIRST
             echo
         done
-
-        DOMAIN=$(crop_domain "$DOMAIN")
+        while [[ -z $DOMAIN_SECOND ]]; do
+            reading " $(text 72) " DOMAIN_SECOND
+            echo
+        done
         
+        DOMAIN=$(crop_domain "$DOMAIN_FIRST")
         if [[ $? -ne 0 ]]; then
             DOMAIN=""
             continue
@@ -290,11 +299,11 @@ check_cf_token() {
             reading " $(text 15) " EMAIL
             echo
         done
-
         while [[ -z $CFTOKEN ]]; do
             reading " $(text 16) " CFTOKEN
             echo
         done
+
         get_test_response
         info " $(text 17) "
     done
@@ -444,8 +453,8 @@ data_entry() {
     esac
     tilda "$(text 10)"
 
-    SUB_URI=https://${DOMAIN}/${SUB_PATH}/
-    SUB_JSON_URI=https://${DOMAIN}/${SUB_JSON_PATH}/
+    SUB_URI=https://${DOMAIN_FIRST}/${SUB_PATH}/
+    SUB_JSON_URI=https://${DOMAIN_FIRST}/${SUB_JSON_PATH}/
 }
 
 ### Обновление системы и установка пакетов ###
@@ -775,8 +784,8 @@ EOF
 stream_conf() {
     cat > /etc/nginx/stream-enabled/stream.conf <<EOF
 map \$ssl_preread_server_name \$backend {
-    ${DOMAIN}                   web;
-    www.${DOMAIN}               xtls;
+    ${DOMAIN_FIRST}             web;
+    ${DOMAIN_SECOND}            xtls;
     reality_domain              reality;
     default                     block;
 }
@@ -818,7 +827,7 @@ server {
 server {
     listen                      36077 ssl proxy_protocol;
     http2                       on;
-    server_name                 ${DOMAIN} www.${DOMAIN};
+    server_name                 ${DOMAIN_FIRST} www.${DOMAIN_SECOND};
 
     # SSL
     ssl_certificate             /etc/letsencrypt/live/${DOMAIN}/fullchain.pem;
@@ -841,9 +850,9 @@ server {
     proxy_hide_header X-Powered-By;
 
     # Security
-    if (\$host !~* ^(.+\.)?${DOMAIN}\$ ){return 444;}
+    if (\$host !~* ^(.+\.)?${DOMAIN_FIRST}\$ ){return 444;}
     if (\$scheme ~* https) {set \$safe 1;}
-    if (\$ssl_server_name !~* ^(.+\.)?${DOMAIN}\$ ) {set \$safe "\${safe}0"; }
+    if (\$ssl_server_name !~* ^(.+\.)?${DOMAIN_FIRST}\$ ) {set \$safe "\${safe}0"; }
     if (\$safe = 10){return 444;}
     if (\$request_uri ~ "(\"|'|\`|~|,|:|--|;|%|\\$|&&|\?\?|0x00|0X00|\||\\|\{|\}|\[|\]|<|>|\.\.\.|\.\.\/|\/\/\/)"){set \$hack 1;}
     error_page 400 401 402 403 500 501 502 503 504 =404 /404;
@@ -956,14 +965,14 @@ settings_grpc() {
   "externalProxy": [
     {
       "forceTls": "tls",
-      "dest": "${DOMAIN}",
+      "dest": "${DOMAIN_FIRST}",
       "port": 443,
       "remark": ""
     }
   ],
   "grpcSettings": {
     "serviceName": "/2053/${CDNGRPC}",
-    "authority": "${DOMAIN}",
+    "authority": "${DOMAIN_FIRST}",
     "multiMode": false
   }
 }
@@ -979,7 +988,7 @@ settings_split() {
   "externalProxy": [
     {
       "forceTls": "tls",
-      "dest": "${DOMAIN}",
+      "dest": "${DOMAIN_FIRST}",
       "port": 443,
       "remark": ""
     }
@@ -1015,7 +1024,7 @@ settings_httpu() {
   "externalProxy": [
     {
       "forceTls": "tls",
-      "dest": "${DOMAIN}",
+      "dest": "${DOMAIN_FIRST}",
       "port": 443,
       "remark": ""
     }
@@ -1023,7 +1032,7 @@ settings_httpu() {
     "httpupgradeSettings": {
     "acceptProxyProtocol": false,
     "path": "/2073/${CDNHTTPU}",
-    "host": "${DOMAIN}",
+    "host": "${DOMAIN_FIRST}",
     "headers": {}
   }
 }
@@ -1039,7 +1048,7 @@ settings_ws() {
   "externalProxy": [
     {
       "forceTls": "tls",
-      "dest": "${DOMAIN}",
+      "dest": "${DOMAIN_FIRST}",
       "port": 443,
       "remark": ""
     }
@@ -1047,7 +1056,7 @@ settings_ws() {
   "wsSettings": {
     "acceptProxyProtocol": false,
     "path": "/2083/${CDNWS}",
-    "host": "${DOMAIN}",
+    "host": "${DOMAIN_FIRST}",
     "headers": {}
   }
 }
@@ -1064,7 +1073,7 @@ settings_steal() {
   "externalProxy": [
     {
       "forceTls": "same",
-      "dest": "www.${DOMAIN}",
+      "dest": "${DOMAIN_SECOND}",
       "port": 443,
       "remark": ""
     }
@@ -1074,7 +1083,7 @@ settings_steal() {
     "xver": 2,
     "dest": "36077",
     "serverNames": [
-      "${DOMAIN}"
+      "${DOMAIN_FIRST}"
     ],
     "privateKey": "${PRIVATE_KEY0}",
     "minClient": "",
@@ -1117,7 +1126,7 @@ settings_reality() {
   "externalProxy": [
     {
       "forceTls": "same",
-      "dest": "www.${DOMAIN}",
+      "dest": "${DOMAIN_SECOND}",
       "port": 443,
       "remark": ""
     }
@@ -1169,13 +1178,13 @@ settings_xtls() {
   "externalProxy": [
     {
       "forceTls": "same",
-      "dest": "www.${DOMAIN}",
+      "dest": "${DOMAIN_SECOND}",
       "port": 443,
       "remark": ""
     }
   ],
   "tlsSettings": {
-    "serverName": "www.${DOMAIN}",
+    "serverName": "${DOMAIN_SECOND}",
     "minVersion": "1.3",
     "maxVersion": "1.3",
     "cipherSuites": "",
@@ -1396,10 +1405,10 @@ data_output() {
     info " $(text 58) "
     printf '0\n' | x-ui | grep --color=never -i ':'
     echo
-    out_data " $(text 59) " "https://${DOMAIN}/${WEB_BASE_PATH}/"
+    out_data " $(text 59) " "https://${DOMAIN_FIRST}/${WEB_BASE_PATH}/"
     out_data " $(text 60) " "${SUB_URI}user"
     if [[ $CHOISE_DNS = "2" ]]; then
-        out_data " $(text 61) " "https://${DOMAIN}/${ADGUARDPATH}/login.html"
+        out_data " $(text 61) " "https://${DOMAIN_FIRST}/${ADGUARDPATH}/login.html"
         
     fi
     echo
