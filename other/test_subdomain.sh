@@ -728,7 +728,7 @@ events {
 http {
     map \$request_uri \$cleaned_request_uri {
         default \$request_uri;
-        "~^(.*?)(\?x_padding=[^ ]*)$" $1;
+        "~^(.*?)(\?x_padding=[^ ]*)\$" \$1;
     }
     log_format json_analytics escape=json '{'
         '$time_local, '
@@ -739,7 +739,6 @@ http {
         '$http_user_agent, '
         '$cleaned_request_uri, '
         '$http_referer, '
-        '$geoip_country_code'
         '}';
     set_real_ip_from                     127.0.0.1;
     real_ip_header                       X-Forwarded-For;
