@@ -788,7 +788,7 @@ stream_conf() {
 map \$ssl_preread_server_name \$backend {
     ${DOMAIN_FIRST}             web;
     ${DOMAIN_SECOND}            xtls;
-    reality_domain              reality;
+    ${REALITY}                  reality;
     default                     block;
 }
 upstream block {
