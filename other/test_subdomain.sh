@@ -472,14 +472,14 @@ installation_of_utilities() {
         sqlite3 \
         certbot \
         net-tools \
-	lsb-release \
+	    lsb-release \
         apache2-utils \
-	ca-certificates \
+	    ca-certificates \
         unattended-upgrades \
         python3-certbot-dns-cloudflare
         
 	mkdir -p /usr/share/keyrings
-        curl https://nginx.org/keys/nginx_signing.key | gpg --dearmor | tee /usr/share/keyrings/nginx-archive-keyring.gpg >/dev/null
+    curl https://nginx.org/keys/nginx_signing.key | gpg --dearmor | tee /usr/share/keyrings/nginx-archive-keyring.gpg >/dev/null
     # Проверяем, какая операционная система используется (Ubuntu или Debian)
     if grep -qi "ubuntu" /etc/os-release; then
         apt install ubuntu-keyring -y
