@@ -829,7 +829,7 @@ server {
 server {
     listen                               36077 ssl proxy_protocol;
     http2                                on;
-    server_name                          ${DOMAIN_FIRST} www.${DOMAIN_SECOND};
+    server_name                          ${DOMAIN_FIRST} ${DOMAIN_SECOND};
 
     # SSL
     ssl_certificate                      /etc/letsencrypt/live/${DOMAIN}/fullchain.pem;
