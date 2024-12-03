@@ -725,14 +725,14 @@ http {
         "~^(.*?)(\?x_padding=[^ ]*)\$" \$1;
     }
     log_format json_analytics escape=json '{'
-        '$time_local, '
-        '$http_x_forwarded_for, '
-        '$proxy_protocol_addr, '
-        '$request_method '
-        '$status, '
-        '$http_user_agent, '
-        '$cleaned_request_uri, '
-        '$http_referer, '
+        '\$time_local, '
+        '\$http_x_forwarded_for, '
+        '\$proxy_protocol_addr, '
+        '\$request_method '
+        '\$status, '
+        '\$http_user_agent, '
+        '\$cleaned_request_uri, '
+        '\$http_referer, '
         '}';
     set_real_ip_from                     127.0.0.1;
     real_ip_header                       X-Forwarded-For;
