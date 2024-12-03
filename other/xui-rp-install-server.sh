@@ -653,12 +653,15 @@ issuance_of_certificates() {
         echo "dns_cloudflare_api_key = ${CFTOKEN}" >> ${CF_CREDENTIALS_PATH}
     fi
 
-    while true; do
+    attempt=0
+    max_attempts=2
+    while [ $attempt -lt $max_attempts ]; do
         certbot certonly --dns-cloudflare --dns-cloudflare-credentials ${CF_CREDENTIALS_PATH} --dns-cloudflare-propagation-seconds 30 --rsa-key-size 4096 -d ${DOMAIN},*.${DOMAIN} --agree-tos -m ${EMAIL} --no-eff-email --non-interactive
-
-        if [ $? -eq 0 ]; then
+        
+	if [ $? -eq 0 ]; then
             break
         else
+            attempt=$((attempt + 1))
             sleep 5
         fi
     done
