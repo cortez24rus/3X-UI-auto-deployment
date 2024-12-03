@@ -722,7 +722,7 @@ events {
 http {
     map \$request_uri \$cleaned_request_uri {
         default \$request_uri;
-        "~^(.*?)(\?x_padding=[^ ]*)$" $1;
+        "~^(.*?)(\?x_padding=[^ ]*)\$" \$1;
     }
     log_format json_analytics escape=json '{'
         '$time_local, '
@@ -733,7 +733,6 @@ http {
         '$http_user_agent, '
         '$cleaned_request_uri, '
         '$http_referer, '
-        '$geoip_country_code'
         '}';
     set_real_ip_from                     127.0.0.1;
     real_ip_header                       X-Forwarded-For;
@@ -781,9 +780,9 @@ EOF
 stream_conf() {
     cat > /etc/nginx/stream-enabled/stream.conf <<EOF
 map \$ssl_preread_server_name \$backend {
-    ${DOMAIN_FIRST}             web;
-    ${DOMAIN_SECOND}            xtls;
-    reality_domain              reality;
+    ${DOMAIN}                   web;
+    www.${DOMAIN}               xtls;
+    ${REALITY}                  reality;
     default                     block;
 }
 upstream block {
@@ -824,7 +823,7 @@ server {
 server {
     listen                               36077 ssl proxy_protocol;
     http2                                on;
-    server_name                          ${DOMAIN_FIRST} www.${DOMAIN_SECOND};
+    server_name                          ${DOMAIN} www.${DOMAIN};
 
     # SSL
     ssl_certificate                      /etc/letsencrypt/live/${DOMAIN}/fullchain.pem;
@@ -838,9 +837,9 @@ server {
     root /var/www/html/;
 
     # Security
-    if (\$host !~* ^(.+\.)?${DOMAIN_FIRST}\$ ){return 444;}
+    if (\$host !~* ^(.+\.)?${DOMAIN}\$ ){return 444;}
     if (\$scheme ~* https) {set \$safe 1;}
-    if (\$ssl_server_name !~* ^(.+\.)?${DOMAIN_FIRST}\$ ) {set \$safe "\${safe}0"; }
+    if (\$ssl_server_name !~* ^(.+\.)?${DOMAIN}\$ ) {set \$safe "\${safe}0"; }
     if (\$safe = 10){return 444;}
     if (\$request_uri ~ "(\"|'|\`|~|,|:|--|;|%|\\$|&&|\?\?|0x00|0X00|\||\\|\{|\}|\[|\]|<|>|\.\.\.|\.\.\/|\/\/\/)"){set \$hack 1;}
     error_page 400 401 402 403 500 501 502 503 504 =404 /404;
