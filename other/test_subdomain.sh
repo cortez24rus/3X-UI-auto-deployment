@@ -472,7 +472,9 @@ installation_of_utilities() {
         sqlite3 \
         certbot \
         net-tools \
+	lsb-release \
         apache2-utils \
+	ca-certificates \
         unattended-upgrades \
         python3-certbot-dns-cloudflare
         
