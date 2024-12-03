@@ -475,28 +475,23 @@ installation_of_utilities() {
         apache2-utils \
         unattended-upgrades \
         python3-certbot-dns-cloudflare
-    
-    # Установка ключей репозиториев
-    if grep -Eqi "(bullseye|bookworm)" /etc/os-release; then
-        apt install debian-archive-keyring -y
-    else
+        
+	mkdir -p /usr/share/keyrings
+        curl https://nginx.org/keys/nginx_signing.key | gpg --dearmor | tee /usr/share/keyrings/nginx-archive-keyring.gpg >/dev/null
+    # Проверяем, какая операционная система используется (Ubuntu или Debian)
+    if grep -qi "ubuntu" /etc/os-release; then
         apt install ubuntu-keyring -y
-    fi
-
-    if [ ! -d /usr/share/keyrings ]; then
-        mkdir /usr/share/keyrings
-    fi
-
-    curl https://nginx.org/keys/nginx_signing.key | gpg --dearmor | tee /usr/share/keyrings/nginx-archive-keyring.gpg >/dev/null
-    gpg --dry-run --quiet --no-keyring --import --import-options import-show /usr/share/keyrings/nginx-archive-keyring.gpg
-    
-    if grep -q "Ubuntu" /etc/os-release; then
+        gpg --dry-run --quiet --no-keyring --import --import-options import-show /usr/share/keyrings/nginx-archive-keyring.gpg
         echo "deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] http://nginx.org/packages/ubuntu $(lsb_release -cs) nginx" | tee /etc/apt/sources.list.d/nginx.list
-    elif grep -q "Debian" /etc/os-release; then
+    elif grep -qi "debian" /etc/os-release; then
+        apt install debian-archive-keyring -y
+        gpg --dry-run --quiet --no-keyring --import --import-options import-show /usr/share/keyrings/nginx-archive-keyring.gpg
         echo "deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] http://nginx.org/packages/debian $(lsb_release -cs) nginx" | tee /etc/apt/sources.list.d/nginx.list
+    else
+        echo "Unsupported OS"
+        exit 1
     fi
     echo -e "Package: *\nPin: origin nginx.org\nPin: release o=nginx\nPin-Priority: 900\n" | tee /etc/apt/preferences.d/99nginx
-    
     apt-get update && apt-get install -y nginx systemd-resolved
     tilda "$(text 10)"
 }
