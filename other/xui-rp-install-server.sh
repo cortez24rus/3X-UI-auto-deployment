@@ -14,7 +14,7 @@ reading()    { read -rp " $(question "$1")" "$2"; }
 text()       { eval echo "\${${L}[$*]}"; }
 text_eval()  { eval echo "\$(eval echo "\${${L}[$*]}")"; }
 
-E[0]="1Language:\n  1. English (default) \n  2. Русский"
+E[0]="2Language:\n  1. English (default) \n  2. Русский"
 R[0]="Язык:\n  1. English (по умолчанию) \n  2. Русский"
 E[1]="Choose:"
 R[1]="Выбери:"
