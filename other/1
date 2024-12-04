@@ -1,0 +1,46 @@
+#!/bin/bash
+
+# Проверяем, запущен ли скрипт от имени root
+if [[ $EUID -ne 0 ]]; then
+  echo "Этот скрипт должен быть запущен от имени root!"
+  exit 1
+fi
+
+# Обновляем систему и устанавливаем зависимости
+echo "Обновление системы и установка зависимостей..."
+apt update && apt upgrade -y
+apt install -y curl gnupg2 ca-certificates lsb-release software-properties-common
+
+# Определяем операционную систему
+OS=$(lsb_release -is | tr '[:upper:]' '[:lower:]')
+DISTRO=$(lsb_release -cs)
+
+echo "Обнаружена операционная система: $OS ($DISTRO)"
+
+# Добавляем ключ репозитория
+echo "Добавление ключа репозитория Nginx..."
+curl -fsSL https://nginx.org/keys/nginx_signing.key | gpg --dearmor -o /usr/share/keyrings/nginx-archive-keyring.gpg
+
+# Добавляем репозиторий в зависимости от ОС
+if [[ "$OS" == "ubuntu" ]]; then
+  echo "Добавление репозитория для Ubuntu..."
+  echo "deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] https://nginx.org/packages/ubuntu/ $DISTRO nginx" > /etc/apt/sources.list.d/nginx.list
+elif [[ "$OS" == "debian" ]]; then
+  echo "Добавление репозитория для Debian..."
+  echo "deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] https://nginx.org/packages/debian/ $DISTRO nginx" > /etc/apt/sources.list.d/nginx.list
+else
+  echo "Неизвестная или неподдерживаемая операционная система: $OS"
+  exit 1
+fi
+
+# Обновляем пакеты и устанавливаем Nginx
+echo "Обновление списка пакетов и установка Nginx..."
+apt update && apt install -y nginx
+
+# Проверяем статус Nginx
+echo "Проверяем статус Nginx..."
+systemctl start nginx
+systemctl enable nginx
+systemctl status nginx
+
+echo "Установка Nginx завершена!"
