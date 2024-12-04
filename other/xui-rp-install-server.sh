@@ -537,25 +537,34 @@ installation_of_utilities() {
     apache2-utils \
   	ca-certificates \
     unattended-upgrades \
+    software-properties-common \
     python3-certbot-dns-cloudflare
     
-	mkdir -p /usr/share/keyrings
-  curl https://nginx.org/keys/nginx_signing.key | gpg --dearmor | tee /usr/share/keyrings/nginx-archive-keyring.gpg >/dev/null
-  # Проверяем, какая операционная система используется (Ubuntu или Debian)
-  if grep -qi "ubuntu" /etc/os-release; then
-    apt install ubuntu-keyring -y
-    gpg --dry-run --quiet --no-keyring --import --import-options import-show /usr/share/keyrings/nginx-archive-keyring.gpg
-    echo "deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] http://nginx.org/packages/ubuntu $(lsb_release -cs) nginx" | tee /etc/apt/sources.list.d/nginx.list
-  elif grep -qi "debian" /etc/os-release; then
-    apt install debian-archive-keyring -y
-    gpg --dry-run --quiet --no-keyring --import --import-options import-show /usr/share/keyrings/nginx-archive-keyring.gpg
-    echo "deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] http://nginx.org/packages/debian $(lsb_release -cs) nginx" | tee /etc/apt/sources.list.d/nginx.list
+  mkdir -p /usr/share/keyrings
+  OS=$(lsb_release -is | tr '[:upper:]' '[:lower:]')
+  DISTRO=$(lsb_release -cs)
+
+  echo "Обнаружена операционная система: $OS ($DISTRO)"
+
+  echo "Добавление ключа репозитория Nginx..."
+  curl -fsSL https://nginx.org/keys/nginx_signing.key | gpg --dearmor -o /usr/share/keyrings/nginx-archive-keyring.gpg
+
+  if [[ "$OS" == "ubuntu" ]]; then
+    echo "Добавление репозитория для Ubuntu..."
+    echo "deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] https://nginx.org/packages/ubuntu/ $DISTRO nginx" > /etc/apt/sources.list.d/nginx.list
+  elif [[ "$OS" == "debian" ]]; then
+    echo "Добавление репозитория для Debian..."
+    echo "deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] https://nginx.org/packages/debian/ $DISTRO nginx" > /etc/apt/sources.list.d/nginx.list
   else
-    echo "Unsupported OS"
-    exit 1
+    echo "Неизвестная или неподдерживаемая операционная система: $OS"
+  exit 1
   fi
+
   echo -e "Package: *\nPin: origin nginx.org\nPin: release o=nginx\nPin-Priority: 900\n" | tee /etc/apt/preferences.d/99nginx
   apt-get update && apt-get install -y nginx systemd-resolved
+  systemctl start nginx
+  systemctl enable nginx
+  systemctl status nginx
   tilda "$(text 10)"
 }
 
