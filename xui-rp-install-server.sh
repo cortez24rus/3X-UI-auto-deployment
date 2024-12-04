@@ -832,11 +832,6 @@ server {
     if (\$host = ${IP4}) {
         return 444;
     }
-
-#    location / {
-#        auth_basic "Restricted Content";
-#        auth_basic_user_file /etc/nginx/.htpasswd;
-#    }
     # X-ui Admin panel
     location /${WEB_BASE_PATH} {
         proxy_redirect off;
@@ -869,37 +864,15 @@ server {
         proxy_pass http://127.0.0.1:36074/${SUB_JSON_PATH};
         break;
     }
-    location /${CDNSPLIT} {
-        proxy_pass http://127.0.0.1:2063;
-        proxy_http_version 1.1;
-        proxy_redirect off;
-    }
-    # Xray Config
-    location ~ ^/(?<fwdport>\d+)/(?<fwdpath>.*)\$ {
-        if (\$hack = 1) {return 404;}
-        client_max_body_size 0;
-        client_body_timeout 1d;
-        grpc_read_timeout 1d;
-        grpc_socket_keepalive on;
-        proxy_read_timeout 1d;
-        proxy_http_version 1.1;
-        proxy_buffering off;
-        proxy_request_buffering off;
-        proxy_socket_keepalive on;
-        proxy_set_header Upgrade \$http_upgrade;
-        proxy_set_header Connection "upgrade";
-        proxy_set_header Host \$host;
-        proxy_set_header X-Real-IP \$remote_addr;
-        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-        if (\$content_type ~* "GRPC") {
-            grpc_pass grpc://127.0.0.1:\$fwdport\$is_args\$args;
-            break;
-        }
-		proxy_pass http://127.0.0.1:\$fwdport\$is_args\$args;
-		break;
-    }
     # Adguard home
     ${COMMENT_AGH}
+}
+server {
+  listen                   80;
+  server_name              ${DOMAIN} www.${DOMAIN};
+  location / {
+    return 301             https://${DOMAIN}\$request_uri;
+  }
 }
 EOF
 }

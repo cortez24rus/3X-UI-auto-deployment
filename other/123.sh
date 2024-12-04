@@ -21,7 +21,8 @@ cd nginx-$NGINX_VERSION
 git clone https://github.com/leev/ngx_http_geoip2_module.git
 
 ./configure \
-    --prefix=/usr/share/nginx \
+    --prefix=/usr//nginx \
+    --sbin-path=/usr/sbin/nginx \
     --conf-path=/etc/nginx/nginx.conf \
     --http-log-path=/var/log/nginx/access.log \
     --error-log-path=/var/log/nginx/error.log \
@@ -60,16 +61,16 @@ cat > /etc/systemd/system/nginx.service <<EOF
 Description=The NGINX HTTP and reverse proxy server
 After=syslog.target network-online.target remote-fs.target nss-lookup.target
 Wants=network-online.target
-
+        
 [Service]
 Type=forking
-PIDFile=/etc/nginx/nginx.pid
+PIDFile=/var/run/nginx.pid
 ExecStartPre=/usr/sbin/nginx -t
 ExecStart=/usr/sbin/nginx
 ExecReload=/usr/sbin/nginx -s reload
 ExecStop=/bin/kill -s QUIT $MAINPID
 PrivateTmp=true
-
+        
 [Install]
 WantedBy=multi-user.target
 EOF

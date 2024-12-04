@@ -778,15 +778,15 @@ nginx_setup() {
 
 nginx_conf() {
   cat > /etc/nginx/nginx.conf <<EOF
-user                   www-data;
-pid                    /run/nginx.pid;
-worker_processes             auto;
-worker_rlimit_nofile           65535;
-error_log                /var/log/nginx/error.log;
-include                  /etc/nginx/modules-enabled/*.conf;
+user                                 www-data;
+pid                                  /run/nginx.pid;
+worker_processes                     auto;
+worker_rlimit_nofile                 65535;
+error_log                            /var/log/nginx/error.log;
+include                              /etc/nginx/modules-enabled/*.conf;
 events {
-  multi_accept             on;
-  worker_connections           1024;
+  multi_accept                       on;
+  worker_connections                 1024;
 }
 
 http {
@@ -804,42 +804,42 @@ http {
     '\$cleaned_request_uri, '
     '\$http_referer, '
     '}';
-  set_real_ip_from           127.0.0.1;
-  real_ip_header             X-Forwarded-For;
-  real_ip_recursive          on;
-  access_log               /var/log/nginx/access.log json_analytics;
-  sendfile               on;
-  tcp_nopush               on;
-  tcp_nodelay              on;
-  server_tokens            off;
-  log_not_found            off;
-  types_hash_max_size          2048;
-  types_hash_bucket_size         64;
-  client_max_body_size         16M;
-  keepalive_timeout          75s;
-  keepalive_requests           1000;
-  reset_timedout_connection      on;
-  include                /etc/nginx/mime.types;
-  default_type             application/octet-stream;
-  ssl_session_timeout          1d;
-  ssl_session_cache          shared:SSL:1m;
-  ssl_session_tickets          off;
-  ssl_prefer_server_ciphers      on;
-  ssl_protocols            TLSv1.2 TLSv1.3;
-  ssl_ciphers              TLS13_AES_128_GCM_SHA256:TLS13_AES_256_GCM_SHA384:TLS13_CHACHA20_POLY1305_SHA256:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305;
-  ssl_stapling             on;
-  ssl_stapling_verify          on;
-  resolver               127.0.0.1 valid=60s;
-  resolver_timeout           2s;
-  gzip                 on;
-  add_header X-XSS-Protection      "0" always;
-  add_header X-Content-Type-Options  "nosniff" always;
-  add_header Referrer-Policy       "no-referrer-when-downgrade" always;
-  add_header Permissions-Policy    "interest-cohort=()" always;
+  set_real_ip_from                     127.0.0.1;
+  real_ip_header                       X-Forwarded-For;
+  real_ip_recursive                    on;
+  access_log                           /var/log/nginx/access.log json_analytics;
+  sendfile                             on;
+  tcp_nopush                           on;
+  tcp_nodelay                          on;
+  server_tokens                        off;
+  log_not_found                        off; 
+  types_hash_max_size                  2048;
+  types_hash_bucket_size               64;
+  client_max_body_size                 16M;
+  keepalive_timeout                    75s;
+  keepalive_requests                   1000;
+  reset_timedout_connection            on;
+  include                              /etc/nginx/mime.types;
+  default_type                         application/octet-stream;
+  ssl_session_timeout                  1d;
+  ssl_session_cache                    shared:SSL:1m;
+  ssl_session_tickets                  off;
+  ssl_prefer_server_ciphers            on;
+  ssl_protocols                        TLSv1.2 TLSv1.3;
+  ssl_ciphers                          TLS13_AES_128_GCM_SHA256:TLS13_AES_256_GCM_SHA384:TLS13_CHACHA20_POLY1305_SHA256:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305;
+  ssl_stapling                         on;
+  ssl_stapling_verify                  on;
+  resolver                             127.0.0.1 valid=60s;
+  resolver_timeout                     2s;
+  gzip                                 on;
+  add_header X-XSS-Protection          "0" always;
+  add_header X-Content-Type-Options    "nosniff" always;
+  add_header Referrer-Policy           "no-referrer-when-downgrade" always;
+  add_header Permissions-Policy        "interest-cohort=()" always;
   add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;
-  add_header X-Frame-Options       "SAMEORIGIN";
-  proxy_hide_header X-Powered-By;
-  include                /etc/nginx/conf.d/*.conf;
+  add_header X-Frame-Options           "SAMEORIGIN";
+  proxy_hide_header                    X-Powered-By;
+  include                              /etc/nginx/conf.d/*.conf;
 }
 stream {
   include /etc/nginx/stream-enabled/stream.conf;
@@ -850,10 +850,10 @@ EOF
 stream_conf() {
   cat > /etc/nginx/stream-enabled/stream.conf <<EOF
 map \$ssl_preread_server_name \$backend {
-  ${DOMAIN}              web;
-  www.${DOMAIN}            xtls;
-  ${REALITY}               reality;
-  default                block;
+  ${DOMAIN}                            web;
+  www.${DOMAIN}                        xtls;
+  ${REALITY}                           reality;
+  default                              block;
 }
 upstream block {
   server 127.0.0.1:36076;
@@ -868,10 +868,10 @@ upstream xtls {
   server 127.0.0.1:9443;
 }
 server {
-  listen 443               reuseport;
-  ssl_preread              on;
-  proxy_protocol             on;
-  proxy_pass               \$backend;
+  listen 443                           reuseport;
+  ssl_preread                          on;
+  proxy_protocol                       on;
+  proxy_pass                           \$backend;
 }
 EOF
 }
@@ -879,28 +879,35 @@ EOF
 local_conf() {
   cat > /etc/nginx/conf.d/local.conf <<EOF
 server {
-  listen                 9090 default_server;
-  server_name              ${DOMAIN} www.${DOMAIN};
+  listen                               80;
+  server_name                          ${DOMAIN} www.${DOMAIN};
   location / {
-    return 301             https://${DOMAIN}\$request_uri;
+    return 301                         https://${DOMAIN}\$request_uri;
   }
 }
 server {
-  listen                 36076 ssl proxy_protocol;
-  ssl_reject_handshake         on;
+  listen                               9090 default_server;
+  server_name                          ${DOMAIN} www.${DOMAIN};
+  location / {
+    return 301                         https://${DOMAIN}\$request_uri;
+  }
 }
 server {
-  listen                 36077 ssl proxy_protocol;
-  http2                on;
-  server_name              ${DOMAIN} www.${DOMAIN};
+  listen                               36076 ssl proxy_protocol;
+  ssl_reject_handshake                 on;
+}
+server {
+  listen                               36077 ssl proxy_protocol;
+  http2                                on;
+  server_name                          ${DOMAIN} www.${DOMAIN};
 
   # SSL
-  ssl_certificate            /etc/letsencrypt/live/${DOMAIN}/fullchain.pem;
-  ssl_certificate_key          /etc/letsencrypt/live/${DOMAIN}/privkey.pem;
-  ssl_trusted_certificate        /etc/letsencrypt/live/${DOMAIN}/chain.pem;
+  ssl_certificate                      /etc/letsencrypt/live/${DOMAIN}/fullchain.pem;
+  ssl_certificate_key                  /etc/letsencrypt/live/${DOMAIN}/privkey.pem;
+  ssl_trusted_certificate              /etc/letsencrypt/live/${DOMAIN}/chain.pem;
 
   # Diffie-Hellman parameter for DHE ciphersuites
-  ssl_dhparam              /etc/nginx/dhparam.pem;
+  ssl_dhparam                          /etc/nginx/dhparam.pem;
 
   index index.html index.htm index.php index.nginx-debian.html;
   root /var/www/html/;
@@ -984,13 +991,6 @@ server {
   }
   # Adguard home
   ${COMMENT_AGH}
-}
-server {
-  listen                 80;
-  server_name              ${DOMAIN} www.${DOMAIN};
-  location / {
-    return 301             https://${DOMAIN}\$request_uri;
-  }
 }
 EOF
 }
