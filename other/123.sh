@@ -10,12 +10,15 @@ apt update && apt install -y \
     libgd-dev \
     libmaxminddb0 \
     libmaxminddb-dev \
-    mmdb-bin
+    mmdb-bin \
+    git
 
-wget https://nginx.org/download/nginx-1.27.3.tar.gz
+NGINX_VERSION="1.27.3"
+wget https://nginx.org/download/nginx-$NGINX_VERSION.tar.gz
+tar -xvf nginx-$NGINX_VERSION.tar.gz
+cd nginx-$NGINX_VERSION
 
-tar -xvf nginx-1.27.3.tar.gz
-cd nginx-1.27.3
+git clone https://github.com/leev/ngx_http_geoip2_module.git
 
 ./configure --prefix=/usr/share/nginx --conf-path=/etc/nginx/nginx.conf \
     --http-log-path=/var/log/nginx/access.log --error-log-path=/var/log/nginx/error.log \
@@ -29,8 +32,8 @@ cd nginx-1.27.3
     --with-http_gzip_static_module --with-http_image_filter_module=dynamic --with-http_sub_module \
     --with-http_xslt_module=dynamic --with-stream=dynamic --with-stream_ssl_module \
     --with-mail=dynamic --with-mail_ssl_module --with-http_mp4_module \
-    --add-dynamic-module=../nginx-geoip-module --add-dynamic-module=../nginx-geoip2-module
-
+    --add-module=./ngx_http_geoip2_module
+    
 make
 make install
 
@@ -57,4 +60,8 @@ systemctl daemon-reload
 systemctl start nginx
 systemctl enable nginx
 
-rm -Rf nginx-*
+cd ..
+rm -rf nginx-$NGINX_VERSION.tar.gz nginx-$NGINX_VERSION ngx_http_geoip2_module
+
+systemctl status nginx
+nginx -v
