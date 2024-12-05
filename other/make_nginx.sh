@@ -21,13 +21,13 @@ cd nginx-$NGINX_VERSION
 git clone https://github.com/leev/ngx_http_geoip2_module.git
 
 ./configure \
-    --prefix=/usr//nginx \
     --sbin-path=/usr/sbin/nginx \
+    --prefix=/etc/nginx \
     --conf-path=/etc/nginx/nginx.conf \
     --http-log-path=/var/log/nginx/access.log \
     --error-log-path=/var/log/nginx/error.log \
     --lock-path=/var/lock/nginx.lock \
-    --pid-path=/run/nginx.pid \
+    --pid-path=/var/run/nginx.pid \
     --modules-path=/usr/lib/nginx/modules \
     --http-client-body-temp-path=/var/lib/nginx/body \
     --http-fastcgi-temp-path=/var/lib/nginx/fastcgi \
@@ -53,8 +53,19 @@ git clone https://github.com/leev/ngx_http_geoip2_module.git
     --with-stream_ssl_module \
     --add-dynamic-module=./ngx_http_geoip2_module
 
+#--with-http_ssl_module \
+#--with-http_stub_status_module \
+#--with-http_realip_module \
+#--with-http_v2_module \
+#--with-stream \
+#--with-stream_ssl_module \
+#--add-dynamic-module=./ngx_http_geoip2_module
+
+
 make
 make install
+
+sudo /usr/sbin/nginx
 
 cat > /etc/systemd/system/nginx.service <<EOF
 [Unit]

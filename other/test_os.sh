@@ -287,6 +287,7 @@ banner_1() {
 
 ### Начало установки ###
 start_installation() {
+  local ANSWER_START
   warning " $(text 5) "
   echo
   info " $(text 6) "
@@ -341,9 +342,7 @@ get_test_response() {
 
 check_cf_token() {
   while ! echo "$test_response" | grep -qE "\"${testdomain}\"|\"#dns_records:edit\"|\"#dns_records:read\"|\"#zone:read\""; do
-    DOMAIN=""
-    EMAIL=""
-    CFTOKEN=""
+    DOMAIN="" EMAIL="" CFTOKEN=""
     while [[ -z $DOMAIN ]]; do
       reading " $(text 13) " DOMAIN
 	  echo ${DOMAIN}
@@ -451,6 +450,7 @@ validate_path() {
 }
 
 choise_dns () {
+  local CHOISE_DNS
   while true; do
     hint " $(text 31) \n" && reading " $(text 1) " CHOISE_DNS
     case $CHOISE_DNS in 
@@ -522,11 +522,11 @@ data_entry() {
 install() {
   info " $(text 36) "
   case "$SYSTEM" in
-    Debian )
+    Debian|Ubuntu )
       ${PACKAGE_UPDATE[int]}
       ${PACKAGE_INSTALL[int]} --no-install-recommends \
-        net-tools \
         dnsutils \
+        net-tools \
         iptables \
         jq \
         ufw \
@@ -543,28 +543,7 @@ install() {
         python3-certbot-dns-cloudflare
       ;;
 
-    Ubuntu )
-      ${PACKAGE_UPDATE[int]}
-      ${PACKAGE_INSTALL[int]} --no-install-recommends \
-        net-tools \
-        dnsutils \
-        iptables \
-        jq \
-        ufw \
-        zip \
-        sudo \
-        gnupg2 \
-        sqlite3 \
-        certbot \
-        lsb-release \
-        apache2-utils \
-        ca-certificates \
-        unattended-upgrades \
-        software-properties-common \
-        python3-certbot-dns-cloudflare
-      ;;
-
-    CentOS|Fedora 
+    CentOS|Fedora )
       [ "$SYSTEM" = 'CentOS' ] && ${PACKAGE_INSTALL[int]} epel-release
       ${PACKAGE_UPDATE[int]}
       ${PACKAGE_INSTALL[int]} --no-install-recommends \
@@ -585,6 +564,8 @@ install() {
         python3-certbot-dns-cloudflare
       ;;
   esac
+
+  ${PACKAGE_INSTALL[int]} --no-install-recommends systemd-resolved
   tilda "$(text 10)"
 }
 
@@ -1044,17 +1025,17 @@ settings_grpc() {
   "network": "grpc",
   "security": "none",
   "externalProxy": [
-  {
-    "forceTls": "tls",
-    "dest": "${DOMAIN}",
-    "port": 443,
-    "remark": ""
-  }
+    {
+      "forceTls": "tls",
+      "dest": "${DOMAIN}",
+      "port": 443,
+      "remark": ""
+    }
   ],
   "grpcSettings": {
-  "serviceName": "/2053/${CDNGRPC}",
-  "authority": "${DOMAIN}",
-  "multiMode": false
+    "serviceName": "/2053/${CDNGRPC}",
+    "authority": "${DOMAIN}",
+    "multiMode": false
   }
 }
 EOF
@@ -1067,27 +1048,27 @@ settings_split() {
   "network": "splithttp",
   "security": "none",
   "externalProxy": [
-  {
-    "forceTls": "tls",
-    "dest": "${DOMAIN}",
-    "port": 443,
-    "remark": ""
-  }
+    {
+      "forceTls": "tls",
+      "dest": "${DOMAIN}",
+      "port": 443,
+      "remark": ""
+    }
   ],
   "splithttpSettings": {
-  "path": "${CDNSPLIT}",
-  "host": "",
-  "headers": {},
-  "scMaxConcurrentPosts": "100-200",
-  "scMaxEachPostBytes": "1000000-2000000",
-  "scMinPostsIntervalMs": "10-50",
-  "noSSEHeader": false,
-  "xPaddingBytes": "100-1000",
-  "xmux": {
-    "maxConcurrency": "16-32",
-    "maxConnections": 0,
-    "cMaxReuseTimes": "64-128",
-    "cMaxLifetimeMs": 0
+    "path": "${CDNSPLIT}",
+    "host": "",
+    "headers": {},
+    "scMaxConcurrentPosts": "100-200",
+    "scMaxEachPostBytes": "1000000-2000000",
+    "scMinPostsIntervalMs": "10-50",
+    "noSSEHeader": false,
+    "xPaddingBytes": "100-1000",
+    "xmux": {
+      "maxConcurrency": "16-32",
+      "maxConnections": 0,
+      "cMaxReuseTimes": "64-128",
+      "cMaxLifetimeMs": 0
   },
   "mode": "auto",
   "noGRPCHeader": false
@@ -1103,18 +1084,18 @@ settings_httpu() {
   "network": "httpupgrade",
   "security": "none",
   "externalProxy": [
-  {
-    "forceTls": "tls",
-    "dest": "${DOMAIN}",
-    "port": 443,
-    "remark": ""
-  }
+    {
+      "forceTls": "tls",
+      "dest": "${DOMAIN}",
+      "port": 443,
+      "remark": ""
+    }
   ],
   "httpupgradeSettings": {
-  "acceptProxyProtocol": false,
-  "path": "/2073/${CDNHTTPU}",
-  "host": "${DOMAIN}",
-  "headers": {}
+    "acceptProxyProtocol": false,
+    "path": "/2073/${CDNHTTPU}",
+    "host": "${DOMAIN}",
+    "headers": {}
   }
 }
 EOF
@@ -1127,18 +1108,18 @@ settings_ws() {
   "network": "ws",
   "security": "none",
   "externalProxy": [
-  {
-    "forceTls": "tls",
-    "dest": "${DOMAIN}",
-    "port": 443,
-    "remark": ""
-  }
+    {
+      "forceTls": "tls",
+      "dest": "${DOMAIN}",
+      "port": 443,
+      "remark": ""
+    }
   ],
   "wsSettings": {
-  "acceptProxyProtocol": false,
-  "path": "/2083/${CDNWS}",
-  "host": "${DOMAIN}",
-  "headers": {}
+    "acceptProxyProtocol": false,
+    "path": "/2083/${CDNWS}",
+    "host": "${DOMAIN}",
+    "headers": {}
   }
 }
 EOF
@@ -1152,46 +1133,46 @@ settings_steal() {
   "network": "tcp",
   "security": "reality",
   "externalProxy": [
-  {
-    "forceTls": "same",
-    "dest": "www.${DOMAIN}",
-    "port": 443,
-    "remark": ""
-  }
+    {
+      "forceTls": "same",
+      "dest": "www.${DOMAIN}",
+      "port": 443,
+      "remark": ""
+    }
   ],
   "realitySettings": {
-  "show": false,
-  "xver": 2,
-  "dest": "36077",
-  "serverNames": [
-    "${DOMAIN}"
-  ],
-  "privateKey": "${PRIVATE_KEY0}",
-  "minClient": "",
-  "maxClient": "",
-  "maxTimediff": 0,
-  "shortIds": [
-    "22dff0",
-    "0041e9ca",
-    "49afaa139d",
-    "89",
-    "1addf92cc1bd50",
-    "6e122954e9df",
-    "8d93026df5de065c",
-    "bc85"
-  ],
-  "settings": {
-    "publicKey": "${PUBLIC_KEY0}",
-    "fingerprint": "random",
-    "serverName": "",
-    "spiderX": "/"
-  }
+    "show": false,
+    "xver": 2,
+    "dest": "36077",
+    "serverNames": [
+      "${DOMAIN}"
+    ],
+    "privateKey": "${PRIVATE_KEY0}",
+    "minClient": "",
+    "maxClient": "",
+    "maxTimediff": 0,
+    "shortIds": [
+      "22dff0",
+      "0041e9ca",
+      "49afaa139d",
+      "89",
+      "1addf92cc1bd50",
+      "6e122954e9df",
+      "8d93026df5de065c",
+      "bc85"
+    ],
+    "settings": {
+      "publicKey": "${PUBLIC_KEY0}",
+      "fingerprint": "random",
+      "serverName": "",
+      "spiderX": "/"
+    }
   },
   "tcpSettings": {
-  "acceptProxyProtocol": true,
-  "header": {
-    "type": "none"
-  }
+    "acceptProxyProtocol": true,
+    "header": {
+      "type": "none"
+    }
   }
 }
 EOF
@@ -1205,46 +1186,46 @@ settings_reality() {
   "network": "tcp",
   "security": "reality",
   "externalProxy": [
-  {
-    "forceTls": "same",
-    "dest": "www.${DOMAIN}",
-    "port": 443,
-    "remark": ""
-  }
+    {
+      "forceTls": "same",
+      "dest": "www.${DOMAIN}",
+      "port": 443,
+      "remark": ""
+    }
   ],
   "realitySettings": {
-  "show": false,
-  "xver": 0,
-  "dest": "${REALITY}:443",
-  "serverNames": [
-    "${REALITY}"
-  ],
-  "privateKey": "${PRIVATE_KEY1}",
-  "minClient": "",
-  "maxClient": "",
-  "maxTimediff": 0,
-  "shortIds": [
-    "c7c487",
-    "cf",
-    "248c16289e",
-    "ae60608a67d1a367",
-    "21221b811591",
-    "648bc6ab5ba1bc",
-    "73d1",
-    "3028618d"
-  ],
-  "settings": {
-    "publicKey": "${PUBLIC_KEY1}",
-    "fingerprint": "random",
-    "serverName": "",
-    "spiderX": "/"
-  }
+    "show": false,
+    "xver": 0,
+    "dest": "${REALITY}:443",
+    "serverNames": [
+      "${REALITY}"
+    ],
+    "privateKey": "${PRIVATE_KEY1}",
+    "minClient": "",
+    "maxClient": "",
+    "maxTimediff": 0,
+    "shortIds": [
+      "c7c487",
+      "cf",
+      "248c16289e",
+      "ae60608a67d1a367",
+      "21221b811591",
+      "648bc6ab5ba1bc",
+      "73d1",
+      "3028618d"
+    ],
+    "settings": {
+      "publicKey": "${PUBLIC_KEY1}",
+      "fingerprint": "random",
+      "serverName": "",
+      "spiderX": "/"
+    }
   },
   "tcpSettings": {
-  "acceptProxyProtocol": true,
-  "header": {
-    "type": "none"
-  }
+    "acceptProxyProtocol": true,
+    "header": {
+      "type": "none"
+    }
   }
 }
 EOF
@@ -1257,44 +1238,44 @@ settings_xtls() {
   "network": "tcp",
   "security": "tls",
   "externalProxy": [
-  {
-    "forceTls": "same",
-    "dest": "www.${DOMAIN}",
-    "port": 443,
-    "remark": ""
-  }
-  ],
-  "tlsSettings": {
-  "serverName": "www.${DOMAIN}",
-  "minVersion": "1.3",
-  "maxVersion": "1.3",
-  "cipherSuites": "",
-  "rejectUnknownSni": false,
-  "disableSystemRoot": false,
-  "enableSessionResumption": false,
-  "certificates": [
     {
-    "certificateFile": "/etc/letsencrypt/live/${DOMAIN}/fullchain.pem",
-    "keyFile": "/etc/letsencrypt/live/${DOMAIN}/privkey.pem",
-    "ocspStapling": 3600,
-    "oneTimeLoading": false,
-    "usage": "encipherment",
-    "buildChain": false
+      "forceTls": "same",
+      "dest": "www.${DOMAIN}",
+      "port": 443,
+      "remark": ""
     }
   ],
-  "alpn": [
-    "http/1.1"
-  ],
-  "settings": {
-    "allowInsecure": false,
-    "fingerprint": "random"
-  }
+  "tlsSettings": {
+    "serverName": "www.${DOMAIN}",
+    "minVersion": "1.3",
+    "maxVersion": "1.3",
+    "cipherSuites": "",
+    "rejectUnknownSni": false,
+    "disableSystemRoot": false,
+    "enableSessionResumption": false,
+    "certificates": [
+      {
+        "certificateFile": "/etc/letsencrypt/live/${DOMAIN}/fullchain.pem",
+        "keyFile": "/etc/letsencrypt/live/${DOMAIN}/privkey.pem",
+        "ocspStapling": 3600,
+        "oneTimeLoading": false,
+        "usage": "encipherment",
+        "buildChain": false
+      }
+    ],
+    "alpn": [
+      "http/1.1"
+    ],
+    "settings": {
+      "allowInsecure": false,
+      "fingerprint": "random"
+    }
   },
   "tcpSettings": {
-  "acceptProxyProtocol": true,
-  "header": {
-    "type": "none"
-  }
+    "acceptProxyProtocol": true,
+    "header": {
+      "type": "none"
+    }
   }
 }
 EOF
@@ -1371,12 +1352,31 @@ panel_installation() {
 ### UFW ###
 enabling_security() {
   info " $(text 47) "
-  ufw --force reset
-  ufw allow 36079/tcp
-  ufw allow 443/tcp
-  ufw allow 22/tcp
-  ufw insert 1 deny from $(echo ${IP4} | cut -d '.' -f 1-3).0/22
-  ufw --force enable
+  BLOCK_ZONE_IP=$(echo ${IP4} | cut -d '.' -f 1-3).0/22
+
+  case "$SYSTEM" in
+    Debian|Ubuntu )  
+      ufw --force reset
+      ufw allow 36079/tcp
+      ufw allow 443/tcp
+      ufw allow 22/tcp
+      ufw insert 1 deny from "$BLOCK_ZONE_IP"
+      ufw --force enable
+      ;;
+
+    CentOS|Fedora )
+      firewall-cmd --permanent --zone=public --remove-port=36079/tcp
+      firewall-cmd --permanent --zone=public --remove-port=443/tcp
+      firewall-cmd --permanent --zone=public --remove-port=22/tcp
+      firewall-cmd --permanent --zone=public --add-port=36079/tcp
+      firewall-cmd --permanent --zone=public --add-port=443/tcp
+      firewall-cmd --permanent --zone=public --add-port=22/tcp
+      firewall-cmd --permanent --zone=public --add-rich-rule="rule family='ipv4' source address='$BLOCK_ZONE_IP' reject"
+      firewall-cmd --reload
+      systemctl enable --now firewalld
+      ;;
+  esac
+
   tilda "$(text 10)"
 }
 
@@ -1392,7 +1392,6 @@ ssh_setup() {
   out_data " $(text 52)" "type \$env:USERPROFILE\.ssh\id_rsa.pub | ssh -p 22 ${USERNAME}@${IP4} \"cat >> ~/.ssh/authorized_keys\""
   out_data " $(text 53)" "ssh-copy-id -p 22 ${USERNAME}@${IP4}"
   echo
-  while read -r -t 0.1 -n 1; do :; done
   reading " $(text 54) " ANSWER_SSH
   if [[ "${ANSWER_SSH}" == [yY] ]]; then
     # Цикл проверки наличия ключа
@@ -1428,7 +1427,7 @@ ssh_setup() {
     cat > /etc/motd <<EOF
 
 ################################################################################
-             WARNING: AUTHORIZED ACCESS ONLY
+                        WARNING: AUTHORIZED ACCESS ONLY
 ################################################################################
 
 This system is for the use of authorized users only. Individuals using this
@@ -1448,20 +1447,20 @@ to the fullest extent of the law.
 
 ################################################################################
 
-       +----------------------------------------------------+
-       | █████ █████ ███████████   █████████   █████ █████|
-       |░░███ ░░███ ░░███░░░░░███   ███░░░░░███ ░░███ ░░███ |
-       | ░░███ ███   ░███  ░███  ░███  ░███  ░░███ ███  |
-       |  ░░█████  ░██████████   ░███████████   ░░█████   |
-       |   ███░███   ░███░░░░░███  ░███░░░░░███  ░░███  |
-       |  ███ ░░███  ░███  ░███  ░███  ░███   ░███  |
-       | █████ █████ █████   █████ █████   █████  █████   |
-       |░░░░░ ░░░░░ ░░░░░   ░░░░░ ░░░░░   ░░░░░  ░░░░░  |
-       +----------------------------------------------------+
+             +----------------------------------------------------+
+             | █████ █████ ███████████     █████████   █████ █████|
+             |░░███ ░░███ ░░███░░░░░███   ███░░░░░███ ░░███ ░░███ |
+             | ░░███ ███   ░███    ░███  ░███    ░███  ░░███ ███  |
+             |  ░░█████    ░██████████   ░███████████   ░░█████   |
+             |   ███░███   ░███░░░░░███  ░███░░░░░███    ░░███    |
+             |  ███ ░░███  ░███    ░███  ░███    ░███     ░███    |
+             | █████ █████ █████   █████ █████   █████    █████   |
+             |░░░░░ ░░░░░ ░░░░░   ░░░░░ ░░░░░   ░░░░░    ░░░░░    |
+             +----------------------------------------------------+
 
 
 EOF
-    systemctl restart ssh.service
+    systemctl restart sshd
   else
     warning " $(text 9) "
     return 0
