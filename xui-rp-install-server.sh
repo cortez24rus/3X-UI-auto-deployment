@@ -776,8 +776,7 @@ server {
     ssl_reject_handshake        on;
 }
 server {
-    listen                      36077 ssl proxy_protocol;
-    http2                       on;
+    listen                      36077 ssl http2 proxy_protocol;
     server_name                 ${DOMAIN} www.${DOMAIN};
 
     # SSL
