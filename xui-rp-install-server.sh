@@ -1086,7 +1086,7 @@ ssh_setup() {
         cat > /etc/motd <<EOF
 
 ################################################################################
-                         WARNING: AUTHORIZED ACCESS ONLY
+                         WARNING: AUTHORIZED ACCESS ONLY                         
 ################################################################################
 
 This system is for the use of authorized users only. Individuals using this

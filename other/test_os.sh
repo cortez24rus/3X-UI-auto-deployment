@@ -521,13 +521,11 @@ data_entry() {
 
 install() {
   info " $(text 36) "
+
   case "$SYSTEM" in
     Debian|Ubuntu )
       ${PACKAGE_UPDATE[int]}
       ${PACKAGE_INSTALL[int]} --no-install-recommends \
-        dnsutils \
-        net-tools \
-        iptables \
         jq \
         ufw \
         zip \
@@ -535,6 +533,8 @@ install() {
         gnupg2 \
         sqlite3 \
         certbot \
+        openssl \
+        net-tools \
         lsb-release \
         apache2-utils \
         ca-certificates \
@@ -547,8 +547,6 @@ install() {
       [ "$SYSTEM" = 'CentOS' ] && ${PACKAGE_INSTALL[int]} epel-release
       ${PACKAGE_UPDATE[int]}
       ${PACKAGE_INSTALL[int]} --no-install-recommends \
-        net-tools \
-        iptables \
         jq \
         ufw \
         zip \
@@ -556,8 +554,10 @@ install() {
         gnupg2 \
         sqlite3 \
         certbot \
+        openssl \
+        net-tools \
         lsb-release \
-        apache2-utils \
+        httpd-tools \
         ca-certificates \
         unattended-upgrades \
         software-properties-common \
@@ -578,8 +578,10 @@ DNS=1.1.1.1 8.8.8.8 8.8.4.4
 Domains=~.
 DNSSEC=yes
 DNSOverTLS=yes
+Cache=yes
+DNSCacheTimeoutSec=3600
 EOF
-  systemctl restart systemd-resolved.service
+  systemctl restart systemd-resolved
 }
 
 dns_adguard_home() {
@@ -617,7 +619,7 @@ DNS=127.0.0.1
 DNSOverTLS=no
 DNSStubListener=no
 EOF
-  systemctl restart systemd-resolved.service
+  systemctl restart systemd-resolved
 }
 
 ### DoH, DoT ###
@@ -656,7 +658,7 @@ dns_encryption() {
 ### Добавление пользователя ###
 add_user() {
   info " $(text 39) "
-  useradd -m -s $(which bash) -G sudo ${USERNAME}
+  useradd -m -s $(which bash) -G wheel,sudo ${USERNAME}
   echo "${USERNAME}:${PASSWORD}" | chpasswd
   mkdir -p /home/${USERNAME}/.ssh/
   touch /home/${USERNAME}/.ssh/authorized_keys
@@ -670,10 +672,30 @@ add_user() {
 ### Безопасность ###
 unattended_upgrade() {
   info " $(text 40) "
-  echo 'Unattended-Upgrade::Mail "root";' >> /etc/apt/apt.conf.d/50unattended-upgrades
-  echo unattended-upgrades unattended-upgrades/enable_auto_updates boolean true | debconf-set-selections
-  dpkg-reconfigure -f noninteractive unattended-upgrades
-  systemctl restart unattended-upgrades
+
+  case "$SYSTEM" in
+    Debian|Ubuntu )
+      echo 'Unattended-Upgrade::Mail "root";' >> /etc/apt/apt.conf.d/50unattended-upgrades
+      echo unattended-upgrades unattended-upgrades/enable_auto_updates boolean true | debconf-set-selections
+      dpkg-reconfigure -f noninteractive unattended-upgrades
+      systemctl restart unattended-upgrades
+      ;;
+
+    CentOS|Fedora )
+      echo "[commands]" | sudo tee -a /etc/dnf/automatic.conf
+      echo "upgrade_type = default" | sudo tee -a /etc/dnf/automatic.conf
+      echo "random_sleep = 0" | sudo tee -a /etc/dnf/automatic.conf
+      echo "update_cmd = default" | sudo tee -a /etc/dnf/automatic.conf
+      echo "download_cmd = default" | sudo tee -a /etc/dnf/automatic.conf
+      echo "apply_updates = yes" | sudo tee -a /etc/dnf/automatic.conf
+      echo "[email]" | sudo tee -a /etc/dnf/automatic.conf
+      echo "email_from = root@localhost" | sudo tee -a /etc/dnf/automatic.conf
+      echo "email_to = root" | sudo tee -a /etc/dnf/automatic.conf
+      sudo systemctl enable --now dnf-automatic.timer
+      sudo systemctl status dnf-automatic.timer
+      ;;
+  esac
+
   tilda "$(text 10)"
 }
 
@@ -683,7 +705,6 @@ enable_bbr() {
   if [[ ! "$(sysctl net.core.default_qdisc)" == *"= fq" ]]; then
     echo "net.core.default_qdisc = fq" >> /etc/sysctl.conf
   fi
-
   if [[ ! "$(sysctl net.ipv4.tcp_congestion_control)" == *"bbr" ]]; then
     echo "net.ipv4.tcp_congestion_control = bbr" >> /etc/sysctl.conf
   fi
@@ -1289,6 +1310,7 @@ EOF
 #  )
 #}
 #UPDATE settings SET value = '${SUB_JSON_RULES}' WHERE LOWER(key) LIKE '%subjsonrules%';
+#json_rules
 
 database_change() {
   DB_PATH="x-ui.db"
@@ -1334,7 +1356,6 @@ panel_installation() {
   settings_steal
   settings_reality
   settings_xtls
-#  json_rules
   database_change
 
   x-ui stop
@@ -1356,24 +1377,23 @@ enabling_security() {
 
   case "$SYSTEM" in
     Debian|Ubuntu )  
-      ufw --force reset
-      ufw allow 36079/tcp
-      ufw allow 443/tcp
-      ufw allow 22/tcp
-      ufw insert 1 deny from "$BLOCK_ZONE_IP"
-      ufw --force enable
+      sudo ufw --force reset
+      sudo ufw allow 36079/tcp
+      sudo ufw allow 443/tcp
+      sudo ufw allow 22/tcp
+      sudo ufw insert 1 deny from "$BLOCK_ZONE_IP"
+      sudo ufw --force enable
       ;;
 
     CentOS|Fedora )
-      firewall-cmd --permanent --zone=public --remove-port=36079/tcp
-      firewall-cmd --permanent --zone=public --remove-port=443/tcp
-      firewall-cmd --permanent --zone=public --remove-port=22/tcp
-      firewall-cmd --permanent --zone=public --add-port=36079/tcp
-      firewall-cmd --permanent --zone=public --add-port=443/tcp
-      firewall-cmd --permanent --zone=public --add-port=22/tcp
-      firewall-cmd --permanent --zone=public --add-rich-rule="rule family='ipv4' source address='$BLOCK_ZONE_IP' reject"
-      firewall-cmd --reload
-      systemctl enable --now firewalld
+      sudo firewall-cmd --permanent --delete-all-rules
+      sudo firewall-cmd --flush
+      sudo firewall-cmd --permanent --zone=public --add-port=36079/tcp
+      sudo firewall-cmd --permanent --zone=public --add-port=443/tcp
+      sudo firewall-cmd --permanent --zone=public --add-port=22/tcp
+      sudo firewall-cmd --permanent --zone=public --add-rich-rule="rule family='ipv4' source address='$BLOCK_ZONE_IP' reject"
+      sudo firewall-cmd --reload
+      sudo systemctl enable --now firewalld
       ;;
   esac
 
@@ -1566,3 +1586,46 @@ main_choise() {
 }
 
 main_choise
+
+DNS_TYPE=""
+UFW_STATUS="on"
+SSH_STATUS="on"
+MONITORING_STATUS="off"
+
+# Функция для обработки флагов
+while [[ "$#" -gt 0 ]]; do
+    case $1 in
+        --dns)
+            DNS_TYPE="$2"
+            shift 2
+            ;;
+        --ufw)
+            UFW_STATUS="$2"
+            shift 2
+            ;;
+        --ssh)
+            SSH_STATUS="$2"
+            shift 2
+            ;;
+        --monitoring)
+            MONITORING_STATUS="$2"
+            shift 2
+            ;;
+        *)
+            echo "Unknown option $1"
+            exit 1
+            ;;
+    esac
+done
+
+if [[ "$DNS_TYPE" == "sysr" ]]; then
+    echo "Устанавливаем systemd-resolved..."
+elif [[ "$DNS_TYPE" == "adguard" ]]; then
+    echo "Устанавливаем AdGuard..."
+fi
+
+if [[ "$UFW_STATUS" == "off" ]]; then
+    echo "UFW не будет установлен."
+else
+    echo "Устанавливаем UFW..."
+fi
