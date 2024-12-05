@@ -195,7 +195,7 @@ check_root() {
   fi
 }
 
-# Многоступенчатая проверка операционной системы, пробуем до тех пор, пока не получим значение. Поддерживаются только Debian 10/11, Ubuntu 18.04/20.04 или CentOS 7/8. Если это не одна из перечисленных операционных систем, скрипт завершится.
+# Многоступенчатая проверка операционной системы, пробуем до тех пор, пока не получим значение. Поддерживаются только Debian 10/11/12, Ubuntu 18.04/20.04/22.04/24.04 или CentOS 7/8/9. Если это не одна из перечисленных операционных систем, скрипт завершится.
 # Благодарность котику за техническую помощь и оптимизацию повторяющихся команд. https://github.com/Oreomeow
 check_operating_system() {
   if [ -s /etc/os-release ]; then
@@ -215,7 +215,7 @@ check_operating_system() {
   REGEX=("debian" "ubuntu" "centos|red hat|kernel|alma|rocky")
   RELEASE=("Debian" "Ubuntu" "CentOS")
   EXCLUDE=("---")
-  MAJOR=("9" "16" "7")
+  MAJOR=("10" "18" "7")
   PACKAGE_UPDATE=("apt -y update" "apt -y update" "yum -y update --skip-broken")
   PACKAGE_INSTALL=("apt -y install" "apt -y install" "yum -y install")
   PACKAGE_UNINSTALL=("apt -y autoremove" "apt -y autoremove" "yum -y autoremove")
@@ -520,84 +520,71 @@ data_entry() {
 }
 
 install() {
-  
-case "$SYSTEM" in
+  info " $(text 36) "
+  case "$SYSTEM" in
     Debian )
-      local DEBIAN_VERSION=$(echo $SYS | sed "s/[^0-9.]//g" | cut -d. -f1)
-      if [ "$DEBIAN_VERSION" = '9' ]; then
-        echo "deb http://deb.debian.org/debian/ unstable main" > /etc/apt/sources.list.d/unstable-wireguard.list
-        echo -e "Package: *\nPin: release a=unstable\nPin-Priority: 150\n" > /etc/apt/preferences.d/limit-unstable
-      elif
-        [ "$DEBIAN_VERSION" = '10' ]; then
-        echo 'deb http://archive.debian.org/debian buster-backports main' > /etc/apt/sources.list.d/backports.list
-      else
-        echo "deb http://deb.debian.org/debian $(awk -F '=' '/VERSION_CODENAME/{print $2}' /etc/os-release)-backports main" > /etc/apt/sources.list.d/backports.list
-      fi
-
       ${PACKAGE_UPDATE[int]}
-      ${PACKAGE_INSTALL[int]} --no-install-recommends net-tools openresolv dnsutils iptables
+      ${PACKAGE_INSTALL[int]} --no-install-recommends \
+        net-tools \
+        dnsutils \
+        iptables \
+        jq \
+        ufw \
+        zip \
+        sudo \
+        gnupg2 \
+        sqlite3 \
+        certbot \
+        lsb-release \
+        apache2-utils \
+        ca-certificates \
+        unattended-upgrades \
+        software-properties-common \
+        python3-certbot-dns-cloudflare
       ;;
 
     Ubuntu )
       ${PACKAGE_UPDATE[int]}
-      ${PACKAGE_INSTALL[int]} --no-install-recommends net-tools openresolv dnsutils iptables
+      ${PACKAGE_INSTALL[int]} --no-install-recommends \
+        net-tools \
+        dnsutils \
+        iptables \
+        jq \
+        ufw \
+        zip \
+        sudo \
+        gnupg2 \
+        sqlite3 \
+        certbot \
+        lsb-release \
+        apache2-utils \
+        ca-certificates \
+        unattended-upgrades \
+        software-properties-common \
+        python3-certbot-dns-cloudflare
       ;;
 
     CentOS|Fedora 
       [ "$SYSTEM" = 'CentOS' ] && ${PACKAGE_INSTALL[int]} epel-release
-      ${PACKAGE_INSTALL[int]} net-tools iptables
       ${PACKAGE_UPDATE[int]}
+      ${PACKAGE_INSTALL[int]} --no-install-recommends \
+        net-tools \
+        iptables \
+        jq \
+        ufw \
+        zip \
+        sudo \
+        gnupg2 \
+        sqlite3 \
+        certbot \
+        lsb-release \
+        apache2-utils \
+        ca-certificates \
+        unattended-upgrades \
+        software-properties-common \
+        python3-certbot-dns-cloudflare
       ;;
   esac
-}
-
-### Обновление системы и установка пакетов ###
-installation_of_utilities() {
-  info " $(text 36) "
-  apt-get update && apt-get upgrade -y && apt-get install -y \
-    jq \
-    ufw \
-    zip \
-    wget \
-    sudo \
-    curl \
-    screen \
-    gnupg2 \
-    sqlite3 \
-    certbot \
-    net-tools \
-	  lsb-release \
-    apache2-utils \
-  	ca-certificates \
-    unattended-upgrades \
-    software-properties-common \
-    python3-certbot-dns-cloudflare
-    
-  mkdir -p /usr/share/keyrings
-  OS=$(lsb_release -is | tr '[:upper:]' '[:lower:]')
-  DISTRO=$(lsb_release -cs)
-
-  echo "Обнаружена операционная система: $OS ($DISTRO)"
-
-  echo "Добавление ключа репозитория Nginx..."
-  curl -fsSL https://nginx.org/keys/nginx_signing.key | gpg --dearmor -o /usr/share/keyrings/nginx-archive-keyring.gpg
-
-  if [[ "$OS" == "ubuntu" ]]; then
-    echo "Добавление репозитория для Ubuntu..."
-    echo "deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] https://nginx.org/packages/ubuntu/ $DISTRO nginx" > /etc/apt/sources.list.d/nginx.list
-  elif [[ "$OS" == "debian" ]]; then
-    echo "Добавление репозитория для Debian..."
-    echo "deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] https://nginx.org/packages/debian/ $DISTRO nginx" > /etc/apt/sources.list.d/nginx.list
-  else
-    echo "Неизвестная или неподдерживаемая операционная система: $OS"
-  exit 1
-  fi
-
-  echo -e "Package: *\nPin: origin nginx.org\nPin: release o=nginx\nPin-Priority: 900\n" | tee /etc/apt/preferences.d/99nginx
-  apt-get update && apt-get install -y nginx systemd-resolved
-  systemctl start nginx
-  systemctl enable nginx
-  systemctl status nginx
   tilda "$(text 10)"
 }
 
