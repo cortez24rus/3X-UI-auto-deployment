@@ -468,33 +468,9 @@ installation_of_utilities() {
   	ca-certificates \
     unattended-upgrades \
     software-properties-common \
-    python3-certbot-dns-cloudflare
-    
-  mkdir -p /usr/share/keyrings
-  OS=$(lsb_release -is | tr '[:upper:]' '[:lower:]')
-  DISTRO=$(lsb_release -cs)
-
-  echo "Обнаружена операционная система: $OS ($DISTRO)"
-
-  echo "Добавление ключа репозитория Nginx..."
-  curl -fsSL https://nginx.org/keys/nginx_signing.key | gpg --dearmor -o /usr/share/keyrings/nginx-archive-keyring.gpg
-
-  if [[ "$OS" == "ubuntu" ]]; then
-    echo "Добавление репозитория для Ubuntu..."
-    echo "deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] https://nginx.org/packages/ubuntu/ $DISTRO nginx" > /etc/apt/sources.list.d/nginx.list
-  elif [[ "$OS" == "debian" ]]; then
-    echo "Добавление репозитория для Debian..."
-    echo "deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] https://nginx.org/packages/debian/ $DISTRO nginx" > /etc/apt/sources.list.d/nginx.list
-  else
-    echo "Неизвестная или неподдерживаемая операционная система: $OS"
-  exit 1
-  fi
-
-  echo -e "Package: *\nPin: origin nginx.org\nPin: release o=nginx\nPin-Priority: 900\n" | tee /etc/apt/preferences.d/99nginx
-  apt-get update && apt-get install -y nginx systemd-resolved
-  systemctl start nginx
-  systemctl enable nginx
-  systemctl status nginx
+    python3-certbot-dns-cloudflare \
+    nginx-full \
+    systemd-resolved 
   tilda "$(text 10)"
 }
 
@@ -999,12 +975,14 @@ EOF
     )
 }
 
-json_rules() {
-    SUB_JSON_RULES=$(cat <<EOF
-[{"type":"field","outboundTag":"direct","domain":["keyword:xn--","keyword:ru","keyword:su","keyword:kg","keyword:by","keyword:kz","keyword:rt","keyword:yandex","keyword:avito.","keyword:2gis.","keyword:gismeteo.","keyword:livejournal."]},{"type":"field","outboundTag":"direct","domain":["domain:ru","domain:su","domain:kg","domain:by","domain:kz"]},{"type":"field","outboundTag":"direct","domain":["geosite:category-ru","geosite:category-gov-ru","geosite:yandex","geosite:vk","geosite:whatsapp","geosite:apple","geosite:mailru","geosite:github","geosite:gitlab","geosite:duckduckgo","geosite:google","geosite:wikimedia","geosite:mozilla"]},{"type":"field","outboundTag":"direct","ip":["geoip:private","geoip:ru"]}]
-EOF
-    )
-}
+#json_rules() {
+#    SUB_JSON_RULES=$(cat <<EOF
+#[{"type":"field","outboundTag":"direct","domain":["keyword:xn--","keyword:ru","keyword:su","keyword:kg","keyword:by","keyword:kz","keyword:rt","keyword:yandex","keyword:avito.","keyword:2gis.","keyword:gismeteo.","keyword:livejournal."]},{"type":"field","outboundTag":"direct","domain":["domain:ru","domain:su","domain:kg","domain:by","domain:kz"]},{"type":"field","outboundTag":"direct","domain":["geosite:category-ru","geosite:category-gov-ru","geosite:yandex","geosite:vk","geosite:whatsapp","geosite:apple","geosite:mailru","geosite:github","geosite:gitlab","geosite:duckduckgo","geosite:google","geosite:wikimedia","geosite:mozilla"]},{"type":"field","outboundTag":"direct","ip":["geoip:private","geoip:ru"]}]
+#EOF
+#    )
+#}
+#UPDATE settings SET value = '${SUB_JSON_RULES}' WHERE LOWER(key) LIKE '%subjsonrules%';
+#json_rules
 
 database_change() {
     DB_PATH="x-ui.db"
@@ -1022,7 +1000,6 @@ UPDATE settings SET value = '/${SUB_PATH}/' WHERE LOWER(key) LIKE '%subpath%';
 UPDATE settings SET value = '${SUB_URI}' WHERE LOWER(key) LIKE '%suburi%';
 UPDATE settings SET value = '/${SUB_JSON_PATH}/' WHERE LOWER(key) LIKE '%subjsonpath%';
 UPDATE settings SET value = '${SUB_JSON_URI}' WHERE LOWER(key) LIKE '%subjsonuri%';
-UPDATE settings SET value = '${SUB_JSON_RULES}' WHERE LOWER(key) LIKE '%subjsonrules%';
 EOF
 }
 
@@ -1040,7 +1017,6 @@ panel_installation() {
 
     settings_steal
     settings_xtls
-    json_rules
     database_change
 
     x-ui stop

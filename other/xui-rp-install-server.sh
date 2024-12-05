@@ -163,7 +163,6 @@ R[72]="Список зависимостей для установки:"
 E[73]="All dependencies already exist and do not need to be installed additionally."
 R[73]="Все зависимости уже установлены и не требуют дополнительной установки."
 
-
 # Логирование
 log_entry() {
   mkdir -p /usr/local/xui-rp/
@@ -237,7 +236,7 @@ check_operating_system() {
 }
 
 check_dependencies() {
-  # 对于三大系统需要的依赖
+  # Зависимости, необходимые для трех основных систем
   DEPS_CHECK=("ping" "wget" "curl" "systemctl" "ip")
   DEPS_INSTALL=("iputils-ping" "wget" "curl" "systemctl" "iproute2")
 
