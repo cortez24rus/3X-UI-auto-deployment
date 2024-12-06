@@ -735,8 +735,7 @@ data_entry() {
   SUB_JSON_URI=https://${DOMAIN}/${SUB_JSON_PATH}/
 }
 
-install() {
-  
+install1() {
 case "$SYSTEM" in
     Debian )
       local DEBIAN_VERSION=$(echo $SYS | sed "s/[^0-9.]//g" | cut -d. -f1)
@@ -1563,7 +1562,7 @@ EOF
 }
 
 ### Установка 3x-ui ###
-install() {
+install_panel() {
   info " $(text 46) "
   touch /usr/local/xui-rp/reinstallation_check
 
@@ -1765,7 +1764,7 @@ main() {
   [[ ${args[mon]} == "true" ]] && monitoring
   write_defaults_to_file
   [[ ${args[nginx]} == "true" ]] && nginx_setup
-  [[ ${args[panel]} == "true" ]] && install
+  [[ ${args[panel]} == "true" ]] && install_panel
   [[ ${args[ufw]} == "true" ]] && enabling_security
   [[ ${args[ssh]} == "true" ]] && ssh_setup
   [[ ${args[tgbot]} == "true" ]] && install_bot
