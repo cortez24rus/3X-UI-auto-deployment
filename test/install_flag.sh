@@ -758,7 +758,7 @@ case "$SYSTEM" in
       ${PACKAGE_INSTALL[int]} --no-install-recommends net-tools openresolv dnsutils iptables
       ;;
 
-    CentOS|Fedora 
+    CentOS|Fedora)
       [ "$SYSTEM" = 'CentOS' ] && ${PACKAGE_INSTALL[int]} epel-release
       ${PACKAGE_INSTALL[int]} net-tools iptables
       ${PACKAGE_UPDATE[int]}
