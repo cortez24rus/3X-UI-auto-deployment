@@ -141,6 +141,11 @@ function parse_args {
         ;;
     esac
   done
+  for key in "${!defaults[@]}"; do
+    if [[ -z "${args[$key]}" ]]; then
+      args[$key]=${defaults[$key]}
+    fi
+  done
 }
 
 disable_ipv6(){
