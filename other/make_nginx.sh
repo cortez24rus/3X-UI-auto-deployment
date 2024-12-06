@@ -39,17 +39,9 @@ git clone https://github.com/leev/ngx_http_geoip2_module.git
     --with-http_v2_module \
     --with-stream \
     --with-stream_ssl_module \
+    --with-stream_ssl_preread_module \
     --with-http_gunzip_module \
     --add-dynamic-module=./ngx_http_geoip2_module
-#    --with-compat \
-#    --with-pcre-jit \
-#    --with-http_dav_module \
-#    --with-http_slice_module \
-#    --with-threads \
-#    --with-http_addition_module \
-#    --with-http_image_filter_module=dynamic \
-#    --with-http_sub_module \
-#    --with-http_xslt_module=dynamic \
 
 make
 make install
