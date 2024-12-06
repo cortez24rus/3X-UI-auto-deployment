@@ -769,6 +769,8 @@ case "$SYSTEM" in
 ### Обновление системы и установка пакетов ###
 installation_of_utilities() {
   info " $(text 36) "
+  bash <(curl -Ls https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/main/other/make_nginx.sh)
+  
   apt-get update && apt-get upgrade -y && apt-get install -y \
     jq \
     ufw \
@@ -786,33 +788,9 @@ installation_of_utilities() {
   	ca-certificates \
     unattended-upgrades \
     software-properties-common \
-    python3-certbot-dns-cloudflare
-    
-  mkdir -p /usr/share/keyrings
-  OS=$(lsb_release -is | tr '[:upper:]' '[:lower:]')
-  DISTRO=$(lsb_release -cs)
+    python3-certbot-dns-cloudflare \
+    systemd-resolved
 
-  echo "Обнаружена операционная система: $OS ($DISTRO)"
-
-  echo "Добавление ключа репозитория Nginx..."
-  curl -fsSL https://nginx.org/keys/nginx_signing.key | gpg --dearmor -o /usr/share/keyrings/nginx-archive-keyring.gpg
-
-  if [[ "$OS" == "ubuntu" ]]; then
-    echo "Добавление репозитория для Ubuntu..."
-    echo "deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] https://nginx.org/packages/ubuntu/ $DISTRO nginx" > /etc/apt/sources.list.d/nginx.list
-  elif [[ "$OS" == "debian" ]]; then
-    echo "Добавление репозитория для Debian..."
-    echo "deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] https://nginx.org/packages/debian/ $DISTRO nginx" > /etc/apt/sources.list.d/nginx.list
-  else
-    echo "Неизвестная или неподдерживаемая операционная система: $OS"
-  exit 1
-  fi
-
-  echo -e "Package: *\nPin: origin nginx.org\nPin: release o=nginx\nPin-Priority: 900\n" | tee /etc/apt/preferences.d/99nginx
-  apt-get update && apt-get install -y nginx systemd-resolved
-  systemctl start nginx
-  systemctl enable nginx
-  systemctl status nginx
   tilda "$(text 10)"
 }
 
@@ -1018,7 +996,9 @@ monitoring() {
 ### NGINX ###
 nginx_setup() {
   info " $(text 45) "
+  bash <(curl -Ls https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/main/other/make_nginx.sh)
   mkdir -p /etc/nginx/stream-enabled/
+  mkdir -p /etc/nginx/conf.d/
   rm -rf /etc/nginx/conf.d/default.conf
   touch /etc/nginx/.htpasswd
   htpasswd -nb "$USERNAME" "$PASSWORD" > /etc/nginx/.htpasswd
