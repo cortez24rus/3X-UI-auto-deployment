@@ -40,6 +40,8 @@ function parse_args {
             echo "Invalid option for --ipver6: $2. Use 'on' or 'off'."
             return 1
             ;;
+        esac
+        ;;
 
       -w|--warp)
         args[warp]="$2"
@@ -57,6 +59,8 @@ function parse_args {
             echo "Invalid option for --warp: $2. Use 'on' or 'off'."
             return 1
             ;;
+        esac
+        ;;
 
       -m|--monitoring)
         args[monitoring]="$2"
@@ -74,6 +78,8 @@ function parse_args {
             echo "Invalid option for --monitoring: $2. Use 'on' or 'off'."
             return 1
             ;;
+        esac
+        ;;
 
       -u|--ufw)
         args[ufw]="$2"
@@ -91,6 +97,8 @@ function parse_args {
             echo "Invalid option for --ufw: $2. Use 'on' or 'off'."
             return 1
             ;;
+        esac
+        ;;
 
       -s|--ssh)
         args[ssh]="$2"
@@ -108,6 +116,8 @@ function parse_args {
             echo "Invalid option for --ssh: $2. Use 'on' or 'off'."
             return 1
             ;;
+        esac
+        ;;
 
       -t|--tgbot)
         args[tgbot]="$2"
@@ -125,6 +135,8 @@ function parse_args {
             echo "Invalid option for --tgbot: $2. Use 'on' or 'off'."
             return 1
             ;;
+        esac
+        ;;
 
       -h|--help)
         return 1
@@ -141,6 +153,7 @@ function parse_args {
         ;;
     esac
   done
+  
   for key in "${!defaults[@]}"; do
     if [[ -z "${args[$key]}" ]]; then
       args[$key]=${defaults[$key]}
@@ -165,6 +178,10 @@ ssh_setup(){
 }
 install_bot(){
   echo "Установка tg бота"  
+}
+
+issuance_of_certificates(){
+  echo "Выдача сертификатов"
 }
 
 ### Первый запуск ###
