@@ -1035,15 +1035,15 @@ nginx_setup() {
 
 nginx_conf() {
   cat > /etc/nginx/nginx.conf <<EOF
-user                                 www-data;
-pid                                  /run/nginx.pid;
-worker_processes                     auto;
-worker_rlimit_nofile                 65535;
-error_log                            /var/log/nginx/error.log;
-include                              /etc/nginx/modules-enabled/*.conf;
+user                                   www-data;
+pid                                    /run/nginx.pid;
+worker_processes                       auto;
+worker_rlimit_nofile                   65535;
+error_log                              /var/log/nginx/error.log;
+include                                /etc/nginx/modules-enabled/*.conf;
 events {
-  multi_accept                       on;
-  worker_connections                 1024;
+  multi_accept                         on;
+  worker_connections                   1024;
 }
 
 http {
@@ -1529,14 +1529,6 @@ EOF
   )
 }
 
-#json_rules() {
-#  SUB_JSON_RULES=$(cat <<EOF
-#[{"type":"field","outboundTag":"direct","domain":["keyword:xn--","keyword:ru","keyword:su","keyword:kg","keyword:by","keyword:kz","keyword:rt","keyword:yandex","keyword:avito.","keyword:2gis.","keyword:gismeteo.","keyword:livejournal."]},{"type":"field","outboundTag":"direct","domain":["domain:ru","domain:su","domain:kg","domain:by","domain:kz"]},{"type":"field","outboundTag":"direct","domain":["geosite:category-ru","geosite:category-gov-ru","geosite:yandex","geosite:vk","geosite:whatsapp","geosite:apple","geosite:mailru","geosite:github","geosite:gitlab","geosite:duckduckgo","geosite:google","geosite:wikimedia","geosite:mozilla"]},{"type":"field","outboundTag":"direct","ip":["geoip:private","geoip:ru"]}]
-#EOF
-#  )
-#}
-#UPDATE settings SET value = '${SUB_JSON_RULES}' WHERE LOWER(key) LIKE '%subjsonrules%';
-
 database_change() {
   DB_PATH="x-ui.db"
 
@@ -1560,6 +1552,15 @@ UPDATE settings SET value = '/${SUB_JSON_PATH}/' WHERE LOWER(key) LIKE '%subjson
 UPDATE settings SET value = '${SUB_JSON_URI}' WHERE LOWER(key) LIKE '%subjsonuri%';
 EOF
 }
+
+#json_rules() {
+#  SUB_JSON_RULES=$(cat <<EOF
+#[{"type":"field","outboundTag":"direct","domain":["keyword:xn--","keyword:ru","keyword:su","keyword:kg","keyword:by","keyword:kz","keyword:rt","keyword:yandex","keyword:avito.","keyword:2gis.","keyword:gismeteo.","keyword:livejournal."]},{"type":"field","outboundTag":"direct","domain":["domain:ru","domain:su","domain:kg","domain:by","domain:kz"]},{"type":"field","outboundTag":"direct","domain":["geosite:category-ru","geosite:category-gov-ru","geosite:yandex","geosite:vk","geosite:whatsapp","geosite:apple","geosite:mailru","geosite:github","geosite:gitlab","geosite:duckduckgo","geosite:google","geosite:wikimedia","geosite:mozilla"]},{"type":"field","outboundTag":"direct","ip":["geoip:private","geoip:ru"]}]
+#EOF
+#  )
+#}
+#UPDATE settings SET value = '${SUB_JSON_RULES}' WHERE LOWER(key) LIKE '%subjsonrules%';
+
 
 ### Установка 3x-ui ###
 install_panel() {
@@ -1743,7 +1744,7 @@ main() {
   echo "Panel: ${args[panel]}"
   check_root
   check_ip
-  check_operating_system
+#  check_operating_system
   select_language
   if [ -f ${defaults_file} ]; then
     echo "повторная установка"
