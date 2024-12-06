@@ -38,7 +38,7 @@ function parse_args {
             ;;
           *)
             echo "Invalid option for --ipver6: $2. Use 'on' or 'off'."
-            return 1
+            exit 1
             ;;
         esac
         ;;
@@ -57,7 +57,7 @@ function parse_args {
             ;;
           *)
             echo "Invalid option for --warp: $2. Use 'on' or 'off'."
-            return 1
+            exit 1
             ;;
         esac
         ;;
@@ -76,7 +76,7 @@ function parse_args {
             ;;
           *)
             echo "Invalid option for --monitoring: $2. Use 'on' or 'off'."
-            return 1
+            exit 1
             ;;
         esac
         ;;
@@ -95,7 +95,7 @@ function parse_args {
             ;;
           *)
             echo "Invalid option for --ufw: $2. Use 'on' or 'off'."
-            return 1
+            exit 1
             ;;
         esac
         ;;
@@ -114,7 +114,7 @@ function parse_args {
             ;;
           *)
             echo "Invalid option for --ssh: $2. Use 'on' or 'off'."
-            return 1
+            exit 1
             ;;
         esac
         ;;
@@ -133,7 +133,7 @@ function parse_args {
             ;;
           *)
             echo "Invalid option for --tgbot: $2. Use 'on' or 'off'."
-            return 1
+            exit 1
             ;;
         esac
         ;;
@@ -149,7 +149,7 @@ function parse_args {
 
       *)
         echo "Unknown option: $1"
-        return 1
+        exit 1
         ;;
     esac
   done
@@ -187,6 +187,7 @@ issuance_of_certificates(){
 ### Первый запуск ###
 main_script_first() {
   echo "Начало"
+  echo "--------------------"
   [[ ${args[ipver6]} == "ON" ]] && disable_ipv6
   [[ ${args[warp]} == "ON" ]] && warp
   issuance_of_certificates
@@ -194,6 +195,7 @@ main_script_first() {
   [[ ${args[ufw]} == "ON" ]] && enabling_security
   [[ ${args[ssh]} == "ON" ]] && ssh_setup
   [[ ${args[tgbot]} == "ON" ]] && install_bot
+  echo "--------------------"
   echo "Конец"
 }
 
