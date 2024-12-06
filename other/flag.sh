@@ -54,7 +54,7 @@ function parse_args {
             ;;
           *)
             echo "Invalid option for --ipv6: $2. Use 'on' or 'off'."
-            exit 1
+            return 1
             ;;
         esac
         ;;
@@ -73,7 +73,7 @@ function parse_args {
             ;;
           *)
             echo "Invalid option for --warp: $2. Use 'on' or 'off'."
-            exit 1
+            return 1
             ;;
         esac
         ;;
@@ -92,7 +92,7 @@ function parse_args {
             ;;
           *)
             echo "Invalid option for --monitoring: $2. Use 'on' or 'off'."
-            exit 1
+            return 1
             ;;
         esac
         ;;
@@ -111,7 +111,7 @@ function parse_args {
             ;;
           *)
             echo "Invalid option for --ufw: $2. Use 'on' or 'off'."
-            exit 1
+            return 1
             ;;
         esac
         ;;
@@ -130,7 +130,7 @@ function parse_args {
             ;;
           *)
             echo "Invalid option for --ssh: $2. Use 'on' or 'off'."
-            exit 1
+            return 1
             ;;
         esac
         ;;
@@ -149,7 +149,7 @@ function parse_args {
             ;;
           *)
             echo "Invalid option for --tgbot: $2. Use 'on' or 'off'."
-            exit 1
+            return 1
             ;;
         esac
         ;;
@@ -165,7 +165,7 @@ function parse_args {
 
       *)
         echo "Unknown option: $1"
-        exit 1
+        return 1
         ;;
     esac
   done
