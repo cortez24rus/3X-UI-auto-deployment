@@ -10,6 +10,22 @@ defaults[ufw]=ON
 defaults[ssh]=ON
 defaults[tgbot]=OFF
 
+function show_help {
+  echo ""
+  echo "Usage: $0 [-i|--ipver6 <on|off>] [-w|--warp <on|off>] [-m|--monitoring <on|off>]"
+  echo "       [-u|--ufw <on|off>] [-s|--ssh <on|off>] [-t|--tgbot <on|off>] [-h|--help]"
+  echo ""
+  echo "  -i, --ipv6 <on|off>       Enable or disable IPv6 (default: ${defaults[ipver6]})"
+  echo "  -w, --warp <on|off>         Enable or disable Warp (default: ${defaults[warp]})"
+  echo "  -m, --monitoring <on|off>   Enable or disable Monitoring (default: ${defaults[monitoring]})"
+  echo "  -u, --ufw <on|off>          Enable or disable UFW (default: ${defaults[ufw]})"
+  echo "  -s, --ssh <on|off>          Enable or disable SSH (default: ${defaults[ssh]})"
+  echo "  -t, --tgbot <on|off>        Enable or disable Telegram bot (default: ${defaults[tgbot]})"
+  echo "  -h, --help                  Display this help message"
+  echo ""
+  exit 0
+}
+
 normalize_case() {
   local key=$1
   args[$key]="${args[$key],,}"
@@ -17,27 +33,27 @@ normalize_case() {
 
 function parse_args {
   local opts
-  opts=$(getopt -o i:w:m:u:s:t:h --long ipver6:,warp:,monitoring:,ufw:,ssh:,tgbot:,help -- "$@")
+  opts=$(getopt -o i:w:m:u:s:t:h --long ipv6:,warp:,monitoring:,ufw:,ssh:,tgbot:,help -- "$@")
   if [[ $? -ne 0 ]]; then
     return 1
   fi
   eval set -- "$opts"
   while true; do
     case $1 in
-      -i|--ipver6)
-        args[ipver6]="$2"
-        normalize_case ipver6
-        case ${args[ipver6]} in
+      -i|--ipv6)
+        args[ipv6]="$2"
+        normalize_case ipv6
+        case ${args[ipv6]} in
           on)
-            args[ipver6]=ON
+            args[ipv6]=ON
             shift 2
             ;;
           off)
-            args[ipver6]=OFF
+            args[ipv6]=OFF
             shift 2
             ;;
           *)
-            echo "Invalid option for --ipver6: $2. Use 'on' or 'off'."
+            echo "Invalid option for --ipv6: $2. Use 'on' or 'off'."
             exit 1
             ;;
         esac
@@ -201,7 +217,7 @@ main_script_first() {
 
 ### Проверка запуска ###
 main_choise() {
-  parse_args "$@"
+  parse_args "$@" || show_help
   main_script_first
 }
 
