@@ -143,51 +143,41 @@ function parse_args {
   done
 }
 
-ssh_setup(){
-  echo "INSTALL SSH"  
+disable_ipv6(){
+  echo "Отключение ipv6"  
 }
-
 warp(){
-  echo "INSTALL SSH"  
+  echo "Установка Warp"  
 }
-
-monitor(){
-  echo "INSTALL SSH"  
+monitoring(){
+  echo "Установка Node exporter"  
+}
+enabling_security(){
+  echo "Настройка UFW"  
+}
+ssh_setup(){
+  echo "Настройка SSH"  
+}
+install_bot(){
+  echo "Установка tg бота"  
 }
 
 ### Первый запуск ###
 main_script_first() {
-  clear
-  check_ip
-  banner_1
-  start_installation
-  data_entry
-  installation_of_utilities
-  dns_encryption
-  add_user
-  unattended_upgrade
-  enable_bbr
+  echo "Начало"
   [[ ${args[ipver6]} == "ON" ]] && disable_ipv6
   [[ ${args[warp]} == "ON" ]] && warp
   issuance_of_certificates
   [[ ${args[monitoring]} == "ON" ]] && monitoring
-  nginx_setup
-  panel_installation
   [[ ${args[ufw]} == "ON" ]] && enabling_security
   [[ ${args[ssh]} == "ON" ]] && ssh_setup
   [[ ${args[tgbot]} == "ON" ]] && install_bot
-  data_output
-  banner_1
-  log_clear
+  echo "Конец"
 }
 
 ### Проверка запуска ###
 main_choise() {
-  log_entry
   parse_args "$@"
-  check_root
-  check_operating_system
-  select_language
   main_script_first
 }
 
