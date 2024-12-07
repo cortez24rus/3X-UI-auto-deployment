@@ -2,9 +2,6 @@
 <p align="center"><a href="#"><img src="./media/3X-UI.png" alt="Image" ></a></p>
 
 -----
-Общее количество просмотров репозитория: **{{ total_views }}**
-
-Уникальные просмотры: **{{ unique_views }}**
 
 ### Подробная информация по дням:
 {{ views_data }}
