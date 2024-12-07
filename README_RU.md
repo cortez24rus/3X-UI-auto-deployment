@@ -1,11 +1,11 @@
-# XUI-REVERSE-PROXY ([English](/README.md)) <img src="https://img.shields.io/github/stars/cortez24rus/xui-reverse-proxy?style=social" />
+# XUI-REVERSE-PROXY ([English](/README.md)) <img src="https://img.shields.io/github/stars/cortez24rus/xui-reverse-proxy?style=social" />[![Downloads](https://img.shields.io/github/downloads/cortez24rus/xui-reverse-proxy/total.svg)](#)
 <p align="center"><a href="#"><img src="./media/3X-UI.png" alt="Image"></a></p>
 
 -----
 
 ### Прокси с использованием  VLESS-TCP-XTLS-Vision и VLESS-TCP-REALITY (Steal oneself) за реверс-прокси NGINX
 Этот скрипт предназначен для быстрой и простой настройки скрытого прокси-сервера, с маскировкой через NGINX. В данном варианте все входящие запросы обрабатываются NGINX, а сервер работает как прокси-сервер только при условии, что запрос содержит правильный путь (URI). Это повышает безопасность и помогает скрыть истинное назначение сервера.
-[![Downloads](https://img.shields.io/github/downloads/cortez24rus/xui-reverse-proxy/total.svg)](#)
+
 > [!IMPORTANT]
 > Этот скрипт был протестирован на Debian 12 в среде виртуализации KVM. Для корректной работы вам потребуется собственный домен, который` необходимо привязать к Cloudflare. Скрипт рекомендуется запускать с правами root на свежеустановленной системе.
 
