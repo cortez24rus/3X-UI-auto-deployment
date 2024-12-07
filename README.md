@@ -1,7 +1,10 @@
-# XUI-REVERSE-PROXY ([Russian](/README_RU.md)) <img src="https://img.shields.io/github/stars/cortez24rus/xui-reverse-proxy?style=social" /><!-- traffic_count -->
+# XUI-REVERSE-PROXY ([Russian](/README_RU.md)) <img src="https://img.shields.io/github/stars/cortez24rus/xui-reverse-proxy?style=social" />
 <p align="center"><a href="#"><img src="./media/3X-UI.png" alt="Image" ></a></p>
 
 -----
+Общее количество просмотров репозитория: **{{ env.total_views }}**
+
+Уникальные просмотры: **{{ env.unique_views }}**
 
 ### Proxy using VLESS-TCP-XTLS-Vision and VLESS-TCP-REALITY (Steal oneself) behind reverse-proxy NGINX
 This script is designed to quickly and easily set up a hidden proxy server, with masking via NGINX. In this variant, all incoming requests are handled by NGINX, and the server acts as a proxy server only if the request contains the correct path (URI). This increases security and helps to hide the true purpose of the server.
