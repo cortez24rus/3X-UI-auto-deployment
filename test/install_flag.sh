@@ -261,7 +261,7 @@ validate_true_false() {
       args[$key]=false
       ;;
     *)
-      echo "Invalid option for --$key: $2. Use 'true' or 'false'."
+      echo "Invalid option for --$key: $value. Use 'true' or 'false'."
       return 1
       ;;
   esac
@@ -451,6 +451,13 @@ check_operating_system() {
   # Сначала исключаем системы, указанные в EXCLUDE, затем для оставшихся делаем сравнение по основной версии
   for ex in "${EXCLUDE[@]}"; do [[ ! "${SYS,,}" =~ $ex ]]; done &&
   [[ "$MAJOR_VERSION" -lt "${MAJOR[int]}" ]] && error " $(text 71) "
+  echo "SYS $SYS"
+  echo "REGEX ${REGEX[int]}"
+  echo "RELEASE ${RELEASE[int]}"
+  echo "MAJOR ${MAJOR[int]}"
+  echo "PACKAGE_UPDATE ${PACKAGE_UPDATE[int]}"
+  echo "SYSTEM ${SYSTEM[int]}"
+  echo "MAJOR_VERSION ${MAJOR_VERSION[int]}"
 }
 
 check_dependencies() {
@@ -996,7 +1003,6 @@ monitoring() {
 ### NGINX ###
 nginx_setup() {
   info " $(text 45) "
-  bash <(curl -Ls https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/main/other/make_nginx.sh)
   mkdir -p /etc/nginx/stream-enabled/
   mkdir -p /etc/nginx/conf.d/
   rm -rf /etc/nginx/conf.d/default.conf
