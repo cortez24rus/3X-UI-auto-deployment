@@ -6,6 +6,9 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
+    - name: Install jq
+      run: sudo apt-get install jq
+
     - name: Fetch traffic data from GitHub API
       id: traffic
       run: |
