@@ -1,4 +1,4 @@
-# XUI-REVERSE-PROXY ([Russian](/README_RU.md)) <img src="https://img.shields.io/github/stars/cortez24rus/xui-reverse-proxy?style=social" />
+# XUI-REVERSE-PROXY ([Russian](/README_RU.md)) <img src="https://img.shields.io/github/stars/cortez24rus/xui-reverse-proxy?style=social" /><!-- traffic_count -->
 <p align="center"><a href="#"><img src="./media/3X-UI.png" alt="Image" ></a></p>
 
 -----
@@ -72,6 +72,3 @@ The script will then prompt you for the necessary configuration information:
 
 ## Stargazers over time
 [![Stargazers over time](https://starchart.cc/cortez24rus/xui-reverse-proxy.svg?variant=adaptive)](https://starchart.cc/cortez24rus/xui-reverse-proxy)
-
-**Количество просмотров репозитория:**
-<!-- traffic_count -->
