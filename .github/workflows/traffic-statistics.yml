@@ -1,58 +1,44 @@
-name: Update Views in README
+name: Update README with traffic statistics
 
 on:
   schedule:
-    - cron: '0 0 * * *'  # Запускать каждый день в полночь
-  workflow_dispatch:  # Также можно запускать вручную через GitHub UI
+    - cron: "0 0 * * *"  # Обновление каждый день в полночь (по вашему желанию)
+  workflow_dispatch:  # Можно запускать вручную через интерфейс GitHub
 
 jobs:
   update-readme:
     runs-on: ubuntu-latest
-    steps:
-      # Шаг для клонирования репозитория
-      - name: Checkout repository
-        uses: actions/checkout@v2
 
-      # Запрос данных о просмотрах из GitHub API
+    steps:
+      # Checkout репозитория
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Получение данных о просмотрах
       - name: Get views data
         id: views
         run: |
-          # Запрос данных с GitHub API
-          response=$(curl -H "Authorization: token ${{ secrets.GH_TOKEN }}" \
-                          -H "Accept: application/vnd.github.v3+json" \
-                          https://api.github.com/repos/cortez24rus/xui-reverse-proxy/traffic/views)
-
-          # Извлекаем общее количество просмотров и уникальных пользователей
+          response=$(curl -H "Authorization: token ${{ secrets.GH_TOKEN }}" -H "Accept: application/vnd.github.v3+json" \
+            https://api.github.com/repos/cortez24rus/xui-reverse-proxy/traffic/views)
           total_views=$(echo "$response" | jq '.count')
           unique_views=$(echo "$response" | jq '.uniques')
-
-          # Формируем строку с данными по дням
-          views_data=$(echo "$response" | jq -r '.views[] | "- \(.timestamp[0:10]): \(.count) просмотров (\(.uniques) уникальных)"')
-
-          # Устанавливаем переменные окружения для использования в следующих шагах
+          views_data=$(echo "$response" | jq -r '.views[] | "- " + .timestamp + ": " + (.count|tostring) + " просмотров (" + (.uniques|tostring) + " уникальных)"')
+          
           echo "total_views=$total_views" >> $GITHUB_ENV
           echo "unique_views=$unique_views" >> $GITHUB_ENV
           echo "views_data=$views_data" >> $GITHUB_ENV
 
-      # Обновление README.md с полученными данными
+      # Обновление README.md с новой статистикой
       - name: Update README
         run: |
-          # Читаем текущий README
           readme_content=$(cat README.md)
-
-          # Формируем новый контент для добавления
-          new_content="Общее количество просмотров репозитория: **${{ env.total_views }}**\n"
-          new_content+="Уникальные просмотры: **${{ env.unique_views }}**\n\n"
-          new_content+="### Подробная информация по дням:\n"
-          new_content+="${{ env.views_data }}"
-
-          # Заменяем старую информацию в README на новую
-          updated_readme=$(echo "$readme_content" | sed "s/## Статистика просмотров.*/## Статистика просмотров\n$new_content/")
-
-          # Записываем обновленный README обратно в файл
+          updated_readme=$(echo "$readme_content" | sed \
+            "s/Общее количество просмотров репозитория: \*\*TBD\*\*/Общее количество просмотров репозитория: \*\*${{ env.total_views }}\*\*/" \
+            | sed "s/Уникальные просмотры: \*\*TBD\*\*/Уникальные просмотры: \*\*${{ env.unique_views }}\*\*/" \
+            | sed "s|TBD|${{ env.views_data }}|")
           echo "$updated_readme" > README.md
 
-      # Коммит изменений в репозитории
+      # Коммит и пуш изменений
       - name: Commit and push changes
         run: |
           git config --global user.name "github-actions"
