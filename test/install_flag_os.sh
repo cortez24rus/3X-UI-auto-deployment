@@ -980,10 +980,30 @@ add_user() {
 ### Безопасность ###
 unattended_upgrade() {
   info " $(text 40) "
-  echo 'Unattended-Upgrade::Mail "root";' >> /etc/apt/apt.conf.d/50unattended-upgrades
-  echo unattended-upgrades unattended-upgrades/enable_auto_updates boolean true | debconf-set-selections
-  dpkg-reconfigure -f noninteractive unattended-upgrades
-  systemctl restart unattended-upgrades
+
+  case "$SYSTEM" in
+    Debian|Ubuntu )
+      echo 'Unattended-Upgrade::Mail "root";' >> /etc/apt/apt.conf.d/50unattended-upgrades
+      echo unattended-upgrades unattended-upgrades/enable_auto_updates boolean true | debconf-set-selections
+      dpkg-reconfigure -f noninteractive unattended-upgrades
+      systemctl restart unattended-upgrades
+      ;;
+
+    CentOS|Fedora )
+      echo "[commands]" | sudo tee -a /etc/dnf/automatic.conf
+      echo "upgrade_type = default" | sudo tee -a /etc/dnf/automatic.conf
+      echo "random_sleep = 0" | sudo tee -a /etc/dnf/automatic.conf
+      echo "update_cmd = default" | sudo tee -a /etc/dnf/automatic.conf
+      echo "download_cmd = default" | sudo tee -a /etc/dnf/automatic.conf
+      echo "apply_updates = yes" | sudo tee -a /etc/dnf/automatic.conf
+      echo "[email]" | sudo tee -a /etc/dnf/automatic.conf
+      echo "email_from = root@localhost" | sudo tee -a /etc/dnf/automatic.conf
+      echo "email_to = root" | sudo tee -a /etc/dnf/automatic.conf
+      sudo systemctl enable --now dnf-automatic.timer
+      sudo systemctl status dnf-automatic.timer
+      ;;
+  esac
+
   tilda "$(text 10)"
 }
 
@@ -997,6 +1017,7 @@ enable_bbr() {
   if [[ ! "$(sysctl net.ipv4.tcp_congestion_control)" == *"bbr" ]]; then
     echo "net.ipv4.tcp_congestion_control = bbr" >> /etc/sysctl.conf
   fi
+  sysctl -p
 }
 
 ### Отключение IPv6 ###
@@ -1664,12 +1685,30 @@ install_panel() {
 ### UFW ###
 enabling_security() {
   info " $(text 47) "
-  ufw --force reset
-  ufw allow 36079/tcp
-  ufw allow 443/tcp
-  ufw allow 22/tcp
-  ufw insert 1 deny from $(echo ${IP4} | cut -d '.' -f 1-3).0/22
-  ufw --force enable
+  BLOCK_ZONE_IP=$(echo ${IP4} | cut -d '.' -f 1-3).0/22
+
+  case "$SYSTEM" in
+    Debian|Ubuntu )  
+      sudo ufw --force reset
+      sudo ufw allow 36079/tcp
+      sudo ufw allow 443/tcp
+      sudo ufw allow 22/tcp
+      sudo ufw insert 1 deny from "$BLOCK_ZONE_IP"
+      sudo ufw --force enable
+      ;;
+
+    CentOS|Fedora )
+      sudo firewall-cmd --permanent --delete-all-rules
+      sudo firewall-cmd --flush
+      sudo firewall-cmd --permanent --zone=public --add-port=36079/tcp
+      sudo firewall-cmd --permanent --zone=public --add-port=443/tcp
+      sudo firewall-cmd --permanent --zone=public --add-port=22/tcp
+      sudo firewall-cmd --permanent --zone=public --add-rich-rule="rule family='ipv4' source address='$BLOCK_ZONE_IP' reject"
+      sudo firewall-cmd --reload
+      sudo systemctl enable --now firewalld
+      ;;
+  esac
+
   tilda "$(text 10)"
 }
 
@@ -1804,8 +1843,8 @@ main() {
   log_entry
   read_defaults_from_file
   parse_args "$@" || show_help
-  echo "NGINX: ${args[nginx]}"
-  echo "Panel: ${args[panel]}"
+  #echo "NGINX: ${args[nginx]}"
+  #echo "Panel: ${args[panel]}"
   check_root
   check_ip
   check_operating_system
