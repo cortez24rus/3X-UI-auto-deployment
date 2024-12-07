@@ -748,7 +748,7 @@ install_nginx() {
       if [ "${#DEPS_BUILD[@]}" -ge 1 ]; then
         echo "Список зависимостей для установки ${DEPS_BUILD[@]}"
         ${PACKAGE_UPDATE[int]} >/dev/null 2>&1
-        ${PACKAGE_INSTALL[int]} --no-install-recommends ${DEPS_BUILD[@]} >/dev/null 2>&1
+        ${PACKAGE_INSTALL[int]} ${DEPS_BUILD[@]} >/dev/null 2>&1
       else
         echo "Все зависимости уже установлены и не требуют дополнительной установки."
       fi
@@ -765,7 +765,7 @@ install_nginx() {
       if [ "${#DEPS_BUILD[@]}" -ge 1 ]; then
         echo "Список зависимостей для установки ${DEPS_BUILD[@]}"
         ${PACKAGE_UPDATE[int]} >/dev/null 2>&1
-        ${PACKAGE_INSTALL[int]} --no-install-recommends ${DEPS_BUILD[@]} >/dev/null 2>&1
+        ${PACKAGE_INSTALL[int]} ${DEPS_BUILD[@]} >/dev/null 2>&1
       else
         echo "Все зависимости уже установлены и не требуют дополнительной установки."
       fi
@@ -850,7 +850,7 @@ installation_of_utilities() {
       if [ "${#DEPS_PACK[@]}" -ge 1 ]; then
         echo "Список зависимостей для установки ${DEPS_PACK[@]}"
         ${PACKAGE_UPDATE[int]} >/dev/null 2>&1
-        ${PACKAGE_INSTALL[int]} --no-install-recommends ${DEPS_PACK[@]} >/dev/null 2>&1
+        ${PACKAGE_INSTALL[int]} ${DEPS_PACK[@]} >/dev/null 2>&1
       else
         echo "Все зависимости уже установлены и не требуют дополнительной установки."
       fi
@@ -867,7 +867,7 @@ installation_of_utilities() {
       if [ "${#DEPS_PACK[@]}" -ge 1 ]; then
         echo "Список зависимостей для установки ${DEPS_PACK[@]}"
         ${PACKAGE_UPDATE[int]} >/dev/null 2>&1
-        ${PACKAGE_INSTALL[int]} --no-install-recommends ${DEPS_PACK[@]} >/dev/null 2>&1
+        ${PACKAGE_INSTALL[int]} ${DEPS_PACK[@]} >/dev/null 2>&1
       else
         echo "Все зависимости уже установлены и не требуют дополнительной установки."
       fi
@@ -875,7 +875,7 @@ installation_of_utilities() {
   esac
   
   install_nginx
-  ${PACKAGE_INSTALL[int]} --no-install-recommends systemd-resolved
+  ${PACKAGE_INSTALL[int]} systemd-resolved
   tilda "$(text 10)"
 }
 
