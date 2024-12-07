@@ -529,7 +529,6 @@ install() {
         jq \
         ufw \
         zip \
-        sudo \
         gnupg2 \
         sqlite3 \
         certbot \
@@ -550,7 +549,6 @@ install() {
         jq \
         ufw \
         zip \
-        sudo \
         gnupg2 \
         sqlite3 \
         certbot \

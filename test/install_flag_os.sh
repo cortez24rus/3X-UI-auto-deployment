@@ -841,8 +841,8 @@ installation_of_utilities() {
   info " $(text 36) "
   case "$SYSTEM" in
     Debian|Ubuntu )
-      DEPS_PACK_CHECK=("jq" "ufw" "zip" "gpg" "sqlite3" "certbot" "openssl" "netstat" "lsb_release" "htpasswd" "update-ca-certificates" "unattended-upgrades" "add-apt-repository" "certbot-dns-cloudflare")
-      DEPS_PACK_INSTALL=("jq" "ufw" "zip" "gnupg2" "sqlite3" "certbot" "openssl" "net-tools" "lsb-release" "apache2-utils" "ca-certificates" "unattended-upgrades" "software-properties-common" "python3-certbot-dns-cloudflare")
+      DEPS_PACK_CHECK=("jq" "ufw" "zip" "gpg" "cron" "sqlite3" "certbot" "openssl" "netstat" "lsb_release" "htpasswd" "update-ca-certificates" "unattended-upgrades" "add-apt-repository" "certbot-dns-cloudflare")
+      DEPS_PACK_INSTALL=("jq" "ufw" "zip" "gnupg2" "cron" "sqlite3" "certbot" "openssl" "net-tools" "lsb-release" "apache2-utils" "ca-certificates" "unattended-upgrades" "software-properties-common" "python3-certbot-dns-cloudflare")
     
       for g in "${!DEPS_PACK_CHECK[@]}"; do
         [ ! -x "$(type -p ${DEPS_PACK_CHECK[g]})" ] && [[ ! "${DEPS_PACK[@]}" =~ "${DEPS_PACK_INSTALL[g]}" ]] && DEPS_PACK+=(${DEPS_PACK_INSTALL[g]})
@@ -858,8 +858,8 @@ installation_of_utilities() {
       ;;
 
     CentOS|Fedora )
-      DEPS_PACK_CHECK=("jq" "ufw" "zip" "gnupg2" "sqlite3" "certbot" "openssl" "netstat" "lsb_release" "htpasswd" "update-ca-certificates" "unattended-upgrades" "add-apt-repository" "certbot-dns-cloudflare")
-      DEPS_PACK_INSTALL=("jq" "ufw" "zip" "gnupg2" "sqlite3" "certbot" "openssl" "net-tools" "lsb-release" "httpd-tools" "ca-certificates" "unattended-upgrades" "software-properties-common" "python3-certbot-dns-cloudflare")
+      DEPS_PACK_CHECK=("jq" "ufw" "zip" "gnupg2" "cron" "sqlite3" "certbot" "openssl" "netstat" "lsb_release" "htpasswd" "update-ca-certificates" "unattended-upgrades" "add-apt-repository" "certbot-dns-cloudflare")
+      DEPS_PACK_INSTALL=("jq" "ufw" "zip" "gnupg2" "cron" "sqlite3" "certbot" "openssl" "net-tools" "lsb-release" "httpd-tools" "ca-certificates" "unattended-upgrades" "software-properties-common" "python3-certbot-dns-cloudflare")
     
       for g in "${!DEPS_PACK_CHECK[@]}"; do
         [ ! -x "$(type -p ${DEPS_PACK_CHECK[g]})" ] && [[ ! "${DEPS_PACK[@]}" =~ "${DEPS_PACK_INSTALL[g]}" ]] && DEPS_PACK+=(${DEPS_PACK_INSTALL[g]})
