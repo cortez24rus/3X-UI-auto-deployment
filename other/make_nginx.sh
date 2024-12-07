@@ -3,7 +3,7 @@
 apt update && apt install -y \
   git \
   build-essential \
-  libpcre++-dev \
+  libpcre2-dev \
   libssl-dev \
   libgeoip-dev \
   libxslt1-dev \
