@@ -1,17 +1,18 @@
 #!/bin/bash
 
-sudo apt update && apt install -y \
-    build-essential \
-    libpcre++-dev \
-    libssl-dev \
-    libgeoip-dev \
-    libxslt1-dev \
-    zlib1g-dev \
-    libgd-dev \
-    libmaxminddb0 \
-    libmaxminddb-dev \
-    mmdb-bin \
-    git
+apt update && apt install -y \
+  sudo \
+  build-essential \
+  libpcre++-dev \
+  libssl-dev \
+  libgeoip-dev \
+  libxslt1-dev \
+  zlib1g-dev \
+  libgd-dev \
+  libmaxminddb0 \
+  libmaxminddb-dev \
+  mmdb-bin \
+  git
 
 NGINX_VERSION="1.27.3"
 wget https://nginx.org/download/nginx-$NGINX_VERSION.tar.gz

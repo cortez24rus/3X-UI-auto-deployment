@@ -1724,10 +1724,10 @@ main() {
   echo "Panel: ${args[panel]}"
   check_root
   check_ip
-#  check_operating_system
+  check_operating_system
   select_language
   if [ -f ${defaults_file} ]; then
-    echo "повторная установка"
+    tilda "$(text 4)"
   fi
   sleep 2
   clear
