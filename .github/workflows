@@ -1,0 +1,40 @@
+name: Update README with Download Stats
+
+on:
+  schedule:
+    - cron: '0 0 * * *' # Запуск раз в сутки
+  workflow_dispatch: # Возможность запуска вручную
+
+jobs:
+  update-readme:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout the repository
+      uses: actions/checkout@v3
+
+    - name: Get download statistics
+      id: get_stats
+      run: |
+        REPO_OWNER="cortez24rus"
+        REPO_NAME="xui-reverse-proxy"
+        
+        # Запрос статистики
+        STATS=$(curl -s -H "Accept: application/vnd.github.v3+json" \
+          "https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/traffic/views" | jq '.count')
+        
+        # Запись результата в переменную для использования в дальнейшем
+        echo "download_count=$STATS" >> $GITHUB_ENV
+
+    - name: Update README.md
+      run: |
+        # Заменяем старое значение статистики на новое
+        sed -i "s|<downloads_placeholder>|$DOWNLOAD_COUNT|g" README.md
+
+    - name: Commit and push changes
+      run: |
+        git config user.name "GitHub Actions"
+        git config user.email "actions@github.com"
+        git add README.md
+        git commit -m "Update README with download stats"
+        git push
