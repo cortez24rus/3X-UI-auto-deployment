@@ -68,6 +68,7 @@ The script will then prompt you for the necessary configuration information:
 ### Note: 
 - Once the configuration is complete, the script will display all the necessary links and login information for the XUI administration panel.
 - All configurations can be modified as needed due to the flexibility of the settings.
+Количество скачиваний: **<downloads_placeholder>**
 
 ## Stargazers over time
 [![Stargazers over time](https://starchart.cc/cortez24rus/xui-reverse-proxy.svg?variant=adaptive)](https://starchart.cc/cortez24rus/xui-reverse-proxy)
