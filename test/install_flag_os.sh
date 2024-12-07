@@ -455,6 +455,7 @@ check_operating_system() {
 
 check_dependencies() {
   # Зависимости, необходимые для трех основных систем
+  [ "${SYSTEM}" = 'CentOS' ] && ${PACKAGE_INSTALL[int]} vim-common
   DEPS_CHECK=("ping" "wget" "curl" "systemctl" "ip" "sudo")
   DEPS_INSTALL=("iputils-ping" "wget" "curl" "systemctl" "iproute2" "sudo")
 
