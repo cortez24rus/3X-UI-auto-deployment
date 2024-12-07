@@ -451,19 +451,12 @@ check_operating_system() {
   # Сначала исключаем системы, указанные в EXCLUDE, затем для оставшихся делаем сравнение по основной версии
   for ex in "${EXCLUDE[@]}"; do [[ ! "${SYS,,}" =~ $ex ]]; done &&
   [[ "$MAJOR_VERSION" -lt "${MAJOR[int]}" ]] && error " $(text 71) "
-  echo "SYS $SYS"
-  echo "REGEX ${REGEX[int]}"
-  echo "RELEASE ${RELEASE[int]}"
-  echo "MAJOR ${MAJOR[int]}"
-  echo "PACKAGE_UPDATE ${PACKAGE_UPDATE[int]}"
-  echo "SYSTEM ${SYSTEM[int]}"
-  echo "MAJOR_VERSION ${MAJOR_VERSION[int]}"
 }
 
 check_dependencies() {
   # Зависимости, необходимые для трех основных систем
-  DEPS_CHECK=("ping" "wget" "curl" "systemctl" "ip")
-  DEPS_INSTALL=("iputils-ping" "wget" "curl" "systemctl" "iproute2")
+  DEPS_CHECK=("ping" "wget" "curl" "systemctl" "ip" "sudo")
+  DEPS_INSTALL=("iputils-ping" "wget" "curl" "systemctl" "iproute2" "sudo")
 
   for g in "${!DEPS_CHECK[@]}"; do
     [ ! -x "$(type -p ${DEPS_CHECK[g]})" ] && [[ ! "${DEPS[@]}" =~ "${DEPS_INSTALL[g]}" ]] && DEPS+=(${DEPS_INSTALL[g]})
@@ -742,62 +735,147 @@ data_entry() {
   SUB_JSON_URI=https://${DOMAIN}/${SUB_JSON_PATH}/
 }
 
-install1() {
-case "$SYSTEM" in
-    Debian )
-      local DEBIAN_VERSION=$(echo $SYS | sed "s/[^0-9.]//g" | cut -d. -f1)
-      if [ "$DEBIAN_VERSION" = '9' ]; then
-        echo "deb http://deb.debian.org/debian/ unstable main" > /etc/apt/sources.list.d/unstable-wireguard.list
-        echo -e "Package: *\nPin: release a=unstable\nPin-Priority: 150\n" > /etc/apt/preferences.d/limit-unstable
-      elif
-        [ "$DEBIAN_VERSION" = '10' ]; then
-        echo 'deb http://archive.debian.org/debian buster-backports main' > /etc/apt/sources.list.d/backports.list
+install_nginx() {
+  case "$SYSTEM" in
+    Debian|Ubuntu )
+      DEPS_BUILD_CHECK=("git" "gcc" "make" "libpcre2-dev" "libssl-dev" "libgeoip-dev" "libxslt1-dev" "zlib1g-dev" "libgd-dev" "libmaxminddb0" "libmaxminddb-dev" "mmdb-bin")
+      DEPS_BUILD_INSTALL=("git" "build-essential" "libpcre2-dev" "libssl-dev" "libgeoip-dev" "libxslt1-dev" "zlib1g-dev" "libgd-dev" "libmaxminddb0" "libmaxminddb-dev" "mmdb-bin")
+    
+      for g in "${!DEPS_BUILD_CHECK[@]}"; do
+        [ ! -x "$(type -p ${DEPS_BUILD_CHECK[g]})" ] && [[ ! "${DEPS_BUILD[@]}" =~ "${DEPS_BUILD_INSTALL[g]}" ]] && DEPS_BUILD+=(${DEPS_BUILD_INSTALL[g]})
+      done
+    
+      if [ "${#DEPS_BUILD[@]}" -ge 1 ]; then
+        echo "Список зависимостей для установки ${DEPS_BUILD[@]}"
+        ${PACKAGE_UPDATE[int]} >/dev/null 2>&1
+        ${PACKAGE_INSTALL[int]} --no-install-recommends ${DEPS_BUILD[@]} >/dev/null 2>&1
       else
-        echo "deb http://deb.debian.org/debian $(awk -F '=' '/VERSION_CODENAME/{print $2}' /etc/os-release)-backports main" > /etc/apt/sources.list.d/backports.list
+        echo "Все зависимости уже установлены и не требуют дополнительной установки."
       fi
-
-      ${PACKAGE_UPDATE[int]}
-      ${PACKAGE_INSTALL[int]} --no-install-recommends net-tools openresolv dnsutils iptables
       ;;
 
-    Ubuntu )
-      ${PACKAGE_UPDATE[int]}
-      ${PACKAGE_INSTALL[int]} --no-install-recommends net-tools openresolv dnsutils iptables
-      ;;
-
-    CentOS|Fedora)
-      [ "$SYSTEM" = 'CentOS' ] && ${PACKAGE_INSTALL[int]} epel-release
-      ${PACKAGE_INSTALL[int]} net-tools iptables
-      ${PACKAGE_UPDATE[int]}
+    CentOS|Fedora )
+      DEPS_BUILD_CHECK=("git" "gcc" "make" "pcre-devel" "openssl-devel" "GeoIP-devel" "libxslt-devel" "zlib-devel" "gd-devel" "libmaxminddb" "libmaxminddb-devel" "mmdblookup")
+      DEPS_BUILD_INSTALL=("git" "gcc" "make" "pcre-devel" "openssl-devel" "GeoIP-devel" "libxslt-devel" "zlib-devel" "gd-devel" "libmaxminddb" "libmaxminddb-devel" "mmdb-bin")
+    
+      for g in "${!DEPS_BUILD_CHECK[@]}"; do
+        [ ! -x "$(type -p ${DEPS_BUILD_CHECK[g]})" ] && [[ ! "${DEPS_BUILD[@]}" =~ "${DEPS_BUILD_INSTALL[g]}" ]] && DEPS_BUILD+=(${DEPS_BUILD_INSTALL[g]})
+      done
+    
+      if [ "${#DEPS_BUILD[@]}" -ge 1 ]; then
+        echo "Список зависимостей для установки ${DEPS_BUILD[@]}"
+        ${PACKAGE_UPDATE[int]} >/dev/null 2>&1
+        ${PACKAGE_INSTALL[int]} --no-install-recommends ${DEPS_BUILD[@]} >/dev/null 2>&1
+      else
+        echo "Все зависимости уже установлены и не требуют дополнительной установки."
+      fi
       ;;
   esac
+
+  NGINX_VERSION="1.27.3"
+  wget https://nginx.org/download/nginx-$NGINX_VERSION.tar.gz
+  tar -xvf nginx-$NGINX_VERSION.tar.gz
+  cd nginx-$NGINX_VERSION
+  git clone https://github.com/leev/ngx_http_geoip2_module.git
+  
+  ./configure \
+      --sbin-path=/usr/sbin/nginx \
+      --prefix=/etc/nginx \
+      --conf-path=/etc/nginx/nginx.conf \
+      --http-log-path=/var/log/nginx/access.log \
+      --error-log-path=/var/log/nginx/error.log \
+      --lock-path=/run/nginx.lock \
+      --pid-path=/run/nginx.pid \
+      --modules-path=/usr/lib/nginx/modules \
+      --http-client-body-temp-path=/var/lib/nginx/body \
+      --http-fastcgi-temp-path=/var/lib/nginx/fastcgi \
+      --http-proxy-temp-path=/var/lib/nginx/proxy \
+      --http-scgi-temp-path=/var/lib/nginx/scgi \
+      --http-uwsgi-temp-path=/var/lib/nginx/uwsgi \
+      --with-http_ssl_module \
+      --with-http_stub_status_module \
+      --with-http_realip_module \
+      --with-http_v2_module \
+      --with-stream \
+      --with-stream_ssl_module \
+      --with-stream_ssl_preread_module \
+      --with-http_gunzip_module \
+      --add-dynamic-module=./ngx_http_geoip2_module
+  
+  make
+  make install
+  
+  mkdir -p /var/lib/nginx/body
+  chown -R www-data:www-data /var/lib/nginx
+  chmod -R 700 /var/lib/nginx
+  
+  cat > /etc/systemd/system/nginx.service <<EOF
+[Unit]
+Description=The NGINX HTTP and reverse proxy server
+After=syslog.target network-online.target remote-fs.target nss-lookup.target
+Wants=network-online.target
+
+[Service]
+Type=forking
+PIDFile=/run/nginx.pid
+ExecStartPre=/usr/sbin/nginx -t
+ExecStart=/usr/sbin/nginx -c /etc/nginx/nginx.conf
+ExecReload=/bin/sh -c "/bin/kill -s HUP $(/bin/cat /run/nginx.pid)"
+ExecStop=/bin/sh -c "/bin/kill -s TERM $(/bin/cat /run/nginx.pid)"
+#PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
+EOF
+  
+  sudo systemctl daemon-reload
+  sudo systemctl start nginx
+  sudo systemctl enable nginx
+  systemctl status nginx --no-pager
+  cd ..
+  sudo rm -rf nginx-$NGINX_VERSION.tar.gz nginx-$NGINX_VERSION ngx_http_geoip2_module
 }
 
-### Обновление системы и установка пакетов ###
 installation_of_utilities() {
   info " $(text 36) "
-  bash <(curl -Ls https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/main/other/make_nginx.sh)
-  
-  apt-get update && apt-get upgrade -y && apt-get install -y \
-    jq \
-    ufw \
-    zip \
-    wget \
-    sudo \
-    curl \
-    screen \
-    gnupg2 \
-    sqlite3 \
-    certbot \
-    net-tools \
-	  lsb-release \
-    apache2-utils \
-  	ca-certificates \
-    unattended-upgrades \
-    software-properties-common \
-    python3-certbot-dns-cloudflare \
-    systemd-resolved
+  case "$SYSTEM" in
+    Debian|Ubuntu )
+      DEPS_PACK_CHECK=("jq" "ufw" "zip" "gpg" "sqlite3" "certbot" "openssl" "netstat" "lsb_release" "htpasswd" "update-ca-certificates" "unattended-upgrades" "add-apt-repository" "certbot-dns-cloudflare")
+      DEPS_PACK_INSTALL=("jq" "ufw" "zip" "gnupg2" "sqlite3" "certbot" "openssl" "net-tools" "lsb-release" "apache2-utils" "ca-certificates" "unattended-upgrades" "software-properties-common" "python3-certbot-dns-cloudflare")
+    
+      for g in "${!DEPS_PACK_CHECK[@]}"; do
+        [ ! -x "$(type -p ${DEPS_PACK_CHECK[g]})" ] && [[ ! "${DEPS_PACK[@]}" =~ "${DEPS_PACK_INSTALL[g]}" ]] && DEPS_PACK+=(${DEPS_PACK_INSTALL[g]})
+      done
+    
+      if [ "${#DEPS_PACK[@]}" -ge 1 ]; then
+        echo "Список зависимостей для установки ${DEPS_PACK[@]}"
+        ${PACKAGE_UPDATE[int]} >/dev/null 2>&1
+        ${PACKAGE_INSTALL[int]} --no-install-recommends ${DEPS_PACK[@]} >/dev/null 2>&1
+      else
+        echo "Все зависимости уже установлены и не требуют дополнительной установки."
+      fi
+      ;;
 
+    CentOS|Fedora )
+      DEPS_PACK_CHECK=("jq" "ufw" "zip" "gnupg2" "sqlite3" "certbot" "openssl" "netstat" "lsb_release" "htpasswd" "update-ca-certificates" "unattended-upgrades" "add-apt-repository" "certbot-dns-cloudflare")
+      DEPS_PACK_INSTALL=("jq" "ufw" "zip" "gnupg2" "sqlite3" "certbot" "openssl" "net-tools" "lsb-release" "httpd-tools" "ca-certificates" "unattended-upgrades" "software-properties-common" "python3-certbot-dns-cloudflare")
+    
+      for g in "${!DEPS_PACK_CHECK[@]}"; do
+        [ ! -x "$(type -p ${DEPS_PACK_CHECK[g]})" ] && [[ ! "${DEPS_PACK[@]}" =~ "${DEPS_PACK_INSTALL[g]}" ]] && DEPS_PACK+=(${DEPS_PACK_INSTALL[g]})
+      done
+    
+      if [ "${#DEPS_PACK[@]}" -ge 1 ]; then
+        echo "Список зависимостей для установки ${DEPS_PACK[@]}"
+        ${PACKAGE_UPDATE[int]} >/dev/null 2>&1
+        ${PACKAGE_INSTALL[int]} --no-install-recommends ${DEPS_PACK[@]} >/dev/null 2>&1
+      else
+        echo "Все зависимости уже установлены и не требуют дополнительной установки."
+      fi
+      ;;
+  esac
+  
+  install_nginx
+  ${PACKAGE_INSTALL[int]} --no-install-recommends systemd-resolved
   tilda "$(text 10)"
 }
 
@@ -1643,7 +1721,7 @@ ssh_setup() {
     cat > /etc/motd <<EOF
 
 ################################################################################
-             WARNING: AUTHORIZED ACCESS ONLY
+                         WARNING: AUTHORIZED ACCESS ONLY                         
 ################################################################################
 
 This system is for the use of authorized users only. Individuals using this
@@ -1663,16 +1741,16 @@ to the fullest extent of the law.
 
 ################################################################################
 
-       +----------------------------------------------------+
-       | █████ █████ ███████████   █████████   █████ █████|
-       |░░███ ░░███ ░░███░░░░░███   ███░░░░░███ ░░███ ░░███ |
-       | ░░███ ███   ░███  ░███  ░███  ░███  ░░███ ███  |
-       |  ░░█████  ░██████████   ░███████████   ░░█████   |
-       |   ███░███   ░███░░░░░███  ░███░░░░░███  ░░███  |
-       |  ███ ░░███  ░███  ░███  ░███  ░███   ░███  |
-       | █████ █████ █████   █████ █████   █████  █████   |
-       |░░░░░ ░░░░░ ░░░░░   ░░░░░ ░░░░░   ░░░░░  ░░░░░  |
-       +----------------------------------------------------+
+             +----------------------------------------------------+
+             | █████ █████ ███████████     █████████   █████ █████|
+             |░░███ ░░███ ░░███░░░░░███   ███░░░░░███ ░░███ ░░███ |
+             | ░░███ ███   ░███    ░███  ░███    ░███  ░░███ ███  |
+             |  ░░█████    ░██████████   ░███████████   ░░█████   |
+             |   ███░███   ░███░░░░░███  ░███░░░░░███    ░░███    |
+             |  ███ ░░███  ░███    ░███  ░███    ░███     ░███    |
+             | █████ █████ █████   █████ █████   █████    █████   |
+             |░░░░░ ░░░░░ ░░░░░   ░░░░░ ░░░░░   ░░░░░    ░░░░░    |
+             +----------------------------------------------------+
 
 
 EOF
