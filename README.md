@@ -1,6 +1,5 @@
 # XUI-REVERSE-PROXY ([Russian](/README_RU.md)) <img src="https://img.shields.io/github/stars/cortez24rus/xui-reverse-proxy?style=social" />
 <p align="center"><a href="#"><img src="./media/3X-UI.png" alt="Image" ></a></p>
-<br/>
 
 -----
 
