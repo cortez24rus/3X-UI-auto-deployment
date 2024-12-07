@@ -72,3 +72,28 @@ The script will then prompt you for the necessary configuration information:
 
 ## Stargazers over time
 [![Stargazers over time](https://starchart.cc/cortez24rus/xui-reverse-proxy.svg?variant=adaptive)](https://starchart.cc/cortez24rus/xui-reverse-proxy)
+
+
+### Пример GitHub Actions для получения статистики:
+
+```yaml
+name: Fetch Traffic Data
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  fetch_traffic:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Fetch traffic data from GitHub API
+      run: |
+        curl -H "Authorization: token ${{ secrets.GH_TOKEN }}" \
+             -H "Accept: application/vnd.github.v3+json" \
+             https://api.github.com/repos/cortez24rus/xui-reverse-proxy/traffic/views
