@@ -1,7 +1,7 @@
 #!/bin/bash
 
 apt update && apt install -y \
-  sudo \
+  git \
   build-essential \
   libpcre++-dev \
   libssl-dev \
