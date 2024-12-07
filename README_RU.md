@@ -1,4 +1,4 @@
-# XUI-REVERSE-PROXY ([English](/README.md)) <img src="https://img.shields.io/github/stars/cortez24rus/xui-reverse-proxy?style=social" />[![Downloads](https://img.shields.io/github/downloads/cortez24rus/xui-reverse-proxy/total.svg)](#)
+# XUI-REVERSE-PROXY ([English](/README.md)) <img src="https://img.shields.io/github/stars/cortez24rus/xui-reverse-proxy?style=social" />
 <p align="center"><a href="#"><img src="./media/3X-UI.png" alt="Image"></a></p>
 
 -----
