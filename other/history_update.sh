@@ -24,3 +24,23 @@ if [ $days_diff -le 3 ]; then
 else
     echo "Система не обновлялась более 3-х дней."
 fi
+
+
+get_download_count() {
+    REPO_OWNER="cortez24rus"     # Имя владельца репозитория
+    REPO_NAME="xui-reverse-proxy" # Имя репозитория
+    FILE_PATH="other/history_update.sh" # Путь к файлу
+    RAW_URL="https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/refs/heads/main/${FILE_PATH}"
+
+    # Логирование запросов
+    curl -X POST -H "Content-Type: application/json" -d '{"event": "script_downloaded"}' \
+        "https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/traffic/views" > /dev/null 2>&1
+
+    # Информация о скачивании
+    DOWNLOAD_COUNT=$(curl -s -H "Accept: application/vnd.github.v3+json" \
+        "https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/traffic/views" | jq '.count')
+
+    echo "Количество скачиваний скрипта: $DOWNLOAD_COUNT"
+}
+
+get_download_count
