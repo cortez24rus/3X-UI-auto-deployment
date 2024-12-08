@@ -693,42 +693,8 @@ choise_dns () {
 ### Ввод данных ###
 data_entry() {
   tilda "$(text 10)"
-
-  if [[ ${args[ssh]} == "true" ]]; then
-    reading " $(text 54) " ANSWER_SSH
-    if [[ "${ANSWER_SSH}" == [yY] ]]; then
-      info " $(text 48) "
-      out_data " $(text 49) "
-      echo
-      out_data " $(text 50) "
-      out_data " $(text 51) "
-      echo
-      out_data " $(text 52)" "type \$env:USERPROFILE\.ssh\id_rsa.pub | ssh -p 22 ${USERNAME}@${IP4} \"cat >> ~/.ssh/authorized_keys\""
-      out_data " $(text 53)" "ssh-copy-id -p 22 ${USERNAME}@${IP4}"
-      echo
-      # Цикл проверки наличия ключа
-      while true; do
-        if [[ -n $(grep -v '^[[:space:]]*$' "/home/${USERNAME}/.ssh/authorized_keys") || -n $(grep -v '^[[:space:]]*$' "/root/.ssh/authorized_keys") ]]; then
-          info " $(text 56) "
-          break
-        else
-          warning " $(text 55) "
-          echo
-          reading " $(text 54) " ANSWER_SSH
-          if [[ "${ANSWER_SSH}" != [yY] ]]; then
-            warning " $(text 9) " # Настройка отменена
-            return 0
-          fi
-        fi
-      done
-      tilda "$(text 10)"
-    else
-      warning " $(text 9) "
-      return 0
-    fi      
-  fi
-
   reading " $(text 70) " SECRET_PASSWORD
+
   tilda "$(text 10)"
 
   reading " $(text 11) " USERNAME
@@ -767,7 +733,42 @@ data_entry() {
 
   tilda "$(text 10)"
 
+  if [[ ${args[ssh]} == "true" ]]; then
+    reading " $(text 54) " ANSWER_SSH
+    if [[ "${ANSWER_SSH,,}" == "y" ]]; then
+      info " $(text 48) "
+      out_data " $(text 49) "
+      echo
+      out_data " $(text 50) "
+      out_data " $(text 51) "
+      echo
+      out_data " $(text 52)" "type \$env:USERPROFILE\.ssh\id_rsa.pub | ssh -p 22 ${USERNAME}@${IP4} \"cat >> ~/.ssh/authorized_keys\""
+      out_data " $(text 53)" "ssh-copy-id -p 22 ${USERNAME}@${IP4}"
+      echo
 
+      # Цикл проверки наличия ключей
+      while true; do
+        if [[ -s "/home/${USERNAME}/.ssh/authorized_keys" || -s "/root/.ssh/authorized_keys" ]]; then
+          info " $(text 56) " # Ключи найдены
+          SSH_OK=true
+          break
+        else
+          warning " $(text 55) " # Ключи отсутствуют
+          echo
+          reading " $(text 54) " ANSWER_SSH
+          if [[ "${ANSWER_SSH,,}" != "y" ]]; then
+            warning " $(text 9) " # Настройка отменена
+            SSH_OK=false
+            break
+          fi
+        fi
+      done
+      tilda "$(text 10)"
+    else
+      warning " $(text 9) " # Настройка пропущена
+      SSH_OK=false
+    fi
+  fi
 
   if [[ ${args[tgbot]} == "true" ]]; then
     reading " $(text 35) " ADMIN_ID
@@ -1759,7 +1760,7 @@ enabling_security() {
 
 ### SSH ####
 ssh_setup() {
-  if [[ "${ANSWER_SSH}" == [yY] ]]; then
+  if [[ "${ANSWER_SSH,,}" == "y" ]]; then
     info " $(text 48) "
     sed -i -e "
       s/#Port/Port/g;
