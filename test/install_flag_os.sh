@@ -871,6 +871,7 @@ nginx_make() {
   make
   make install
   
+  mkdir -p /var/cache/nginx/
   mkdir -p /var/lib/nginx/body
   chown -R www-data:www-data /var/lib/nginx
   chmod -R 700 /var/lib/nginx
@@ -997,8 +998,8 @@ installation_of_utilities() {
       ;;
   esac
   
-  #nginx_make
-  nginx_gpg
+  nginx_make
+  #nginx_gpg
   ${PACKAGE_INSTALL[int]} systemd-resolved
   tilda "$(text 10)"
 }
