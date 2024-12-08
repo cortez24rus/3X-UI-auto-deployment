@@ -1942,12 +1942,12 @@ enabling_security() {
       ;;
 
     CentOS|Fedora )
+      systemctl enable --now firewalld
       firewall-cmd --permanent --zone=public --add-port=36079/tcp
       firewall-cmd --permanent --zone=public --add-port=443/tcp
       firewall-cmd --permanent --zone=public --add-port=22/tcp
       firewall-cmd --permanent --zone=public --add-rich-rule="rule family='ipv4' source address='$BLOCK_ZONE_IP' reject"
       firewall-cmd --reload
-      systemctl enable --now firewalld
       ;;
   esac
 
