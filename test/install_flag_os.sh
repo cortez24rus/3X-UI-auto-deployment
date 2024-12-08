@@ -563,7 +563,6 @@ check_cf_token() {
     CFTOKEN=""
     while [[ -z $DOMAIN ]]; do
       reading " $(text 13) " DOMAIN
-	  echo ${DOMAIN}
       echo
     done
 
@@ -895,13 +894,13 @@ ExecStop=/bin/sh -c "/bin/kill -s TERM $(/bin/cat /run/nginx.pid)"
 WantedBy=multi-user.target
 EOF
   
-  sudo systemctl daemon-reload
-  sudo systemctl start nginx
-  sudo systemctl enable nginx
-  sudo systemctl restart nginx
+  systemctl daemon-reload
+  systemctl start nginx
+  systemctl enable nginx
+  systemctl restart nginx
   systemctl status nginx --no-pager
   cd ..
-  sudo rm -rf nginx-$NGINX_VERSION.tar.gz nginx-$NGINX_VERSION ngx_http_geoip2_module
+  rm -rf nginx-$NGINX_VERSION.tar.gz nginx-$NGINX_VERSION ngx_http_geoip2_module
 }
 
 nginx_gpg() {
@@ -909,25 +908,25 @@ nginx_gpg() {
     Debian)
       ${PACKAGE_INSTALL[int]} debian-archive-keyring
       curl https://nginx.org/keys/nginx_signing.key | gpg --dearmor \
-        | sudo tee /usr/share/keyrings/nginx-archive-keyring.gpg >/dev/null
+        | tee /usr/share/keyrings/nginx-archive-keyring.gpg >/dev/null
       gpg --dry-run --quiet --no-keyring --import --import-options import-show /usr/share/keyrings/nginx-archive-keyring.gpg
       echo "deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] \
       http://nginx.org/packages/debian `lsb_release -cs` nginx" \
-        | sudo tee /etc/apt/sources.list.d/nginx.list
+        | tee /etc/apt/sources.list.d/nginx.list
       echo -e "Package: *\nPin: origin nginx.org\nPin: release o=nginx\nPin-Priority: 900\n" \
-        | sudo tee /etc/apt/preferences.d/99nginx
+        | tee /etc/apt/preferences.d/99nginx
       ;;
 
     Ubuntu)
       ${PACKAGE_INSTALL[int]} ubuntu-keyring
       curl https://nginx.org/keys/nginx_signing.key | gpg --dearmor \
-        | sudo tee /usr/share/keyrings/nginx-archive-keyring.gpg >/dev/null
+        | tee /usr/share/keyrings/nginx-archive-keyring.gpg >/dev/null
       gpg --dry-run --quiet --no-keyring --import --import-options import-show /usr/share/keyrings/nginx-archive-keyring.gpg
       echo "deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] \
       http://nginx.org/packages/ubuntu `lsb_release -cs` nginx" \
-        | sudo tee /etc/apt/sources.list.d/nginx.list
+        | tee /etc/apt/sources.list.d/nginx.list
       echo -e "Package: *\nPin: origin nginx.org\nPin: release o=nginx\nPin-Priority: 900\n" \
-        | sudo tee /etc/apt/preferences.d/99nginx
+        | tee /etc/apt/preferences.d/99nginx
       ;;
 
     CentOS|Fedora)
@@ -953,10 +952,10 @@ EOL
   esac
   ${PACKAGE_UPDATE[int]}
   ${PACKAGE_INSTALL[int]} nginx
-  sudo systemctl daemon-reload
-  sudo systemctl start nginx
-  sudo systemctl enable nginx
-  sudo systemctl restart nginx
+  systemctl daemon-reload
+  systemctl start nginx
+  systemctl enable nginx
+  systemctl restart nginx
   systemctl status nginx --no-pager
 }
 
@@ -1091,7 +1090,7 @@ dns_encryption() {
 ### Добавление пользователя ###
 add_user() {
   info " $(text 39) "
-  useradd -m -s $(which bash) -G sudo ${USERNAME}
+  useradd -m -s $(which bash) -G sudo,wheel ${USERNAME}
   echo "${USERNAME}:${PASSWORD}" | chpasswd
   mkdir -p /home/${USERNAME}/.ssh/
   touch /home/${USERNAME}/.ssh/authorized_keys
@@ -1115,17 +1114,17 @@ unattended_upgrade() {
       ;;
 
     CentOS|Fedora )
-      echo "[commands]" | sudo tee -a /etc/dnf/automatic.conf
-      echo "upgrade_type = default" | sudo tee -a /etc/dnf/automatic.conf
-      echo "random_sleep = 0" | sudo tee -a /etc/dnf/automatic.conf
-      echo "update_cmd = default" | sudo tee -a /etc/dnf/automatic.conf
-      echo "download_cmd = default" | sudo tee -a /etc/dnf/automatic.conf
-      echo "apply_updates = yes" | sudo tee -a /etc/dnf/automatic.conf
-      echo "[email]" | sudo tee -a /etc/dnf/automatic.conf
-      echo "email_from = root@localhost" | sudo tee -a /etc/dnf/automatic.conf
-      echo "email_to = root" | sudo tee -a /etc/dnf/automatic.conf
-      sudo systemctl enable --now dnf-automatic.timer
-      sudo systemctl status dnf-automatic.timer
+      echo "[commands]" | tee -a /etc/dnf/automatic.conf
+      echo "upgrade_type = default" | tee -a /etc/dnf/automatic.conf
+      echo "random_sleep = 0" | tee -a /etc/dnf/automatic.conf
+      echo "update_cmd = default" | tee -a /etc/dnf/automatic.conf
+      echo "download_cmd = default" | tee -a /etc/dnf/automatic.conf
+      echo "apply_updates = yes" | tee -a /etc/dnf/automatic.conf
+      echo "[email]" | tee -a /etc/dnf/automatic.conf
+      echo "email_from = root@localhost" | tee -a /etc/dnf/automatic.conf
+      echo "email_to = root" | tee -a /etc/dnf/automatic.conf
+      systemctl enable --now dnf-automatic.timer
+      systemctl status dnf-automatic.timer
       ;;
   esac
 
@@ -1239,7 +1238,7 @@ nginx_setup() {
   random_site
 
   sleep 2
-  sudo systemctl restart nginx
+  systemctl restart nginx
   sleep 2
   nginx -s reload
   tilda "$(text 10)"
@@ -1816,23 +1815,23 @@ enabling_security() {
 
   case "$SYSTEM" in
     Debian|Ubuntu )  
-      sudo ufw --force reset
-      sudo ufw allow 36079/tcp
-      sudo ufw allow 443/tcp
-      sudo ufw allow 22/tcp
-      sudo ufw insert 1 deny from "$BLOCK_ZONE_IP"
-      sudo ufw --force enable
+      ufw --force reset
+      ufw allow 36079/tcp
+      ufw allow 443/tcp
+      ufw allow 22/tcp
+      ufw insert 1 deny from "$BLOCK_ZONE_IP"
+      ufw --force enable
       ;;
 
     CentOS|Fedora )
-      sudo firewall-cmd --permanent --delete-all-rules
-      sudo firewall-cmd --flush
-      sudo firewall-cmd --permanent --zone=public --add-port=36079/tcp
-      sudo firewall-cmd --permanent --zone=public --add-port=443/tcp
-      sudo firewall-cmd --permanent --zone=public --add-port=22/tcp
-      sudo firewall-cmd --permanent --zone=public --add-rich-rule="rule family='ipv4' source address='$BLOCK_ZONE_IP' reject"
-      sudo firewall-cmd --reload
-      sudo systemctl enable --now firewalld
+      firewall-cmd --permanent --delete-all-rules
+      firewall-cmd --flush
+      firewall-cmd --permanent --zone=public --add-port=36079/tcp
+      firewall-cmd --permanent --zone=public --add-port=443/tcp
+      firewall-cmd --permanent --zone=public --add-port=22/tcp
+      firewall-cmd --permanent --zone=public --add-rich-rule="rule family='ipv4' source address='$BLOCK_ZONE_IP' reject"
+      firewall-cmd --reload
+      systemctl enable --now firewalld
       ;;
   esac
 
