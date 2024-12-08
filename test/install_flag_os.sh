@@ -1942,8 +1942,6 @@ enabling_security() {
       ;;
 
     CentOS|Fedora )
-      firewall-cmd --permanent --delete-all-rules
-      firewall-cmd --flush
       firewall-cmd --permanent --zone=public --add-port=36079/tcp
       firewall-cmd --permanent --zone=public --add-port=443/tcp
       firewall-cmd --permanent --zone=public --add-port=22/tcp
