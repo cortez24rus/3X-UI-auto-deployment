@@ -981,8 +981,8 @@ installation_of_utilities() {
       ;;
 
     CentOS|Fedora)
-      DEPS_PACK_CHECK=("jq" "zip" "wget" "gpg" "crontab" "sqlite3" "openssl" "netstat" "htpasswd" "certbot" "update-ca-certificates")
-      DEPS_PACK_INSTALL=("jq" "zip" "wget" "gnupg2" "cronie" "sqlite" "openssl" "net-tools" "httpd-tools" "certbot" "ca-certificates")
+      DEPS_PACK_CHECK=("jq" "zip" "wget" "gpg" "crontab" "sqlite3" "openssl" "netstat" "htpasswd" "certbot" "update-ca-certificates" "certbot-dns-cloudflare")
+      DEPS_PACK_INSTALL=("jq" "zip" "wget" "gnupg2" "cronie" "sqlite" "openssl" "net-tools" "httpd-tools" "certbot" "ca-certificates" "python3-certbot-dns-cloudflare")
 
       for g in "${!DEPS_PACK_CHECK[@]}"; do
         [ ! -x "$(type -p ${DEPS_PACK_CHECK[g]})" ] && [[ ! "${DEPS_PACK[@]}" =~ "${DEPS_PACK_INSTALL[g]}" ]] && DEPS_PACK+=(${DEPS_PACK_INSTALL[g]})
