@@ -1295,7 +1295,7 @@ monitoring() {
   info " $(text 66) "
   bash <(curl -Ls https://github.com/cortez24rus/grafana-prometheus/raw/refs/heads/main/prometheus_node_exporter.sh)
   
-    COMMENT_METRIC="location /${METRICS} {
+  COMMENT_METRIC="location /${METRICS} {
     auth_basic "Restricted Content";
     auth_basic_user_file /etc/nginx/.htpasswd;
     proxy_pass http://127.0.0.1:9100/metrics;
