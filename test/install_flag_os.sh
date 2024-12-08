@@ -455,7 +455,7 @@ check_operating_system() {
 
 check_dependencies() {
   # Зависимости, необходимые для трех основных систем
-  [ "${SYSTEM}" = 'CentOS' ] && ${PACKAGE_INSTALL[int]} vim-common
+  [ "${SYSTEM}" = 'CentOS' ] && ${PACKAGE_INSTALL[int]} vim-common epel-release
   DEPS_CHECK=("ping" "wget" "curl" "systemctl" "ip" "sudo")
   DEPS_INSTALL=("iputils-ping" "wget" "curl" "systemctl" "iproute2" "sudo")
 
@@ -964,9 +964,9 @@ installation_of_utilities() {
   info " $(text 36) "
   case "$SYSTEM" in
     Debian|Ubuntu)
-      DEPS_PACK_CHECK=("jq" "ufw" "zip" "wget" "gpg" "cron" "sqlite3" "certbot" "openssl" "netstat" "lsb_release" "htpasswd" "update-ca-certificates" "unattended-upgrades" "add-apt-repository" "certbot-dns-cloudflare")
-      DEPS_PACK_INSTALL=("jq" "ufw" "zip" "wget" "gnupg2" "cron" "sqlite3" "certbot" "openssl" "net-tools" "lsb-release" "apache2-utils" "ca-certificates" "unattended-upgrades" "software-properties-common" "python3-certbot-dns-cloudflare")
-    
+      DEPS_PACK_CHECK=("jq" "ufw" "zip" "wget" "gpg" "cron" "sqlite3" "certbot" "openssl" "netstat" "htpasswd" "update-ca-certificates" "add-apt-repository" "certbot-dns-cloudflare")
+      DEPS_PACK_INSTALL=("jq" "ufw" "zip" "wget" "gnupg2" "cron" "sqlite3" "certbot" "openssl" "net-tools" "apache2-utils" "ca-certificates" "software-properties-common" "python3-certbot-dns-cloudflare")
+
       for g in "${!DEPS_PACK_CHECK[@]}"; do
         [ ! -x "$(type -p ${DEPS_PACK_CHECK[g]})" ] && [[ ! "${DEPS_PACK[@]}" =~ "${DEPS_PACK_INSTALL[g]}" ]] && DEPS_PACK+=(${DEPS_PACK_INSTALL[g]})
       done
@@ -981,13 +981,13 @@ installation_of_utilities() {
       ;;
 
     CentOS|Fedora)
-      DEPS_PACK_CHECK=("jq" "ufw" "zip" "wget" "gnupg2" "cron" "sqlite3" "certbot" "openssl" "netstat" "lsb_release" "htpasswd" "update-ca-certificates" "unattended-upgrades" "add-apt-repository" "certbot-dns-cloudflare")
-      DEPS_PACK_INSTALL=("jq" "ufw" "zip" "wget" "gnupg2" "cron" "sqlite3" "certbot" "openssl" "net-tools" "lsb-release" "httpd-tools" "ca-certificates" "unattended-upgrades" "software-properties-common" "python3-certbot-dns-cloudflare")
-    
+      DEPS_PACK_CHECK=("jq" "zip" "wget" "gpg" "crontab" "sqlite3" "openssl" "netstat" "htpasswd" "certbot" "update-ca-certificates")
+      DEPS_PACK_INSTALL=("jq" "zip" "wget" "gnupg2" "cronie" "sqlite" "openssl" "net-tools" "httpd-tools" "certbot" "ca-certificates")
+
       for g in "${!DEPS_PACK_CHECK[@]}"; do
         [ ! -x "$(type -p ${DEPS_PACK_CHECK[g]})" ] && [[ ! "${DEPS_PACK[@]}" =~ "${DEPS_PACK_INSTALL[g]}" ]] && DEPS_PACK+=(${DEPS_PACK_INSTALL[g]})
       done
-    
+
       if [ "${#DEPS_PACK[@]}" -ge 1 ]; then
         echo "Список зависимостей для установки ${DEPS_PACK[@]}"
         ${PACKAGE_UPDATE[int]} >/dev/null 2>&1
@@ -997,7 +997,7 @@ installation_of_utilities() {
       fi
       ;;
   esac
-  
+
   #nginx_make
   #nginx_gpg
   ${PACKAGE_INSTALL[int]} systemd-resolved
@@ -1187,7 +1187,7 @@ warp() {
   mkdir -p /etc/systemd/system/warp-svc.service.d
   cd /usr/local/xui-rp/
   echo "Попытка скачать пакет..."
-  echo $SYSTEM  
+
   case "$SYSTEM" in
     Debian|Ubuntu)
       while ! wget --progress=dot:mega --timeout=30 --tries=10 --retry-connrefused "https://pkg.cloudflareclient.com/pool/$(grep "VERSION_CODENAME=" /etc/os-release | cut -d "=" -f 2)/main/c/cloudflare-warp/cloudflare-warp_2024.6.497-1_amd64.deb"; do
