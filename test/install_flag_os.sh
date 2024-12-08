@@ -781,9 +781,9 @@ data_entry() {
   SUB_JSON_URI=https://${DOMAIN}/${SUB_JSON_PATH}/
 }
 
-install_nginx() {
+nginx_make() {
   case "$SYSTEM" in
-    Debian|Ubuntu )
+    Debian|Ubuntu)
       DEPS_BUILD_CHECK=("git" "gcc" "make" "libpcre2-dev" "libssl-dev" "libgeoip-dev" "libxslt1-dev" "zlib1g-dev" "libgd-dev" "libmaxminddb0" "libmaxminddb-dev" "mmdb-bin")
       DEPS_BUILD_INSTALL=("git" "build-essential" "libpcre2-dev" "libssl-dev" "libgeoip-dev" "libxslt1-dev" "zlib1g-dev" "libgd-dev" "libmaxminddb0" "libmaxminddb-dev" "mmdb-bin")
     
@@ -800,7 +800,7 @@ install_nginx() {
       fi
       ;;
 
-    CentOS|Fedora )
+    CentOS|Fedora)
       DEPS_BUILD_CHECK=("git" "gcc" "make" "pcre-devel" "openssl-devel" "GeoIP-devel" "libxslt-devel" "zlib-devel" "gd-devel" "libmaxminddb" "libmaxminddb-devel" "mmdblookup")
       DEPS_BUILD_INSTALL=("git" "gcc" "make" "pcre-devel" "openssl-devel" "GeoIP-devel" "libxslt-devel" "zlib-devel" "gd-devel" "libmaxminddb" "libmaxminddb-devel" "mmdb-bin")
     
@@ -904,17 +904,73 @@ EOF
   sudo rm -rf nginx-$NGINX_VERSION.tar.gz nginx-$NGINX_VERSION ngx_http_geoip2_module
 }
 
+nginx_gpg() {
+  case "$SYSTEM" in
+    Debian)
+      ${PACKAGE_INSTALL[int]} debian-archive-keyring
+      curl https://nginx.org/keys/nginx_signing.key | gpg --dearmor \
+        | sudo tee /usr/share/keyrings/nginx-archive-keyring.gpg >/dev/null
+      gpg --dry-run --quiet --no-keyring --import --import-options import-show /usr/share/keyrings/nginx-archive-keyring.gpg
+      echo "deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] \
+      http://nginx.org/packages/debian `lsb_release -cs` nginx" \
+        | sudo tee /etc/apt/sources.list.d/nginx.list
+      echo -e "Package: *\nPin: origin nginx.org\nPin: release o=nginx\nPin-Priority: 900\n" \
+        | sudo tee /etc/apt/preferences.d/99nginx
+      ;;
+
+    Ubuntu)
+      ${PACKAGE_INSTALL[int]} ubuntu-keyring
+      curl https://nginx.org/keys/nginx_signing.key | gpg --dearmor \
+        | sudo tee /usr/share/keyrings/nginx-archive-keyring.gpg >/dev/null
+      gpg --dry-run --quiet --no-keyring --import --import-options import-show /usr/share/keyrings/nginx-archive-keyring.gpg
+      echo "deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] \
+      http://nginx.org/packages/ubuntu `lsb_release -cs` nginx" \
+        | sudo tee /etc/apt/sources.list.d/nginx.list
+      echo -e "Package: *\nPin: origin nginx.org\nPin: release o=nginx\nPin-Priority: 900\n" \
+        | sudo tee /etc/apt/preferences.d/99nginx
+      ;;
+
+    CentOS|Fedora)
+      ${PACKAGE_INSTALL[int]} yum-utils
+      cat <<EOL > /etc/yum.repos.d/nginx.repo
+[nginx-stable]
+name=nginx stable repo
+baseurl=http://nginx.org/packages/centos/\$releasever/\$basearch/
+gpgcheck=1
+enabled=1
+gpgkey=https://nginx.org/keys/nginx_signing.key
+module_hotfixes=true
+
+[nginx-mainline]
+name=nginx mainline repo
+baseurl=http://nginx.org/packages/mainline/centos/\$releasever/\$basearch/
+gpgcheck=1
+enabled=0
+gpgkey=https://nginx.org/keys/nginx_signing.key
+module_hotfixes=true
+EOL
+      ;;
+  esac
+  ${PACKAGE_UPDATE[int]}
+  ${PACKAGE_INSTALL[int]} nginx
+  sudo systemctl daemon-reload
+  sudo systemctl start nginx
+  sudo systemctl enable nginx
+  sudo systemctl restart nginx
+  systemctl status nginx --no-pager
+}
+
 installation_of_utilities() {
   info " $(text 36) "
   case "$SYSTEM" in
-    Debian|Ubuntu )
+    Debian|Ubuntu)
       DEPS_PACK_CHECK=("jq" "ufw" "zip" "gpg" "cron" "sqlite3" "certbot" "openssl" "netstat" "lsb_release" "htpasswd" "update-ca-certificates" "unattended-upgrades" "add-apt-repository" "certbot-dns-cloudflare")
       DEPS_PACK_INSTALL=("jq" "ufw" "zip" "gnupg2" "cron" "sqlite3" "certbot" "openssl" "net-tools" "lsb-release" "apache2-utils" "ca-certificates" "unattended-upgrades" "software-properties-common" "python3-certbot-dns-cloudflare")
     
       for g in "${!DEPS_PACK_CHECK[@]}"; do
         [ ! -x "$(type -p ${DEPS_PACK_CHECK[g]})" ] && [[ ! "${DEPS_PACK[@]}" =~ "${DEPS_PACK_INSTALL[g]}" ]] && DEPS_PACK+=(${DEPS_PACK_INSTALL[g]})
       done
-    
+
       if [ "${#DEPS_PACK[@]}" -ge 1 ]; then
         echo "Список зависимостей для установки ${DEPS_PACK[@]}"
         ${PACKAGE_UPDATE[int]} >/dev/null 2>&1
@@ -924,7 +980,7 @@ installation_of_utilities() {
       fi
       ;;
 
-    CentOS|Fedora )
+    CentOS|Fedora)
       DEPS_PACK_CHECK=("jq" "ufw" "zip" "gnupg2" "cron" "sqlite3" "certbot" "openssl" "netstat" "lsb_release" "htpasswd" "update-ca-certificates" "unattended-upgrades" "add-apt-repository" "certbot-dns-cloudflare")
       DEPS_PACK_INSTALL=("jq" "ufw" "zip" "gnupg2" "cron" "sqlite3" "certbot" "openssl" "net-tools" "lsb-release" "httpd-tools" "ca-certificates" "unattended-upgrades" "software-properties-common" "python3-certbot-dns-cloudflare")
     
@@ -942,7 +998,8 @@ installation_of_utilities() {
       ;;
   esac
   
-  install_nginx
+  #nginx_make
+  nginx_gpg
   ${PACKAGE_INSTALL[int]} systemd-resolved
   tilda "$(text 10)"
 }
