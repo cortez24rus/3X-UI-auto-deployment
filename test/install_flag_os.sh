@@ -1159,7 +1159,9 @@ nginx_setup() {
   local_conf
   random_site
 
+  sleep 2
   sudo systemctl restart nginx
+  sleep 2
   nginx -s reload
   tilda "$(text 10)"
 }
