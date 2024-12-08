@@ -1294,6 +1294,18 @@ EOF
 monitoring() {
   info " $(text 66) "
   bash <(curl -Ls https://github.com/cortez24rus/grafana-prometheus/raw/refs/heads/main/prometheus_node_exporter.sh)
+  
+    COMMENT_METRIC="location /${METRICS} {
+    auth_basic "Restricted Content";
+    auth_basic_user_file /etc/nginx/.htpasswd;
+    proxy_pass http://127.0.0.1:9100/metrics;
+    proxy_set_header Host \$host;
+    proxy_set_header X-Real-IP \$remote_addr;
+    proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto \$scheme;
+    break;
+  }"
+  
   tilda "$(text 10)"
 }
 
@@ -1477,15 +1489,7 @@ server {
   if (\$host = ${IP4}) {
     return 444;
   }
-  location /${METRICS} {
-    auth_basic "Restricted Content";
-    auth_basic_user_file /etc/nginx/.htpasswd;
-    proxy_pass http://127.0.0.1:9100/metrics;
-    proxy_set_header Host \$host;
-    proxy_set_header X-Real-IP \$remote_addr;
-    proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-    proxy_set_header X-Forwarded-Proto \$scheme;
-  }
+  ${COMMENT_METRIC}
   location /${WEB_BASE_PATH} {
     proxy_redirect off;
     proxy_set_header Host \$host;
