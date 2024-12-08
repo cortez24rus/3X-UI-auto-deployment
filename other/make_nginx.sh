@@ -68,6 +68,7 @@ git clone https://github.com/leev/ngx_http_geoip2_module.git
 make
 make install
 
+mkdir -p /var/cache/nginx/
 mkdir -p /var/lib/nginx/body
 chown -R www-data:www-data /var/lib/nginx
 chmod -R 700 /var/lib/nginx
@@ -94,9 +95,7 @@ EOF
 sudo systemctl daemon-reload
 sudo systemctl start nginx
 sudo systemctl enable nginx
-
+sudo systemctl restart nginx
+systemctl status nginx --no-pager
 cd ..
 sudo rm -rf nginx-$NGINX_VERSION.tar.gz nginx-$NGINX_VERSION ngx_http_geoip2_module
-
-systemctl status nginx
-nginx -v
