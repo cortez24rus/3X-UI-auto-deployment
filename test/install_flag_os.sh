@@ -760,7 +760,7 @@ data_entry() {
     tilda "$(text 10)"
   fi
 
-  if [[ ${args[tgbot]} == "true" ]]; 
+  if [[ ${args[tgbot]} == "true" ]]; then
     reading " $(text 35) " ADMIN_ID
     echo
     reading " $(text 34) " BOT_TOKEN
