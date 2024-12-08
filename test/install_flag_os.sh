@@ -981,8 +981,8 @@ installation_of_utilities() {
       ;;
 
     CentOS|Fedora)
-      DEPS_PACK_CHECK=("jq" "zip" "tar" "wget" "gpg" "crontab" "sqlite3" "openssl" "netstat" "htpasswd" "certbot" "update-ca-certificates" "certbot-dns-cloudflare")
-      DEPS_PACK_INSTALL=("jq" "zip" "tar" "wget" "gnupg2" "cronie" "sqlite" "openssl" "net-tools" "httpd-tools" "certbot" "ca-certificates" "python3-certbot-dns-cloudflare")
+      DEPS_PACK_CHECK=("jq" "zip" "tar" "wget" "gpg" "crontab" "sqlite3" "openssl" "netstat" "nslookup" "htpasswd" "certbot" "update-ca-certificates" "certbot-dns-cloudflare")
+      DEPS_PACK_INSTALL=("jq" "zip" "tar" "wget" "gnupg2" "cronie" "sqlite" "openssl" "net-tools" "bind-utils" "httpd-tools" "certbot" "ca-certificates" "python3-certbot-dns-cloudflare")
 
       for g in "${!DEPS_PACK_CHECK[@]}"; do
         [ ! -x "$(type -p ${DEPS_PACK_CHECK[g]})" ] && [[ ! "${DEPS_PACK[@]}" =~ "${DEPS_PACK_INSTALL[g]}" ]] && DEPS_PACK+=(${DEPS_PACK_INSTALL[g]})
@@ -1326,16 +1326,16 @@ nginx_setup() {
   systemctl restart nginx
   sleep 2
   nginx -s reload
-  
+
   tilda "$(text 10)"
 }
 
 nginx_conf() {
   cat > /etc/nginx/nginx.conf <<EOF
 user                                   ${usernginx};
-pid                                    /run/nginx.pid;
+pid                                    /var/run/nginx.pid;
 worker_processes                       auto;
-worker_rlimit_nofile                   65535;
+worker_rlimit_nofile                   65535; 
 error_log                              /var/log/nginx/error.log;
 include                                /etc/nginx/modules-enabled/*.conf;
 events {
@@ -1550,7 +1550,40 @@ EOF
 }
 
 random_site() {
-  bash <(curl -Ls https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/main/xui-rp-random-site.sh)
+  echo "Создаем необходимые папки..."
+  mkdir -p /var/www/html/ /usr/local/xui-rp/
+
+  cd /usr/local/xui-rp/ || { echo "Не удалось перейти в /usr/local/xui-rp/"; exit 1; }
+
+  if [[ ! -d "simple-web-templates-main" ]]; then
+      msg_inf "Скачиваем шаблоны..."
+      while ! wget -q --progress=dot:mega --timeout=30 --tries=10 --retry-connrefused "https://github.com/cortez24rus/simple-web-templates/archive/refs/heads/main.zip"; do
+          echo "Скачивание не удалось, пробуем снова..."
+          sleep 3
+      done
+      unzip -q main.zip &>/dev/null && rm -f main.zip
+  fi
+
+  cd simple-web-templates-main || { echo "Не удалось перейти в папку с шаблонами"; exit 1; }
+
+  echo "Удаляем ненужные файлы..."
+  rm -rf assets ".gitattributes" "README.md" "_config.yml"
+
+  RandomHTML=$(ls -d */ | shuf -n1)  # Обновил для выбора случайного подкаталога
+  echo "Random template name: ${RandomHTML}"
+
+  # Если шаблон существует, копируем его в /var/www/html
+  if [[ -d "${RandomHTML}" && -d "/var/www/html/" ]]; then
+      echo "Копируем шаблон в /var/www/html/..."
+      rm -rf /var/www/html/*  # Очищаем старую папку
+      cp -a "${RandomHTML}/." /var/www/html/ || { echo "Ошибка при копировании шаблона"; exit 1; }
+      echo "Шаблон успешно извлечен и установлен!"
+  else
+      echo "Ошибка при извлечении шаблона!"
+      exit 1
+  fi
+
+  cd ~ || { echo "Не удалось вернуться в домашнюю директорию"; exit 1; }
 }
 
 generate_keys() {
@@ -1857,7 +1890,6 @@ EOF
 #  )
 #}
 #UPDATE settings SET value = '${SUB_JSON_RULES}' WHERE LOWER(key) LIKE '%subjsonrules%';
-
 
 ### Установка 3x-ui ###
 install_panel() {
