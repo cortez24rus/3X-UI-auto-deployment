@@ -981,8 +981,8 @@ installation_of_utilities() {
       ;;
 
     CentOS|Fedora)
-      DEPS_PACK_CHECK=("jq" "zip" "wget" "gpg" "crontab" "sqlite3" "openssl" "netstat" "htpasswd" "certbot" "update-ca-certificates" "certbot-dns-cloudflare")
-      DEPS_PACK_INSTALL=("jq" "zip" "wget" "gnupg2" "cronie" "sqlite" "openssl" "net-tools" "httpd-tools" "certbot" "ca-certificates" "python3-certbot-dns-cloudflare")
+      DEPS_PACK_CHECK=("jq" "zip" "tar" "wget" "gpg" "crontab" "sqlite3" "openssl" "netstat" "htpasswd" "certbot" "update-ca-certificates" "certbot-dns-cloudflare")
+      DEPS_PACK_INSTALL=("jq" "zip" "tar" "wget" "gnupg2" "cronie" "sqlite" "openssl" "net-tools" "httpd-tools" "certbot" "ca-certificates" "python3-certbot-dns-cloudflare")
 
       for g in "${!DEPS_PACK_CHECK[@]}"; do
         [ ! -x "$(type -p ${DEPS_PACK_CHECK[g]})" ] && [[ ! "${DEPS_PACK[@]}" =~ "${DEPS_PACK_INSTALL[g]}" ]] && DEPS_PACK+=(${DEPS_PACK_INSTALL[g]})
@@ -1306,6 +1306,16 @@ nginx_setup() {
   touch /etc/nginx/.htpasswd
   htpasswd -nb "$USERNAME" "$PASSWORD" > /etc/nginx/.htpasswd
 
+  case "$SYSTEM" in
+    Debian|Ubuntu)
+      usernginx="www-data"
+      ;;
+
+    CentOS|Fedora)
+      usernginx="nginx"
+      ;;
+  esac
+
   nginx_conf
   stream_conf
   local_conf
@@ -1320,7 +1330,7 @@ nginx_setup() {
 
 nginx_conf() {
   cat > /etc/nginx/nginx.conf <<EOF
-user                                   www-data;
+user                                   ${usernginx};
 pid                                    /run/nginx.pid;
 worker_processes                       auto;
 worker_rlimit_nofile                   65535;
