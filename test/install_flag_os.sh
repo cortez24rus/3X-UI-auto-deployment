@@ -1547,7 +1547,6 @@ server {
     proxy_pass http://127.0.0.1:\$fwdport\$is_args\$args;
     break;
   }
-  # Adguard home
   ${COMMENT_AGH}
 }
 EOF
