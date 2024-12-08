@@ -711,7 +711,9 @@ data_entry() {
   echo
   validate_path "CDNWS"
   echo
-  validate_path "METRICS"
+  if [[ ${args[mon]} == "true" ]]; then
+    validate_path "METRICS"
+  fi
   tilda "$(text 10)"
   choise_dns
   validate_path WEB_BASE_PATH
@@ -719,17 +721,12 @@ data_entry() {
   validate_path SUB_PATH
   echo
   validate_path SUB_JSON_PATH
-  tilda "$(text 10)"
-  reading " $(text 67) " ENABLE_BOT_CHOISE
-  case "${ENABLE_BOT_CHOISE,,}" in
-    y|"")  
+  if [[ ${args[tgbot]} == "true" ]]; 
+      tilda "$(text 10)"
       reading " $(text 35) " ADMIN_ID
       echo
       reading " $(text 34) " BOT_TOKEN
-      ;;
-    *)
-      ;;
-  esac
+  fi
   tilda "$(text 10)"
 
   SUB_URI=https://${DOMAIN}/${SUB_PATH}/
@@ -1844,8 +1841,6 @@ main() {
   log_entry
   read_defaults_from_file
   parse_args "$@" || show_help
-  #echo "NGINX: ${args[nginx]}"
-  #echo "Panel: ${args[panel]}"
   check_root
   check_ip
   check_operating_system
