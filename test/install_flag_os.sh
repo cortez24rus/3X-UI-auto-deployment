@@ -732,7 +732,7 @@ data_entry() {
 
   tilda "$(text 10)"
 
-  if [[ ${args[ssh]} == "true" ]]; thenэ
+  if [[ ${args[ssh]} == "true" ]]; then
     reading " $(text 54) " ANSWER_SSH
     if [[ "${ANSWER_SSH}" == [yY] ]]; then
       info " $(text 48) "
