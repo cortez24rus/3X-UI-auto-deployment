@@ -693,16 +693,21 @@ choise_dns () {
 ### Ввод данных ###
 data_entry() {
   tilda "$(text 10)"
+  reading " $(text 70) " SECRET_PASSWORD
+  tilda "$(text 10)"
+
   reading " $(text 11) " USERNAME
   echo
   reading " $(text 12) " PASSWORD
+
   tilda "$(text 10)"
+
   check_cf_token
+  
   tilda "$(text 10)"
-  reading " $(text 70) " SECRET_PASSWORD
-  tilda "$(text 10)"
+
   reading " $(text 19) " REALITY
-  tilda "$(text 10)"
+  echo
   validate_path "CDNGRPC"
   echo
   validate_path "CDNSPLIT"
@@ -710,24 +715,57 @@ data_entry() {
   validate_path "CDNHTTPU"
   echo
   validate_path "CDNWS"
-  echo
   if [[ ${args[mon]} == "true" ]]; then
+    echo
     validate_path "METRICS"
   fi
+
   tilda "$(text 10)"
+
   choise_dns
+
   validate_path WEB_BASE_PATH
   echo
   validate_path SUB_PATH
   echo
   validate_path SUB_JSON_PATH
-  if [[ ${args[tgbot]} == "true" ]]; 
-      tilda "$(text 10)"
-      reading " $(text 35) " ADMIN_ID
-      echo
-      reading " $(text 34) " BOT_TOKEN
-  fi
+
   tilda "$(text 10)"
+
+  if [[ ${args[ssh]} == "true" ]]; then
+    info " $(text 48) "
+    out_data " $(text 49) "
+    echo
+    out_data " $(text 50) "
+    out_data " $(text 51) "
+    echo
+    out_data " $(text 52)" "type \$env:USERPROFILE\.ssh\id_rsa.pub | ssh -p 22 ${USERNAME}@${IP4} \"cat >> ~/.ssh/authorized_keys\""
+    out_data " $(text 53)" "ssh-copy-id -p 22 ${USERNAME}@${IP4}"
+    echo
+    # Цикл проверки наличия ключа
+    while true; do
+      if [[ -n $(grep -v '^[[:space:]]*$' "/home/${USERNAME}/.ssh/authorized_keys") || -n $(grep -v '^[[:space:]]*$' "/root/.ssh/authorized_keys") ]]; then
+        info " $(text 56) "
+        break
+      else
+        warning " $(text 55) "
+        echo
+        reading " $(text 54) " CONTINUE_SSH
+        if [[ "${CONTINUE_SSH}" != [yY] ]]; then
+          warning " $(text 9) " # Настройка отменена
+          return 0
+        fi
+      fi
+    done
+    tilda "$(text 10)"
+  fi
+
+  if [[ ${args[tgbot]} == "true" ]]; 
+    reading " $(text 35) " ADMIN_ID
+    echo
+    reading " $(text 34) " BOT_TOKEN
+    tilda "$(text 10)"
+  fi
 
   SUB_URI=https://${DOMAIN}/${SUB_PATH}/
   SUB_JSON_URI=https://${DOMAIN}/${SUB_JSON_PATH}/
@@ -1712,50 +1750,21 @@ enabling_security() {
 
 ### SSH ####
 ssh_setup() {
-  exec > /dev/tty 2>&1
-  info " $(text 48) "
-  out_data " $(text 49) "
-  echo
-  out_data " $(text 50) "
-  out_data " $(text 51) "
-  echo
-  out_data " $(text 52)" "type \$env:USERPROFILE\.ssh\id_rsa.pub | ssh -p 22 ${USERNAME}@${IP4} \"cat >> ~/.ssh/authorized_keys\""
-  out_data " $(text 53)" "ssh-copy-id -p 22 ${USERNAME}@${IP4}"
-  echo
-  while read -r -t 0.1 -n 1; do :; done
-  reading " $(text 54) " ANSWER_SSH
-  if [[ "${ANSWER_SSH}" == [yY] ]]; then
-    # Цикл проверки наличия ключа
-    while true; do
-      if [[ -n $(grep -v '^[[:space:]]*$' "/home/${USERNAME}/.ssh/authorized_keys") || -n $(grep -v '^[[:space:]]*$' "/root/.ssh/authorized_keys") ]]; then
-        info " $(text 56) "
-        break
-      else
-        warning " $(text 55) "
-        echo
-        reading " $(text 54) " CONTINUE_SSH
-        if [[ "${CONTINUE_SSH}" != [yY] ]]; then
-          warning " $(text 9) " # Настройка отменена
-          return 0
-        fi
-      fi
-    done
-    # Если ключ найден, продолжаем настройку SSH
-    sed -i -e "
-      s/#Port/Port/g;
-      s/Port 22/Port 36079/g;
-      s/#PermitRootLogin/PermitRootLogin/g;
-      s/PermitRootLogin yes/PermitRootLogin prohibit-password/g;
-      s/#PubkeyAuthentication/PubkeyAuthentication/g;
-      s/PubkeyAuthentication no/PubkeyAuthentication yes/g;
-      s/#PasswordAuthentication/PasswordAuthentication/g;
-      s/PasswordAuthentication yes/PasswordAuthentication no/g;
-      s/#PermitEmptyPasswords/PermitEmptyPasswords/g;
-      s/PermitEmptyPasswords yes/PermitEmptyPasswords no/g;
-    " /etc/ssh/sshd_config
+  sed -i -e "
+    s/#Port/Port/g;
+    s/Port 22/Port 36079/g;
+    s/#PermitRootLogin/PermitRootLogin/g;
+    s/PermitRootLogin yes/PermitRootLogin prohibit-password/g;
+    s/#PubkeyAuthentication/PubkeyAuthentication/g;
+    s/PubkeyAuthentication no/PubkeyAuthentication yes/g;
+    s/#PasswordAuthentication/PasswordAuthentication/g;
+    s/PasswordAuthentication yes/PasswordAuthentication no/g;
+    s/#PermitEmptyPasswords/PermitEmptyPasswords/g;
+    s/PermitEmptyPasswords yes/PermitEmptyPasswords no/g;
+  " /etc/ssh/sshd_config
 
-    # Настройка баннера
-    cat > /etc/motd <<EOF
+  # Настройка баннера
+  cat > /etc/motd <<EOF
 
 ################################################################################
                          WARNING: AUTHORIZED ACCESS ONLY                         
@@ -1791,28 +1800,19 @@ to the fullest extent of the law.
 
 
 EOF
-    systemctl restart ssh.service
-  else
-    warning " $(text 9) "
-    return 0
-  fi
+  systemctl restart sshd
+  tilda "$(text 10)"
 }
 
 # Установока xui бота
 install_bot() {
-  case "${ENABLE_BOT_CHOISE,,}" in
-    y|"")  
-      info " $(text 57) "
-      bash <(curl -Ls https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/main/xui-rp-install-bot.sh) "$BOT_TOKEN" "$ADMIN_ID" "$DOMAIN"
-      ;;
-    *)
-      ;;
-  esac
+  info " $(text 57) "
+  bash <(curl -Ls https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/main/xui-rp-install-bot.sh) "$BOT_TOKEN" "$ADMIN_ID" "$DOMAIN"
+  tilda "$(text 10)"
 }
 
 ### Окончание ###
 data_output() {
-  tilda "$(text 10)"
   info " $(text 58) "
   printf '0\n' | x-ui | grep --color=never -i ':'
   echo
@@ -1830,6 +1830,7 @@ data_output() {
   echo
   out_data " $(text 65) " "$LOGFILE"
   tilda "$(text 10)"
+  exec > /dev/tty 2>&1
 }
 
 # Удаление всех управляющих последовательностей
