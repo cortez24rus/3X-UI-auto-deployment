@@ -964,8 +964,8 @@ installation_of_utilities() {
   info " $(text 36) "
   case "$SYSTEM" in
     Debian|Ubuntu)
-      DEPS_PACK_CHECK=("jq" "ufw" "zip" "gpg" "cron" "sqlite3" "certbot" "openssl" "netstat" "lsb_release" "htpasswd" "update-ca-certificates" "unattended-upgrades" "add-apt-repository" "certbot-dns-cloudflare")
-      DEPS_PACK_INSTALL=("jq" "ufw" "zip" "gnupg2" "cron" "sqlite3" "certbot" "openssl" "net-tools" "lsb-release" "apache2-utils" "ca-certificates" "unattended-upgrades" "software-properties-common" "python3-certbot-dns-cloudflare")
+      DEPS_PACK_CHECK=("jq" "ufw" "zip" "wget" "gpg" "cron" "sqlite3" "certbot" "openssl" "netstat" "lsb_release" "htpasswd" "update-ca-certificates" "unattended-upgrades" "add-apt-repository" "certbot-dns-cloudflare")
+      DEPS_PACK_INSTALL=("jq" "ufw" "zip" "wget" "gnupg2" "cron" "sqlite3" "certbot" "openssl" "net-tools" "lsb-release" "apache2-utils" "ca-certificates" "unattended-upgrades" "software-properties-common" "python3-certbot-dns-cloudflare")
     
       for g in "${!DEPS_PACK_CHECK[@]}"; do
         [ ! -x "$(type -p ${DEPS_PACK_CHECK[g]})" ] && [[ ! "${DEPS_PACK[@]}" =~ "${DEPS_PACK_INSTALL[g]}" ]] && DEPS_PACK+=(${DEPS_PACK_INSTALL[g]})
@@ -981,8 +981,8 @@ installation_of_utilities() {
       ;;
 
     CentOS|Fedora)
-      DEPS_PACK_CHECK=("jq" "ufw" "zip" "gnupg2" "cron" "sqlite3" "certbot" "openssl" "netstat" "lsb_release" "htpasswd" "update-ca-certificates" "unattended-upgrades" "add-apt-repository" "certbot-dns-cloudflare")
-      DEPS_PACK_INSTALL=("jq" "ufw" "zip" "gnupg2" "cron" "sqlite3" "certbot" "openssl" "net-tools" "lsb-release" "httpd-tools" "ca-certificates" "unattended-upgrades" "software-properties-common" "python3-certbot-dns-cloudflare")
+      DEPS_PACK_CHECK=("jq" "ufw" "zip" "wget" "gnupg2" "cron" "sqlite3" "certbot" "openssl" "netstat" "lsb_release" "htpasswd" "update-ca-certificates" "unattended-upgrades" "add-apt-repository" "certbot-dns-cloudflare")
+      DEPS_PACK_INSTALL=("jq" "ufw" "zip" "wget" "gnupg2" "cron" "sqlite3" "certbot" "openssl" "net-tools" "lsb-release" "httpd-tools" "ca-certificates" "unattended-upgrades" "software-properties-common" "python3-certbot-dns-cloudflare")
     
       for g in "${!DEPS_PACK_CHECK[@]}"; do
         [ ! -x "$(type -p ${DEPS_PACK_CHECK[g]})" ] && [[ ! "${DEPS_PACK[@]}" =~ "${DEPS_PACK_INSTALL[g]}" ]] && DEPS_PACK+=(${DEPS_PACK_INSTALL[g]})
@@ -1091,14 +1091,23 @@ dns_encryption() {
 ### Добавление пользователя ###
 add_user() {
   info " $(text 39) "
-  useradd -m -s $(which bash) -G sudo,wheel ${USERNAME}
+
+  case "$SYSTEM" in
+    Debian|Ubuntu)
+      useradd -m -s $(which bash) -G sudo ${USERNAME}
+      ;;
+
+    CentOS|Fedora)
+      useradd -m -s $(which bash) -G wheel ${USERNAME}
+      ;;
+  esac
   echo "${USERNAME}:${PASSWORD}" | chpasswd
   mkdir -p /home/${USERNAME}/.ssh/
   touch /home/${USERNAME}/.ssh/authorized_keys
-  chown ${USERNAME}: /home/${USERNAME}/.ssh
-  chmod 700 /home/${USERNAME}/.ssh
-  chown ${USERNAME}:${USERNAME} /home/${USERNAME}/.ssh/authorized_keys
+  chown -R ${USERNAME}: /home/${USERNAME}/.ssh
+  chmod -R 700 /home/${USERNAME}/.ssh
   echo ${USERNAME}
+
   tilda "$(text 10)"
 }
 
@@ -1107,23 +1116,26 @@ unattended_upgrade() {
   info " $(text 40) "
 
   case "$SYSTEM" in
-    Debian|Ubuntu )
+    Debian|Ubuntu)
       echo 'Unattended-Upgrade::Mail "root";' >> /etc/apt/apt.conf.d/50unattended-upgrades
       echo unattended-upgrades unattended-upgrades/enable_auto_updates boolean true | debconf-set-selections
       dpkg-reconfigure -f noninteractive unattended-upgrades
       systemctl restart unattended-upgrades
       ;;
 
-    CentOS|Fedora )
-      echo "[commands]" | tee -a /etc/dnf/automatic.conf
-      echo "upgrade_type = default" | tee -a /etc/dnf/automatic.conf
-      echo "random_sleep = 0" | tee -a /etc/dnf/automatic.conf
-      echo "update_cmd = default" | tee -a /etc/dnf/automatic.conf
-      echo "download_cmd = default" | tee -a /etc/dnf/automatic.conf
-      echo "apply_updates = yes" | tee -a /etc/dnf/automatic.conf
-      echo "[email]" | tee -a /etc/dnf/automatic.conf
-      echo "email_from = root@localhost" | tee -a /etc/dnf/automatic.conf
-      echo "email_to = root" | tee -a /etc/dnf/automatic.conf
+    CentOS|Fedora)
+      cat > /etc/dnf/automatic.conf <<EOF
+[commands]
+upgrade_type = security
+random_sleep = 0
+download_updates = yes
+apply_updates = yes
+
+[email]
+email_from = root@localhost
+email_to = root
+email_host = localhost
+EOF
       systemctl enable --now dnf-automatic.timer
       systemctl status dnf-automatic.timer
       ;;
@@ -1170,7 +1182,64 @@ disable_ipv6() {
 ### WARP ###
 warp() {
   info " $(text 43) "
-  bash <(curl -Ls https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/main/warp/xui-rp-warp.sh)
+  
+  mkdir -p /usr/local/xui-rp/
+  mkdir -p /etc/systemd/system/warp-svc.service.d
+  cd /usr/local/xui-rp/
+  echo "Попытка скачать пакет..."
+  
+  case "$SYSTEM" in
+    Debian|Ubuntu)
+      while ! wget --progress=dot:mega --timeout=30 --tries=10 --retry-connrefused "https://pkg.cloudflareclient.com/pool/$(grep "VERSION_CODENAME=" /etc/os-release | cut -d "=" -f 2)/main/c/cloudflare-warp/cloudflare-warp_2024.6.497-1_amd64.deb"; do
+        echo "Не удалось скачать. Повторная попытка через 3 секунды..."
+        sleep 3
+      done
+      echo "Скачивание завершено успешно."
+      apt install -y ./cloudflare-warp_2024.6.497-1_amd64.deb
+      ;;
+
+    CentOS|Fedora)
+      while ! wget --progress=dot:mega --timeout=30 --tries=10 --retry-connrefused "https://pkg.cloudflareclient.com/rpm/x86_64/cloudflare-warp-2024.6.497-1.x86_64.rpm"; do
+        echo "Не удалось скачать. Повторная попытка через 3 секунды..."
+        sleep 3
+      done
+      echo "Скачивание завершено успешно."
+      sudo yum localinstall -y cloudflare-warp-2024.6.497-1.x86_64.rpm
+      ;;
+  esac
+
+  rm -rf cloudflare-warp_*
+  cd ~/
+
+  cat > /etc/systemd/system/warp-svc.service.d/override.conf <<EOF
+[Service]
+LogLevelMax=3
+EOF
+
+  echo
+  systemctl daemon-reload
+  systemctl restart warp-svc.service
+  sleep 3
+
+  systemctl status warp-svc || echo "Служба warp-svc не найдена или не запустилась."
+
+  warp-cli --accept-tos disconnect || true
+  warp-cli --accept-tos registration delete || true
+  script -q -c "echo y | warp-cli registration new"
+  warp-cli --accept-tos mode proxy
+  warp-cli --accept-tos proxy port 40000
+  warp-cli --accept-tos connect
+
+  echo
+  sleep 3
+  warp-cli tunnel stats
+
+  if curl -x socks5h://localhost:40000 https://2ip.io; then
+    echo "Настройка завершена: WARP подключен и работает."
+  else
+    echo "Ошибка: не удалось подключиться к WARP через прокси. Проверьте настройки."
+  fi
+
   tilda "$(text 10)"
 }
 

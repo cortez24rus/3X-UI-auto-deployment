@@ -38,7 +38,6 @@ sleep 5  # Ожидание запуска демона
 
 systemctl status warp-svc || echo "Служба warp-svc не найдена или не запустилась."
 
-
 # Удаление старых данных и сброс регистрации
 warp-cli --accept-tos disconnect || true
 warp-cli --accept-tos registration delete || true
