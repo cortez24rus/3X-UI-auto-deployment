@@ -1556,7 +1556,7 @@ random_site() {
   cd /usr/local/xui-rp/ || { echo "Не удалось перейти в /usr/local/xui-rp/"; exit 1; }
 
   if [[ ! -d "simple-web-templates-main" ]]; then
-      msg_inf "Скачиваем шаблоны..."
+      echo "Скачиваем шаблоны..."
       while ! wget -q --progress=dot:mega --timeout=30 --tries=10 --retry-connrefused "https://github.com/cortez24rus/simple-web-templates/archive/refs/heads/main.zip"; do
           echo "Скачивание не удалось, пробуем снова..."
           sleep 3
