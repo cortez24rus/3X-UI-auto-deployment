@@ -1756,24 +1756,26 @@ enabling_security() {
 
 ### SSH ####
 ssh_setup() {
-  sed -i -e "
-    s/#Port/Port/g;
-    s/Port 22/Port 36079/g;
-    s/#PermitRootLogin/PermitRootLogin/g;
-    s/PermitRootLogin yes/PermitRootLogin prohibit-password/g;
-    s/#PubkeyAuthentication/PubkeyAuthentication/g;
-    s/PubkeyAuthentication no/PubkeyAuthentication yes/g;
-    s/#PasswordAuthentication/PasswordAuthentication/g;
-    s/PasswordAuthentication yes/PasswordAuthentication no/g;
-    s/#PermitEmptyPasswords/PermitEmptyPasswords/g;
-    s/PermitEmptyPasswords yes/PermitEmptyPasswords no/g;
-  " /etc/ssh/sshd_config
+  if [[ "${ANSWER_SSH}" == [yY] ]]; then
+    info " $(text 48) "
+    sed -i -e "
+      s/#Port/Port/g;
+      s/Port 22/Port 36079/g;
+      s/#PermitRootLogin/PermitRootLogin/g;
+      s/PermitRootLogin yes/PermitRootLogin prohibit-password/g;
+      s/#PubkeyAuthentication/PubkeyAuthentication/g;
+      s/PubkeyAuthentication no/PubkeyAuthentication yes/g;
+      s/#PasswordAuthentication/PasswordAuthentication/g;
+      s/PasswordAuthentication yes/PasswordAuthentication no/g;
+      s/#PermitEmptyPasswords/PermitEmptyPasswords/g;
+      s/PermitEmptyPasswords yes/PermitEmptyPasswords no/g;
+    " /etc/ssh/sshd_config
 
-  # Настройка баннера
-  cat > /etc/motd <<EOF
+    # Настройка баннера
+    cat > /etc/motd <<EOF
 
 ################################################################################
-                         WARNING: AUTHORIZED ACCESS ONLY                         
+                        WARNING: AUTHORIZED ACCESS ONLY                         
 ################################################################################
 
 This system is for the use of authorized users only. Individuals using this
@@ -1793,21 +1795,22 @@ to the fullest extent of the law.
 
 ################################################################################
 
-             +----------------------------------------------------+
-             | █████ █████ ███████████     █████████   █████ █████|
-             |░░███ ░░███ ░░███░░░░░███   ███░░░░░███ ░░███ ░░███ |
-             | ░░███ ███   ░███    ░███  ░███    ░███  ░░███ ███  |
-             |  ░░█████    ░██████████   ░███████████   ░░█████   |
-             |   ███░███   ░███░░░░░███  ░███░░░░░███    ░░███    |
-             |  ███ ░░███  ░███    ░███  ░███    ░███     ░███    |
-             | █████ █████ █████   █████ █████   █████    █████   |
-             |░░░░░ ░░░░░ ░░░░░   ░░░░░ ░░░░░   ░░░░░    ░░░░░    |
-             +----------------------------------------------------+
+            +----------------------------------------------------+
+            | █████ █████ ███████████     █████████   █████ █████|
+            |░░███ ░░███ ░░███░░░░░███   ███░░░░░███ ░░███ ░░███ |
+            | ░░███ ███   ░███    ░███  ░███    ░███  ░░███ ███  |
+            |  ░░█████    ░██████████   ░███████████   ░░█████   |
+            |   ███░███   ░███░░░░░███  ░███░░░░░███    ░░███    |
+            |  ███ ░░███  ░███    ░███  ░███    ░███     ░███    |
+            | █████ █████ █████   █████ █████   █████    █████   |
+            |░░░░░ ░░░░░ ░░░░░   ░░░░░ ░░░░░   ░░░░░    ░░░░░    |
+            +----------------------------------------------------+
 
 
 EOF
-  systemctl restart sshd
-  tilda "$(text 10)"
+    systemctl restart sshd
+    tilda "$(text 10)"
+  fi
 }
 
 # Установока xui бота
