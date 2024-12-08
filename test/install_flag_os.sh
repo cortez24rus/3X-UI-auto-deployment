@@ -732,32 +732,38 @@ data_entry() {
 
   tilda "$(text 10)"
 
-  if [[ ${args[ssh]} == "true" ]]; then
-    info " $(text 48) "
-    out_data " $(text 49) "
-    echo
-    out_data " $(text 50) "
-    out_data " $(text 51) "
-    echo
-    out_data " $(text 52)" "type \$env:USERPROFILE\.ssh\id_rsa.pub | ssh -p 22 ${USERNAME}@${IP4} \"cat >> ~/.ssh/authorized_keys\""
-    out_data " $(text 53)" "ssh-copy-id -p 22 ${USERNAME}@${IP4}"
-    echo
-    # Цикл проверки наличия ключа
-    while true; do
-      if [[ -n $(grep -v '^[[:space:]]*$' "/home/${USERNAME}/.ssh/authorized_keys") || -n $(grep -v '^[[:space:]]*$' "/root/.ssh/authorized_keys") ]]; then
-        info " $(text 56) "
-        break
-      else
-        warning " $(text 55) "
-        echo
-        reading " $(text 54) " CONTINUE_SSH
-        if [[ "${CONTINUE_SSH}" != [yY] ]]; then
-          warning " $(text 9) " # Настройка отменена
-          return 0
+  if [[ ${args[ssh]} == "true" ]]; thenэ
+    reading " $(text 54) " ANSWER_SSH
+    if [[ "${ANSWER_SSH}" == [yY] ]]; then
+      info " $(text 48) "
+      out_data " $(text 49) "
+      echo
+      out_data " $(text 50) "
+      out_data " $(text 51) "
+      echo
+      out_data " $(text 52)" "type \$env:USERPROFILE\.ssh\id_rsa.pub | ssh -p 22 ${USERNAME}@${IP4} \"cat >> ~/.ssh/authorized_keys\""
+      out_data " $(text 53)" "ssh-copy-id -p 22 ${USERNAME}@${IP4}"
+      echo
+      # Цикл проверки наличия ключа
+      while true; do
+        if [[ -n $(grep -v '^[[:space:]]*$' "/home/${USERNAME}/.ssh/authorized_keys") || -n $(grep -v '^[[:space:]]*$' "/root/.ssh/authorized_keys") ]]; then
+          info " $(text 56) "
+          break
+        else
+          warning " $(text 55) "
+          echo
+          reading " $(text 54) " ANSWER_SSH
+          if [[ "${ANSWER_SSH}" != [yY] ]]; then
+            warning " $(text 9) " # Настройка отменена
+            return 0
+          fi
         fi
-      fi
-    done
-    tilda "$(text 10)"
+      done
+      tilda "$(text 10)"
+    else
+      warning " $(text 9) "
+      return 0
+    fi      
   fi
 
   if [[ ${args[tgbot]} == "true" ]]; then
