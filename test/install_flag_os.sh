@@ -1252,10 +1252,14 @@ issuance_of_certificates() {
   chmod 600 cloudflare.credentials
 
   if [[ "$CFTOKEN" =~ [A-Z] ]]; then
-    echo "dns_cloudflare_api_token = ${CFTOKEN}" >> ${CF_CREDENTIALS_PATH}
+    cat > ${CF_CREDENTIALS_PATH} <<EOF
+dns_cloudflare_api_token = ${CFTOKEN}
+EOF
   else
-    echo "dns_cloudflare_email = ${EMAIL}" >> ${CF_CREDENTIALS_PATH}
-    echo "dns_cloudflare_api_key = ${CFTOKEN}" >> ${CF_CREDENTIALS_PATH}
+    cat > ${CF_CREDENTIALS_PATH} <<EOF
+dns_cloudflare_email = ${EMAIL}
+dns_cloudflare_api_key = ${CFTOKEN}
+EOF
   fi
 
   attempt=0
