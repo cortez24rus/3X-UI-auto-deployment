@@ -1300,6 +1300,7 @@ monitoring() {
 ### NGINX ###
 nginx_setup() {
   info " $(text 45) "
+
   mkdir -p /etc/nginx/stream-enabled/
   mkdir -p /etc/nginx/conf.d/
   rm -rf /etc/nginx/conf.d/default.conf
@@ -1325,6 +1326,7 @@ nginx_setup() {
   systemctl restart nginx
   sleep 2
   nginx -s reload
+  
   tilda "$(text 10)"
 }
 
