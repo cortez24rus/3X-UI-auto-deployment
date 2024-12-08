@@ -1187,7 +1187,7 @@ warp() {
   mkdir -p /etc/systemd/system/warp-svc.service.d
   cd /usr/local/xui-rp/
   echo "Попытка скачать пакет..."
-  
+  echo $SYSTEM  
   case "$SYSTEM" in
     Debian|Ubuntu)
       while ! wget --progress=dot:mega --timeout=30 --tries=10 --retry-connrefused "https://pkg.cloudflareclient.com/pool/$(grep "VERSION_CODENAME=" /etc/os-release | cut -d "=" -f 2)/main/c/cloudflare-warp/cloudflare-warp_2024.6.497-1_amd64.deb"; do
