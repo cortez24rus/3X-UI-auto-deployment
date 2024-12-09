@@ -319,7 +319,7 @@ defaults[mon]=false
 defaults[nginx]=true
 defaults[panel]=true
 defaults[ufw]=false
-defaults[ssh]=true
+defaults[ssh]=false
 defaults[tgbot]=false
 EOF
 }
@@ -502,7 +502,7 @@ check_operating_system() {
   REGEX=("debian" "ubuntu" "centos|red hat|kernel|alma|rocky")
   RELEASE=("Debian" "Ubuntu" "CentOS")
   EXCLUDE=("---")
-  MAJOR=("9" "16" "7")
+  MAJOR=("10" "20" "7")
   PACKAGE_UPDATE=("apt -y update" "apt -y update" "yum -y update --skip-broken")
   PACKAGE_INSTALL=("apt -y install" "apt -y install" "yum -y install")
   PACKAGE_UNINSTALL=("apt -y autoremove" "apt -y autoremove" "yum -y autoremove")
@@ -702,43 +702,47 @@ validate_path() {
     esac
 
     if [[ -z "$PATH_VALUE" ]]; then
-      warning " $(text 29) "
+      error " $(text 29) "
       echo
     elif [[ $PATH_VALUE =~ ['{}\$/\\'] ]]; then
-      warning " $(text 30) "
+      error " $(text 30) "
       echo
     else
       break
     fi
   done
+  
+  # Экранируем пробелы в пути
+  local ESCAPED_PATH=$(echo "$PATH_VALUE" | sed 's/ /\\ /g')
 
+  # Присваиваем значение переменной
   case "$VARIABLE_NAME" in
     CDNGRPC)
-      export CDNGRPC="$PATH_VALUE"
+      export CDNGRPC="$ESCAPED_PATH"
       ;;
     CDNSPLIT)
-      export CDNSPLIT="$PATH_VALUE"
+      export CDNSPLIT="$ESCAPED_PATH"
       ;;
     CDNHTTPU)
-      export CDNHTTPU="$PATH_VALUE"
+      export CDNHTTPU="$ESCAPED_PATH"
       ;;
     CDNWS)
-      export CDNWS="$PATH_VALUE"
+      export CDNWS="$ESCAPED_PATH"
       ;;
     METRICS)
-      export METRICS="$PATH_VALUE"
+      export METRICS="$ESCAPED_PATH"
       ;;
     ADGUARDPATH)
-      export ADGUARDPATH="$PATH_VALUE"
+      export ADGUARDPATH="$ESCAPED_PATH"
       ;;
     WEB_BASE_PATH)
-      export WEB_BASE_PATH="$PATH_VALUE"
+      export WEB_BASE_PATH="$ESCAPED_PATH"
       ;;
     SUB_PATH)
-      export SUB_PATH="$PATH_VALUE"
+      export SUB_PATH="$ESCAPED_PATH"
       ;;
     SUB_JSON_PATH)
-      export SUB_JSON_PATH="$PATH_VALUE"
+      export SUB_JSON_PATH="$ESCAPED_PATH"
       ;;
   esac
 }
