@@ -12,17 +12,22 @@
 > [!NOTE]
 > Скрипт настроен с учётом специфики маршрутизации для пользователей из России.
 
-### Supported OS:
+### Supported Operating Systems:
 
-   - Ubuntu 24
-   - Ubuntu 22
-   - Ubuntu 20
-   - Debian 12
-   - Debian 11
-   - Debian 10
-   - CentOS Stream 9
-   - CentOS Stream 8
-   - CentOS 7
+- **Ubuntu:**
+  - 24.04 (upcoming)
+  - 22.04 LTS
+  - 20.04 LTS
+
+- **Debian:**
+  - 12 (bookworm)
+  - 11 (bullseye)
+  - 10 (buster)
+
+- **CentOS:**
+  - Stream 9
+  - Stream 8
+  - 7
 
 ### Настройка cloudflare
 1. Обновите систему и перезагрузите сервер.
