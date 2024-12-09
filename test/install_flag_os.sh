@@ -186,13 +186,13 @@ R[75]="Неверная опция для --$key: $value. Используйте
 E[76]="Unknown option: $1"
 R[76]="Неверная опция: $1"
 E[77]=""
-R[77]=""
+R[77]="Список зависимостей для установки:"
 E[78]=""
-R[78]=""
+R[78]="Все зависимости уже установлены и не требуют дополнительной установки."
 E[79]=""
-R[79]=""
-E[80]=""
-R[80]=""
+R[79]="Настройка шаблона сайта."
+E[80]="Random template name:"
+R[80]="Случайное имя шаблона:"
 E[81]=""
 R[81]=""
 E[82]=""
@@ -1047,11 +1047,11 @@ installation_of_utilities() {
       done
 
       if [ "${#DEPS_PACK[@]}" -ge 1 ]; then
-        echo "Список зависимостей для установки ${DEPS_PACK[@]}"
+        info " $(text 77) ": ${DEPS_PACK[@]}
         ${PACKAGE_UPDATE[int]} >/dev/null 2>&1
         ${PACKAGE_INSTALL[int]} ${DEPS_PACK[@]} >/dev/null 2>&1
       else
-        echo "Все зависимости уже установлены и не требуют дополнительной установки."
+        info " $(text 78) "
       fi
       ;;
 
@@ -1064,11 +1064,11 @@ installation_of_utilities() {
       done
 
       if [ "${#DEPS_PACK[@]}" -ge 1 ]; then
-        echo "Список зависимостей для установки ${DEPS_PACK[@]}"
+        info " $(text 77) ": ${DEPS_PACK[@]}
         ${PACKAGE_UPDATE[int]} >/dev/null 2>&1
         ${PACKAGE_INSTALL[int]} ${DEPS_PACK[@]} >/dev/null 2>&1
       else
-        echo "Все зависимости уже установлены и не требуют дополнительной установки."
+        info " $(text 78) "
       fi
       ;;
   esac
@@ -1187,7 +1187,7 @@ add_user() {
 }
 
 ### Безопасность ###
-unattended_upgrade() {
+setup_auto_updates() {
   info " $(text 40) "
 
   case "$SYSTEM" in
@@ -1261,30 +1261,27 @@ warp() {
   mkdir -p /usr/local/xui-rp/
   mkdir -p /etc/systemd/system/warp-svc.service.d
   cd /usr/local/xui-rp/
-  echo "Попытка скачать пакет..."
 
   case "$SYSTEM" in
     Debian|Ubuntu)
       while ! wget --progress=dot:mega --timeout=30 --tries=10 --retry-connrefused "https://pkg.cloudflareclient.com/pool/$(grep "VERSION_CODENAME=" /etc/os-release | cut -d "=" -f 2)/main/c/cloudflare-warp/cloudflare-warp_2024.6.497-1_amd64.deb"; do
-        echo "Не удалось скачать. Повторная попытка через 3 секунды..."
+        warning " $(text 38) "
         sleep 3
       done
-      echo "Скачивание завершено успешно."
       apt install -y ./cloudflare-warp_2024.6.497-1_amd64.deb
       ;;
 
     CentOS|Fedora)
       while ! wget --progress=dot:mega --timeout=30 --tries=10 --retry-connrefused "https://pkg.cloudflareclient.com/rpm/x86_64/cloudflare-warp-2024.6.497-1.x86_64.rpm"; do
-        echo "Не удалось скачать. Повторная попытка через 3 секунды..."
+        warning " $(text 38) "
         sleep 3
       done
-      echo "Скачивание завершено успешно."
       sudo yum localinstall -y cloudflare-warp-2024.6.497-1.x86_64.rpm
       ;;
   esac
 
   rm -rf cloudflare-warp_*
-  cd ~/
+  cd ~
 
   cat > /etc/systemd/system/warp-svc.service.d/override.conf <<EOF
 [Service]
@@ -1371,7 +1368,7 @@ monitoring() {
   bash <(curl -Ls https://github.com/cortez24rus/grafana-prometheus/raw/refs/heads/main/prometheus_node_exporter.sh)
   
   COMMENT_METRIC="location /${METRICS} {
-    auth_basic "Restricted Content";
+    auth_basic \"Restricted Content\";
     auth_basic_user_file /etc/nginx/.htpasswd;
     proxy_pass http://127.0.0.1:9100/metrics;
     proxy_set_header Host \$host;
@@ -1519,13 +1516,13 @@ EOF
 
 local_conf() {
   cat > /etc/nginx/conf.d/local.conf <<EOF
-server {
-  listen                               80;
-  server_name                          ${DOMAIN} www.${DOMAIN};
-  location / {
-    return 301                         https://${DOMAIN}\$request_uri;
-  }
-}
+#server {
+#  listen                               80;
+#  server_name                          ${DOMAIN} www.${DOMAIN};
+#  location / {
+#    return 301                         https://${DOMAIN}\$request_uri;
+#  }
+#}
 server {
   listen                               9090 default_server;
   server_name                          ${DOMAIN} www.${DOMAIN};
@@ -1628,34 +1625,31 @@ EOF
 }
 
 random_site() {
-  echo "Создаем необходимые папки..."
+  info " $(text 79) "
   mkdir -p /var/www/html/ /usr/local/xui-rp/
 
   cd /usr/local/xui-rp/ || { echo "Не удалось перейти в /usr/local/xui-rp/"; exit 1; }
 
   if [[ ! -d "simple-web-templates-main" ]]; then
-      echo "Скачиваем шаблоны..."
       while ! wget -q --progress=dot:mega --timeout=30 --tries=10 --retry-connrefused "https://github.com/cortez24rus/simple-web-templates/archive/refs/heads/main.zip"; do
-          echo "Скачивание не удалось, пробуем снова..."
-          sleep 3
+        warning " $(text 38) "
+        sleep 3
       done
       unzip -q main.zip &>/dev/null && rm -f main.zip
   fi
 
   cd simple-web-templates-main || { echo "Не удалось перейти в папку с шаблонами"; exit 1; }
 
-  echo "Удаляем ненужные файлы..."
   rm -rf assets ".gitattributes" "README.md" "_config.yml"
 
   RandomHTML=$(ls -d */ | shuf -n1)  # Обновил для выбора случайного подкаталога
-  echo "Random template name: ${RandomHTML}"
+  info " $(text 80) ${RandomHTML}"
 
   # Если шаблон существует, копируем его в /var/www/html
   if [[ -d "${RandomHTML}" && -d "/var/www/html/" ]]; then
       echo "Копируем шаблон в /var/www/html/..."
       rm -rf /var/www/html/*  # Очищаем старую папку
       cp -a "${RandomHTML}/." /var/www/html/ || { echo "Ошибка при копировании шаблона"; exit 1; }
-      echo "Шаблон успешно извлечен и установлен!"
   else
       echo "Ошибка при извлечении шаблона!"
       exit 1
@@ -2014,7 +2008,6 @@ enabling_security() {
       ufw --force reset
       ufw allow 36079/tcp
       ufw allow 443/tcp
-      ufw allow 22/tcp
       ufw insert 1 deny from "$BLOCK_ZONE_IP"
       ufw --force enable
       ;;
@@ -2023,7 +2016,6 @@ enabling_security() {
       systemctl enable --now firewalld
       firewall-cmd --permanent --zone=public --add-port=36079/tcp
       firewall-cmd --permanent --zone=public --add-port=443/tcp
-      firewall-cmd --permanent --zone=public --add-port=22/tcp
       firewall-cmd --permanent --zone=public --add-rich-rule="rule family='ipv4' source address='$BLOCK_ZONE_IP' reject"
       firewall-cmd --reload
       ;;
@@ -2143,7 +2135,7 @@ main() {
   data_entry
   [[ ${args[utils]} == "true" ]] && installation_of_utilities
   [[ ${args[dns]} == "true" ]] && dns_encryption
-  [[ ${args[autoupd]} == "true" ]] && unattended_upgrade
+  [[ ${args[autoupd]} == "true" ]] && setup_auto_updates
   [[ ${args[bbr]} == "true" ]] && enable_bbr
   [[ ${args[ipv6]} == "true" ]] && disable_ipv6
   [[ ${args[warp]} == "true" ]] && warp
