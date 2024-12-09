@@ -16,9 +16,9 @@
 
 <table style="border-collapse: collapse;">
   <tr>
-    <th style="padding: 8px;"></th>
-    <th style="padding: 8px;"></th>
-    <th style="padding: 8px;"></th>
+    <th style="padding: 8px;">**Ubuntu**</th>
+    <th style="padding: 8px;">**Debian**</th>
+    <th style="padding: 8px;">**CentOS**</th>
   </tr>
   <tr>
     <td style="padding: 8px;">24.04 (upcoming)</td>
