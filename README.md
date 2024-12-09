@@ -59,29 +59,32 @@ This script is designed to quickly and easily set up a hidden proxy server, with
 
 -----
 
-## Options
+Help message of the script:
+```
 
-| Option                  | Description                                                       | Default                          |
-|-------------------------|-------------------------------------------------------------------|----------------------------------|
-| `-u, --utils <true|false>`       | Enable additional utilities                                        | `${defaults[utils]}`             |
-| `-d, --dns <true|false>`         | Enable DNS encryption                                              | `${defaults[dns]}`               |
-| `-a, --addu <true|false>`        | Enable user addition                                               | `${defaults[addu]}`              |
-| `-r, --autoupd <true|false>`     | Enable automatic updates                                           | `${defaults[autoupd]}`           |
-| `-b, --bbr <true|false>`         | Enable BBR (TCP Congestion Control)                                | `${defaults[bbr]}`               |
-| `-i, --ipv6 <true|false>`        | Disable IPv6 support                                              | `${defaults[ipv6]}`              |
-| `-w, --warp <true|false>`        | Enable Warp                                                       | `${defaults[warp]}`              |
-| `-c, --cert <true|false>`        | Enable certificate issuance for domain                             | `${defaults[cert]}`              |
-| `-m, --mon <true|false>`         | Enable monitoring services (e.g., node_exporter)                   | `${defaults[mon]}`               |
-| `-n, --nginx <true|false>`       | Enable NGINX installation                                          | `${defaults[nginx]}`             |
-| `-p, --panel <true|false>`       | Enable panel installation for user management                      | `${defaults[panel]}`             |
-| `-f, --firewall <true|false>`    | Enable firewall configuration                                      | `${defaults[firewall]}`          |
-| `-s, --ssh <true|false>`         | Enable SSH access                                                 | `${defaults[ssh]}`               |
-| `-t, --tgbot <true|false>`       | Enable Telegram bot integration for user management                | `${defaults[tgbot]}`             |
-| `-h, --help`                   | Display this help message                                           |                                  |
+Usage: xui-reverse-proxy [-u|--utils <true|false>] [-d|--dns <true|false>] [-a|--addu <true|false>]
+                         [-r|--autoupd <true|false>] [-b|--bbr <true|false>] [-i|--ipv6 <true|false>]
+                         [-w|--warp <true|false>] [-c|--cert <true|false>] [-m|--mon <true|false>]
+                         [-n|--nginx <true|false>] [-p|--panel <true|false>] [-f|--firewall <true|false>]
+                         [-s|--ssh <true|false>] [-t|--tgbot <true|false>] [-h|--help]
 
-## Examples
-To enable DNS encryption and automatic updates:
+  -u, --utils <true|false>       Additional utilities (default: true)
+  -d, --dns <true|false>         DNS encryption (default: true)
+  -a, --addu <true|false>        User addition (default: true)
+  -r, --autoupd <true|false>     Automatic updates (default: true)
+  -b, --bbr <true|false>         BBR (TCP Congestion Control) (default: true)
+  -i, --ipv6 <true|false>        Disable IPv6 support (default: true)
+  -w, --warp <true|false>        Warp (default: true)
+  -c, --cert <true|false>        Certificate issuance for domain (default: true)
+  -m, --mon <true|false>         Monitoring services (e.g., node_exporter) (default: false)
+  -n, --nginx <true|false>       NGINX installation (default: true)
+  -p, --panel <true|false>       Panel installation for user management (default: true)
+  -f, --firewall <true|false>    Firewall configuration (default: true)
+  -s, --ssh <true|false>         SSH access (default: true)
+  -t, --tgbot <true|false>       Telegram bot integration for user management (default: false)
+  -h, --help                     Display this help message
 
+```
 
 ### Installation of XUI-RP:
 
