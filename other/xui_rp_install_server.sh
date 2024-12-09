@@ -624,8 +624,8 @@ get_test_response() {
 check_cf_token() {
   while ! echo "$test_response" | grep -qE "\"${testdomain}\"|\"#dns_records:edit\"|\"#dns_records:read\"|\"#zone:read\""; do
     local temp_domain
-    local DOMAIN
-    local SUBDOMAIN
+    DOMAIN=""
+    SUBDOMAIN=""
 
     while [[ -z "$temp_domain" ]]; do
         reading " $(text 13) " temp_domain
