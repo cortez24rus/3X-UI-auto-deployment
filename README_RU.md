@@ -14,11 +14,11 @@
 
 ### Supported Operating Systems:
 
-| **Ubuntu**       | **Debian**        | **CentOS**       |
-|------------------|-------------------|------------------|
-| 24.04 (upcoming) | 12 (bookworm)     | Stream 9         |
-| 22.04 LTS        | 11 (bullseye)     | Stream 8         |
-| 20.04 LTS        | 10 (buster)       | 7                |1
+| **Ubuntu**        | **Debian**         | **CentOS**       |
+|-------------------|--------------------|------------------|
+| 24.04 (upcoming)  | 12 (bookworm)      | Stream 9         |
+| 22.04 LTS         | 11 (bullseye)      | Stream 8         |
+| 20.04 LTS         | 10 (buster)        | 7                |
 
 ### Настройка cloudflare
 1. Обновите систему и перезагрузите сервер.
