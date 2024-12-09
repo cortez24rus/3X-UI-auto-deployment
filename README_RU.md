@@ -67,20 +67,20 @@
                          [-n|--nginx <true|false>] [-p|--panel <true|false>] [-f|--firewall <true|false>]
                          [-s|--ssh <true|false>] [-t|--tgbot <true|false>] [-h|--help]
 
-  -u, --utils <true|false>       Дополнительные утилиты                                 (по умолчанию: true)
-  -d, --dns <true|false>         Шифрование DNS                                         (по умолчанию: true)
-  -a, --addu <true|false>        Добавление пользователя                                (по умолчанию: true)
-  -r, --autoupd <true|false>     Автоматические обновления                              (по умолчанию: true)
-  -b, --bbr <true|false>         BBR (управление перегрузкой TCP)                       (по умолчанию: true)
-  -i, --ipv6 <true|false>        Отключить поддержку IPv6                               (по умолчанию: true)
-  -w, --warp <true|false>        Warp                                                   (по умолчанию: true)
-  -c, --cert <true|false>        Выпуск сертификатов для домена                         (по умолчанию: true)
-  -m, --mon <true|false>         Сервисы мониторинга (node_exporter)                    (по умолчанию: false)
-  -n, --nginx <true|false>       Установка NGINX                                        (по умолчанию: true)
-  -p, --panel <true|false>       Установка панели для управления пользователями         (по умолчанию: true)
-  -f, --firewall <true|false>    Настройка файрвола                                     (по умолчанию: true)
-  -s, --ssh <true|false>         SSH доступ                                             (по умолчанию: true)
-  -t, --tgbot <true|false>       Интеграция Telegram бота для управления пользователями (по умолчанию: false)
+  -u, --utils <true|false>       Дополнительные утилиты                         (по умолчанию: true)
+  -d, --dns <true|false>         Шифрование DNS                                 (по умолчанию: true)
+  -a, --addu <true|false>        Добавление пользователя                        (по умолчанию: true)
+  -r, --autoupd <true|false>     Автоматические обновления                      (по умолчанию: true)
+  -b, --bbr <true|false>         BBR (управление перегрузкой TCP)               (по умолчанию: true)
+  -i, --ipv6 <true|false>        Отключить поддержку IPv6                       (по умолчанию: true)
+  -w, --warp <true|false>        Warp                                           (по умолчанию: true)
+  -c, --cert <true|false>        Выпуск сертификатов для домена                 (по умолчанию: true)
+  -m, --mon <true|false>         Сервисы мониторинга (node_exporter)            (по умолчанию: false)
+  -n, --nginx <true|false>       Установка NGINX                                (по умолчанию: true)
+  -p, --panel <true|false>       Установка панели для управления пользователями (по умолчанию: true)
+  -f, --firewall <true|false>    Настройка файрвола                             (по умолчанию: true)
+  -s, --ssh <true|false>         SSH доступ                                     (по умолчанию: true)
+  -t, --tgbot <true|false>       Интеграция Telegram бота                       (по умолчанию: false)
   -h, --help                     Показать это сообщение помощи
 ```
 
