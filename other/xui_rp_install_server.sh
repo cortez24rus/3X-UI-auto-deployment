@@ -643,7 +643,8 @@ check_cf_token() {
       DOMAIN="$temp_domain"              # Если это домен второго уровня, то просто сохраняем
       SUBDOMAIN="www.$temp_domain"       # Для домена второго уровня подставляем www в SUBDOMAIN
     fi
-
+      echo $DOMAIN
+      echo $SUBDOMAIN
     while [[ -z $EMAIL ]]; do
       reading " $(text 15) " EMAIL
       echo
