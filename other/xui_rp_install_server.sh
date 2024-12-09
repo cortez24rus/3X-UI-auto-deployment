@@ -695,10 +695,10 @@ validate_path() {
     esac
 
     if [[ -z "$PATH_VALUE" ]]; then
-      error " $(text 29) "
+      warning " $(text 29) "
       echo
     elif [[ $PATH_VALUE =~ ['{}\$/\\'] ]]; then
-      error " $(text 30) "
+      warning " $(text 30) "
       echo
     else
       break
@@ -1489,7 +1489,7 @@ stream_conf() {
   cat > /etc/nginx/stream-enabled/stream.conf <<EOF
 map \$ssl_preread_server_name \$backend {
   ${DOMAIN}                            web;
-  www.${DOMAIN}                        xtls;
+  ${SUBDOMAIN}                         xtls;
   ${REALITY}                           reality;
   default                              block;
 }
@@ -1518,14 +1518,14 @@ local_conf() {
   cat > /etc/nginx/conf.d/local.conf <<EOF
 #server {
 #  listen                               80;
-#  server_name                          ${DOMAIN} www.${DOMAIN};
+#  server_name                          ${DOMAIN} *.${DOMAIN};
 #  location / {
 #    return 301                         https://${DOMAIN}\$request_uri;
 #  }
 #}
 server {
   listen                               9090 default_server;
-  server_name                          ${DOMAIN} www.${DOMAIN};
+  server_name                          ${DOMAIN} *.${DOMAIN};
   location / {
     return 301                         https://${DOMAIN}\$request_uri;
   }
@@ -1537,7 +1537,7 @@ server {
 server {
   listen                               36077 ssl proxy_protocol;
   http2                                on;
-  server_name                          ${DOMAIN} www.${DOMAIN};
+  server_name                          ${DOMAIN} *.${DOMAIN};
 
   # SSL
   ssl_certificate                      /etc/letsencrypt/live/${DOMAIN}/fullchain.pem;
@@ -1784,7 +1784,7 @@ settings_steal() {
   "externalProxy": [
   {
     "forceTls": "same",
-    "dest": "www.${DOMAIN}",
+    "dest": "${SUBDOMAIN},
     "port": 443,
     "remark": ""
   }
@@ -1837,7 +1837,7 @@ settings_reality() {
   "externalProxy": [
   {
     "forceTls": "same",
-    "dest": "www.${DOMAIN}",
+    "dest": "${SUBDOMAIN},
     "port": 443,
     "remark": ""
   }
@@ -1889,13 +1889,13 @@ settings_xtls() {
   "externalProxy": [
   {
     "forceTls": "same",
-    "dest": "www.${DOMAIN}",
+    "dest": "${SUBDOMAIN},
     "port": 443,
     "remark": ""
   }
   ],
   "tlsSettings": {
-  "serverName": "www.${DOMAIN}",
+  "serverName": "${SUBDOMAIN},
   "minVersion": "1.3",
   "maxVersion": "1.3",
   "cipherSuites": "",
