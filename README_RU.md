@@ -14,28 +14,13 @@
 
 ### Supported Operating Systems:
 
-<table style="border-collapse: collapse; width: 100%; table-layout: fixed;">
-  <tr>
-    <th style="padding: 8px; text-align: left;">Ubuntu</th>
-    <th style="padding: 8px; text-align: left;">Debian</th>
-    <th style="padding: 8px; text-align: left;">CentOS</th>
-  </tr>
-  <tr>
-    <td style="padding: 8px;">24.04 LTS</td>
-    <td style="padding: 8px;">12 (bookworm)</td>
-    <td style="padding: 8px;">Stream 9</td>
-  </tr>
-  <tr>
-    <td style="padding: 8px;">22.04 LTS</td>
-    <td style="padding: 8px;">11 (bullseye)</td>
-    <td style="padding: 8px;">Stream 8</td>
-  </tr>
-  <tr>
-    <td style="padding: 8px;">20.04 LTS</td>
-    <td style="padding: 8px;">10 (buster)</td>
-    <td style="padding: 8px;">7</td>
-  </tr>
-</table>
+### Supported Operating Systems:
+
+| **Ubuntu**       | **Debian**        | **CentOS**       |
+|------------------|-------------------|------------------|
+| 24.04 LTS        | 12 (bookworm)     | Stream 9         |
+| 22.04 LTS        | 11 (bullseye)     | Stream 8         |
+| 20.04 LTS        | 10 (buster)       | 7                |
 
 -----
 
