@@ -1785,7 +1785,7 @@ settings_steal() {
   "externalProxy": [
   {
     "forceTls": "same",
-    "dest": "${SUBDOMAIN},
+    "dest": "${SUBDOMAIN}",
     "port": 443,
     "remark": ""
   }
@@ -1838,7 +1838,7 @@ settings_reality() {
   "externalProxy": [
   {
     "forceTls": "same",
-    "dest": "${SUBDOMAIN},
+    "dest": "${SUBDOMAIN}",
     "port": 443,
     "remark": ""
   }
@@ -1890,13 +1890,13 @@ settings_xtls() {
   "externalProxy": [
   {
     "forceTls": "same",
-    "dest": "${SUBDOMAIN},
+    "dest": "${SUBDOMAIN}",
     "port": 443,
     "remark": ""
   }
   ],
   "tlsSettings": {
-  "serverName": "${SUBDOMAIN},
+  "serverName": "${SUBDOMAIN}",
   "minVersion": "1.3",
   "maxVersion": "1.3",
   "cipherSuites": "",
