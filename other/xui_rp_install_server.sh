@@ -1074,8 +1074,8 @@ installation_of_utilities() {
       ;;
   esac
 
-  #nginx_make
-  nginx_gpg
+  nginx_make
+  #nginx_gpg
   ${PACKAGE_INSTALL[int]} systemd-resolved
   tilda "$(text 10)"
 }
