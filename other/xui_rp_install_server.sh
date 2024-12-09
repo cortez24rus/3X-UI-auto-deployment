@@ -2120,11 +2120,11 @@ log_clear() {
 main() {
   log_entry
   read_defaults_from_file
+  select_language
   parse_args "$@" || show_help
   check_root
   check_ip
   check_operating_system
-  select_language
   if [ -f ${defaults_file} ]; then
     tilda "$(text 4)"
   fi
