@@ -185,11 +185,11 @@ E[75]="Invalid option for --$key: $value. Use 'true' or 'false'."
 R[75]="Неверная опция для --$key: $value. Используйте 'true' или 'false'."
 E[76]="Unknown option: $1"
 R[76]="Неверная опция: $1"
-E[77]=""
+E[77]="List of dependencies for installation:"
 R[77]="Список зависимостей для установки:"
-E[78]=""
+E[78]="All dependencies are already installed and do not require additional installation."
 R[78]="Все зависимости уже установлены и не требуют дополнительной установки."
-E[79]=""
+E[79]="Configuring site template."
 R[79]="Настройка шаблона сайта."
 E[80]="Random template name:"
 R[80]="Случайное имя шаблона:"
@@ -203,65 +203,6 @@ E[84]=""
 R[84]=""
 E[85]=""
 R[85]=""
-E[86]=""
-R[86]=""
-E[87]=""
-R[87]=""
-E[88]=""
-R[88]=""
-E[89]=""
-R[89]=""
-E[90]=""
-R[90]=""
-E[91]=""
-R[91]=""
-E[92]=""
-R[92]=""
-E[93]=""
-R[93]=""
-E[94]=""
-R[94]=""
-E[95]=""
-R[95]=""
-E[96]=""
-R[96]=""
-E[97]=""
-R[97]=""
-E[98]=""
-R[98]=""
-E[99]=""
-R[99]=""
-E[100]="  -u, --utils <true|false>       Additional utilities                             (default: ${defaults[utils]})"
-R[100]="  -u, --utils <true|false>       Дополнительные утилиты                           (по умолчанию: ${defaults[utils]})"
-E[101]="  -d, --dns <true|false>         DNS encryption                                   (default: ${defaults[dns]})"
-R[101]="  -d, --dns <true|false>         Шифрование DNS                                   (по умолчанию: ${defaults[dns]})"
-E[102]="  -a, --addu <true|false>        User addition                                    (default: ${defaults[addu]})"
-R[102]="  -a, --addu <true|false>        Добавление пользователя                          (по умолчанию: ${defaults[addu]})"
-E[103]="  -r, --autoupd <true|false>     Automatic updates                                (default: ${defaults[autoupd]})"
-R[103]="  -r, --autoupd <true|false>     Автоматические обновления                        (по умолчанию: ${defaults[autoupd]})"
-E[104]="  -b, --bbr <true|false>         BBR (TCP Congestion Control)                     (default: ${defaults[bbr]})"
-R[104]="  -b, --bbr <true|false>         BBR (управление перегрузкой TCP)                 (по умолчанию: ${defaults[bbr]})"
-E[105]="  -i, --ipv6 <true|false>        Disable IPv6 support                             (default: ${defaults[ipv6]})"
-R[105]="  -i, --ipv6 <true|false>        Отключить поддержку IPv6                         (по умолчанию: ${defaults[ipv6]})"
-E[106]="  -w, --warp <true|false>        Warp                                             (default: ${defaults[warp]})"
-R[106]="  -w, --warp <true|false>        Warp                                             (по умолчанию: ${defaults[warp]})"
-E[107]="  -c, --cert <true|false>        Certificate issuance for domain                  (default: ${defaults[cert]})"
-R[107]="  -c, --cert <true|false>        Выпуск сертификатов для домена                   (по умолчанию: ${defaults[cert]})"
-E[108]="  -m, --mon <true|false>         Monitoring services (e.g., node_exporter)        (default: ${defaults[mon]})"
-R[108]="  -m, --mon <true|false>         Сервисы мониторинга (например, node_exporter)    (по умолчанию: ${defaults[mon]})"
-E[109]="  -n, --nginx <true|false>       NGINX installation                               (default: ${defaults[nginx]})"
-R[109]="  -n, --nginx <true|false>       Установка NGINX                                  (по умолчанию: ${defaults[nginx]})"
-E[110]="  -p, --panel <true|false>       Panel installation for user management           (default: ${defaults[panel]})"
-R[110]="  -p, --panel <true|false>       Установка панели для управления пользователями   (по умолчанию: ${defaults[panel]})"
-E[111]="  -f, --firewall <true|false>    Firewall configuration                           (default: ${defaults[ufw]})"
-R[111]="  -f, --firewall <true|false>    Настройка файрвола                               (по умолчанию: ${defaults[ufw]})"
-E[112]="  -s, --ssh <true|false>         SSH access                                       (default: ${defaults[ssh]})"
-R[112]="  -s, --ssh <true|false>         SSH доступ                                       (по умолчанию: ${defaults[ssh]})"
-E[113]="  -t, --tgbot <true|false>       Telegram bot integration                         (default: ${defaults[tgbot]})"
-R[113]="  -t, --tgbot <true|false>       Интеграция Telegram бота                         (по умолчанию: ${defaults[tgbot]})"
-E[114]="  -h, --help                     Display this help message                        "
-R[114]="  -h, --help                     Показать это сообщение помощи                    "
-
 
 # Функция для отображения справки
 show_help() {
@@ -271,21 +212,36 @@ show_help() {
   info "       [-c|--cert <true|false>] [-m|--mon <true|false>] [-n|--nginx <true|false>] [-p|--panel <true|false>]"
   info "       [-f|--firewall <true|false>] [-s|--ssh <true|false>] [-t|--tgbot <true|false>] [-h|--help]"
   echo
-  info " $(text 100) "
-  info " $(text 101) "
-  info " $(text 102) "
-  info " $(text 103) "
-  info " $(text 104) "
-  info " $(text 105) "
-  info " $(text 106) "
-  info " $(text 107) "
-  info " $(text 108) "
-  info " $(text 109) "
-  info " $(text 110) "
-  info " $(text 111) "
-  info " $(text 112) "
-  info " $(text 113) "
-  info " $(text 114) "
+  echo "  -u, --utils <true|false>       Additional utilities                             (default: ${defaults[utils]})"
+  echo "                                 Дополнительные утилиты"
+  echo "  -d, --dns <true|false>         DNS encryption                                   (default: ${defaults[dns]})"
+  echo "                                 Шифрование DNS"
+  echo "  -a, --addu <true|false>        User addition                                    (default: ${defaults[addu]})"
+  echo "                                 Добавление пользователя"
+  echo "  -r, --autoupd <true|false>     Automatic updates                                (default: ${defaults[autoupd]})"
+  echo "                                 Автоматические обновления"
+  echo "  -b, --bbr <true|false>         BBR (TCP Congestion Control)                     (default: ${defaults[bbr]})"
+  echo "                                 BBR (управление перегрузкой TCP)"
+  echo "  -i, --ipv6 <true|false>        Disable IPv6 support                             (default: ${defaults[ipv6]})"
+  echo "                                 Отключить поддержку IPv6 "
+  echo "  -w, --warp <true|false>        Warp                                             (default: ${defaults[warp]})"
+  echo "                                 Warp"
+  echo "  -c, --cert <true|false>        Certificate issuance for domain                  (default: ${defaults[cert]})"
+  echo "                                 Выпуск сертификатов для домена"
+  echo "  -m, --mon <true|false>         Monitoring services (node_exporter)              (default: ${defaults[mon]})"
+  echo "                                 Сервисы мониторинга (node_exporter)"
+  echo "  -n, --nginx <true|false>       NGINX installation                               (default: ${defaults[nginx]})"
+  echo "                                 Установка NGINX"
+  echo "  -p, --panel <true|false>       Panel installation for user management           (default: ${defaults[panel]})"
+  echo "                                 Установка панели для управления пользователями"
+  echo "  -f, --firewall <true|false>    Firewall configuration                           (default: ${defaults[ufw]})"
+  echo "                                 Настройка файрвола"
+  echo "  -s, --ssh <true|false>         SSH access                                       (default: ${defaults[ssh]})"
+  echo "                                 SSH доступ"
+  echo "  -t, --tgbot <true|false>       Telegram bot integration                         (default: ${defaults[tgbot]})"
+  echo "                                 Интеграция Telegram бота"
+  echo "  -h, --help                     Display this help message                        "
+  echo "                                 Показать это сообщение помощи"
   echo
   exit 0
 }
@@ -363,7 +319,7 @@ validate_true_false() {
 
 parse_args() {
   local opts
-  opts=$(getopt -o i:w:m:u:s:t:f:a:r:b:h:l:d:p:c:n --long utils:,dns:,addu:,autoupd:,bbr:,ipv6:,warp:,cert:,mon:,nginx:,panel:,ufw:,ssh:,tgbot:,help -- "$@")
+  opts=$(getopt -o i:w:m:u:s:t:f:a:r:b:hl:d:p:c:n --long utils:,dns:,addu:,autoupd:,bbr:,ipv6:,warp:,cert:,mon:,nginx:,panel:,ufw:,ssh:,tgbot:,help -- "$@")
   if [[ $? -ne 0 ]]; then
     return 1
   fi
@@ -856,130 +812,6 @@ data_entry() {
   SUB_JSON_URI=https://${DOMAIN}/${SUB_JSON_PATH}/
 }
 
-nginx_make() {
-  case "$SYSTEM" in
-    Debian|Ubuntu)
-      DEPS_BUILD_CHECK=("git" "gcc" "make" "libpcre2-dev" "libssl-dev" "libgeoip-dev" "libxslt1-dev" "zlib1g-dev" "libgd-dev" "libmaxminddb0" "libmaxminddb-dev" "mmdb-bin")
-      DEPS_BUILD_INSTALL=("git" "build-essential" "libpcre2-dev" "libssl-dev" "libgeoip-dev" "libxslt1-dev" "zlib1g-dev" "libgd-dev" "libmaxminddb0" "libmaxminddb-dev" "mmdb-bin")
-    
-      for g in "${!DEPS_BUILD_CHECK[@]}"; do
-        [ ! -x "$(type -p ${DEPS_BUILD_CHECK[g]})" ] && [[ ! "${DEPS_BUILD[@]}" =~ "${DEPS_BUILD_INSTALL[g]}" ]] && DEPS_BUILD+=(${DEPS_BUILD_INSTALL[g]})
-      done
-    
-      if [ "${#DEPS_BUILD[@]}" -ge 1 ]; then
-        echo "Список зависимостей для установки ${DEPS_BUILD[@]}"
-        ${PACKAGE_UPDATE[int]} >/dev/null 2>&1
-        ${PACKAGE_INSTALL[int]} ${DEPS_BUILD[@]} >/dev/null 2>&1
-      else
-        echo "Все зависимости уже установлены и не требуют дополнительной установки."
-      fi
-      ;;
-
-    CentOS|Fedora)
-      DEPS_BUILD_CHECK=("git" "gcc" "make" "pcre-devel" "openssl-devel" "GeoIP-devel" "libxslt-devel" "zlib-devel" "gd-devel" "libmaxminddb" "libmaxminddb-devel" "mmdblookup")
-      DEPS_BUILD_INSTALL=("git" "gcc" "make" "pcre-devel" "openssl-devel" "GeoIP-devel" "libxslt-devel" "zlib-devel" "gd-devel" "libmaxminddb" "libmaxminddb-devel" "mmdb-bin")
-    
-      for g in "${!DEPS_BUILD_CHECK[@]}"; do
-        [ ! -x "$(type -p ${DEPS_BUILD_CHECK[g]})" ] && [[ ! "${DEPS_BUILD[@]}" =~ "${DEPS_BUILD_INSTALL[g]}" ]] && DEPS_BUILD+=(${DEPS_BUILD_INSTALL[g]})
-      done
-    
-      if [ "${#DEPS_BUILD[@]}" -ge 1 ]; then
-        echo "Список зависимостей для установки ${DEPS_BUILD[@]}"
-        ${PACKAGE_UPDATE[int]} >/dev/null 2>&1
-        ${PACKAGE_INSTALL[int]} ${DEPS_BUILD[@]} >/dev/null 2>&1
-      else
-        echo "Все зависимости уже установлены и не требуют дополнительной установки."
-      fi
-      ;;
-  esac
-
-  NGINX_VERSION="1.27.3"
-  wget https://nginx.org/download/nginx-$NGINX_VERSION.tar.gz
-  tar -xvf nginx-$NGINX_VERSION.tar.gz
-  cd nginx-$NGINX_VERSION
-  git clone https://github.com/leev/ngx_http_geoip2_module.git
-  
-  ./configure \
-    --prefix=/etc/nginx \
-    --sbin-path=/usr/sbin/nginx \
-    --modules-path=/usr/lib/nginx/modules \
-    --conf-path=/etc/nginx/nginx.conf \
-    --error-log-path=/var/log/nginx/error.log \
-    --http-log-path=/var/log/nginx/access.log \
-    --pid-path=/run/nginx.pid \
-    --lock-path=/run/nginx.lock \
-    --http-client-body-temp-path=/var/cache/nginx/client_temp \
-    --http-proxy-temp-path=/var/cache/nginx/proxy_temp \
-    --http-fastcgi-temp-path=/var/cache/nginx/fastcgi_temp \
-    --http-uwsgi-temp-path=/var/cache/nginx/uwsgi_temp \
-    --http-scgi-temp-path=/var/cache/nginx/scgi_temp \
-    --user=nginx \
-    --group=nginx \
-    --with-compat \
-    --with-file-aio \
-    --with-threads \
-    --with-http_addition_module \
-    --with-http_auth_request_module \
-    --with-http_dav_module \
-    --with-http_flv_module \
-    --with-http_gunzip_module \
-    --with-http_gzip_static_module \
-    --with-http_mp4_module \
-    --with-http_random_index_module \
-    --with-http_realip_module \
-    --with-http_secure_link_module \
-    --with-http_slice_module \
-    --with-http_ssl_module \
-    --with-http_stub_status_module \
-    --with-http_sub_module \
-    --with-http_v2_module \
-    --with-http_v3_module \
-    --with-mail \
-    --with-mail_ssl_module \
-    --with-stream \
-    --with-stream_realip_module \
-    --with-stream_ssl_module \
-    --with-stream_ssl_preread_module \
-    --add-dynamic-module=./ngx_http_geoip2_module \
-    --with-cc-opt="-g -O2 -ffile-prefix-map=$(pwd)/${NGINX_VERSION}=${PWD}/${NGINX_VERSION} -fstack-protector-strong -Wformat -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -fPIC" \
-    --with-ld-opt="-Wl,-z,relro -Wl,-z,now -Wl,--as-needed -pie"
-  
-  make
-  make install
-  
-  mkdir -p /var/cache/nginx/
-  mkdir -p /var/lib/nginx/body
-  chown -R www-data:www-data /var/lib/nginx
-  chmod -R 700 /var/lib/nginx
-  
-  cat > /etc/systemd/system/nginx.service <<EOF
-[Unit]
-Description=The NGINX HTTP and reverse proxy server
-After=syslog.target network-online.target remote-fs.target nss-lookup.target
-Wants=network-online.target
-
-[Service]
-Type=forking
-PIDFile=/run/nginx.pid
-ExecStartPre=/usr/sbin/nginx -t
-ExecStart=/usr/sbin/nginx -c /etc/nginx/nginx.conf
-ExecReload=/bin/sh -c "/bin/kill -s HUP $(/bin/cat /run/nginx.pid)"
-ExecStop=/bin/sh -c "/bin/kill -s TERM $(/bin/cat /run/nginx.pid)"
-#PrivateTmp=true
-
-[Install]
-WantedBy=multi-user.target
-EOF
-  
-  systemctl daemon-reload
-  systemctl start nginx
-  systemctl enable nginx
-  systemctl restart nginx
-  systemctl status nginx --no-pager
-  cd ..
-  rm -rf nginx-$NGINX_VERSION.tar.gz nginx-$NGINX_VERSION ngx_http_geoip2_module
-}
-
 nginx_gpg() {
   case "$SYSTEM" in
     Debian)
@@ -1075,7 +907,7 @@ installation_of_utilities() {
   esac
 
   nginx_make
-  #nginx_gpg
+  nginx_gpg
   ${PACKAGE_INSTALL[int]} systemd-resolved
   tilda "$(text 10)"
 }
@@ -1394,11 +1226,11 @@ nginx_setup() {
 
   case "$SYSTEM" in
     Debian|Ubuntu)
-      usernginx="www-data"
+      USERNGINX="www-data"
       ;;
 
     CentOS|Fedora)
-      usernginx="nginx"
+      USERNGINX="nginx"
       ;;
   esac
 
@@ -1417,7 +1249,7 @@ nginx_setup() {
 
 nginx_conf() {
   cat > /etc/nginx/nginx.conf <<EOF
-user                                   ${usernginx};
+user                                   ${USERNGINX};
 pid                                    /var/run/nginx.pid;
 worker_processes                       auto;
 worker_rlimit_nofile                   65535; 
@@ -2120,11 +1952,11 @@ log_clear() {
 main() {
   log_entry
   read_defaults_from_file
-  select_language
   parse_args "$@" || show_help
   check_root
   check_ip
   check_operating_system
+  select_language
   if [ -f ${defaults_file} ]; then
     tilda "$(text 4)"
   fi
@@ -2149,7 +1981,6 @@ main() {
   [[ ${args[tgbot]} == "true" ]] && install_bot
   data_output
   banner_1
-  exec > /dev/tty 2>&1
   log_clear
 }
 
