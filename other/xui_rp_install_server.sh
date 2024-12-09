@@ -643,8 +643,7 @@ check_cf_token() {
       DOMAIN="$temp_domain"              # Если это домен второго уровня, то просто сохраняем
       SUBDOMAIN="www.$temp_domain"       # Для домена второго уровня подставляем www в SUBDOMAIN
     fi
-      echo $DOMAIN
-      echo $SUBDOMAIN
+
     while [[ -z $EMAIL ]]; do
       reading " $(text 15) " EMAIL
       echo
@@ -1520,14 +1519,14 @@ local_conf() {
   cat > /etc/nginx/conf.d/local.conf <<EOF
 #server {
 #  listen                               80;
-#  server_name                          ${DOMAIN} *.${DOMAIN};
+#  server_name                          ${DOMAIN} ${SUBDOMAIN};
 #  location / {
 #    return 301                         https://${DOMAIN}\$request_uri;
 #  }
 #}
 server {
   listen                               9090 default_server;
-  server_name                          ${DOMAIN} *.${DOMAIN};
+  server_name                          ${DOMAIN} ${SUBDOMAIN};
   location / {
     return 301                         https://${DOMAIN}\$request_uri;
   }
@@ -1539,7 +1538,7 @@ server {
 server {
   listen                               36077 ssl proxy_protocol;
   http2                                on;
-  server_name                          ${DOMAIN} *.${DOMAIN};
+  server_name                          ${DOMAIN} ${SUBDOMAIN};
 
   # SSL
   ssl_certificate                      /etc/letsencrypt/live/${DOMAIN}/fullchain.pem;
