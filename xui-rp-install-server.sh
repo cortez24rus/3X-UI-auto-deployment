@@ -275,7 +275,6 @@ check_cf_token() {
         CFTOKEN=""
         while [[ -z $DOMAIN ]]; do
             reading " $(text 13) " DOMAIN
-	    echo ${DOMAIN}
             echo
         done
 

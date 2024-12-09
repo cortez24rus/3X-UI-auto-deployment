@@ -181,55 +181,55 @@ E[73]="All dependencies already exist and do not need to be installed additional
 R[73]="Все зависимости уже установлены и не требуют дополнительной установки."
 E[74]="OS - $SYS"
 R[74]="OS - $SYS"
-E[75]=""
-R[75]=""
-E[76]="" 
-R[76]=""
-E[77]="" 
+E[75]="Invalid option for --$key: $value. Use 'true' or 'false'."
+R[75]="Неверная опция для --$key: $value. Используйте 'true' или 'false'."
+E[76]="Unknown option: $1"
+R[76]="Неверная опция: $1"
+E[77]=""
 R[77]=""
-E[78]="" 
+E[78]=""
 R[78]=""
-E[79]="" 
+E[79]=""
 R[79]=""
-E[80]="" 
+E[80]=""
 R[80]=""
-E[81]="" 
+E[81]=""
 R[81]=""
-E[82]="" 
+E[82]=""
 R[82]=""
-E[83]="" 
+E[83]=""
 R[83]=""
-E[84]="" 
+E[84]=""
 R[84]=""
-E[85]="" 
+E[85]=""
 R[85]=""
-E[86]="" 
+E[86]=""
 R[86]=""
-E[87]="" 
+E[87]=""
 R[87]=""
-E[88]="" 
+E[88]=""
 R[88]=""
-E[89]="" 
+E[89]=""
 R[89]=""
-E[90]="" 
+E[90]=""
 R[90]=""
-E[91]="" 
+E[91]=""
 R[91]=""
-E[92]="" 
+E[92]=""
 R[92]=""
-E[93]="" 
+E[93]=""
 R[93]=""
-E[94]="" 
+E[94]=""
 R[94]=""
-E[95]="" 
+E[95]=""
 R[95]=""
-E[96]="" 
+E[96]=""
 R[96]=""
-E[97]="" 
+E[97]=""
 R[97]=""
-E[98]="" 
+E[98]=""
 R[98]=""
-E[99]="" 
+E[99]=""
 R[99]=""
 E[100]="  -u, --utils <true|false>       Additional utilities (default: ${defaults[utils]})"
 R[100]="  -u, --utils <true|false>       Дополнительные утилиты (по умолчанию: ${defaults[utils]})"
@@ -354,7 +354,7 @@ validate_true_false() {
       args[$key]=false
       ;;
     *)
-      echo "Invalid option for --$key: $value. Use 'true' or 'false'."
+      warning " $(text 75) "
       return 1
       ;;
   esac
@@ -461,7 +461,7 @@ parse_args() {
         break
         ;;
       *)
-        echo "Unknown option: $1"
+        warning " $(text 76) "
         return 1
         ;;
     esac
@@ -626,7 +626,10 @@ check_cf_token() {
     local DOMAIN
     local SUBDOMAIN
 
-    reading " $(text 13) " temp_domain
+    while [[ -z "$temp_domain" ]]; do
+        reading " $(text 13) " temp_domain
+        echo
+    done
 
     # Удаляем http:// или https:// (если они есть), порты и пути
     temp_domain=$(echo "$temp_domain" | sed -E 's/^https?:\/\///' | sed -E 's/(:[0-9]+)?(\/[a-zA-Z0-9_\-\/]+)?$//')
