@@ -68,21 +68,22 @@ Usage: xui-rp-install-server.sh [-u|--utils <true|false>] [-d|--dns <true|false>
                          [-n|--nginx <true|false>] [-p|--panel <true|false>] [-f|--firewall <true|false>]
                          [-s|--ssh <true|false>] [-t|--tgbot <true|false>] [-h|--help]
 
-  -u, --utils <true|false>       Additional utilities (default: true)
-  -d, --dns <true|false>         DNS encryption (default: true)
-  -a, --addu <true|false>        User addition (default: true)
-  -r, --autoupd <true|false>     Automatic updates (default: true)
-  -b, --bbr <true|false>         BBR (TCP Congestion Control) (default: true)
-  -i, --ipv6 <true|false>        Disable IPv6 support (default: true)
-  -w, --warp <true|false>        Warp (default: true)
-  -c, --cert <true|false>        Certificate issuance for domain (default: true)
-  -m, --mon <true|false>         Monitoring services (node_exporter) (default: false)
-  -n, --nginx <true|false>       NGINX installation (default: true)
-  -p, --panel <true|false>       Panel installation for user management (default: true)
-  -f, --firewall <true|false>    Firewall configuration (default: true)
-  -s, --ssh <true|false>         SSH access (default: true)
-  -t, --tgbot <true|false>       Telegram bot integration for user management (default: false)
+  -u, --utils <true|false>       Additional utilities                                   (default: true)
+  -d, --dns <true|false>         DNS encryption                                         (default: true)
+  -a, --addu <true|false>        User addition                                          (default: true)
+  -r, --autoupd <true|false>     Automatic updates                                      (default: true)
+  -b, --bbr <true|false>         BBR (TCP Congestion Control)                           (default: true)
+  -i, --ipv6 <true|false>        Disable IPv6 support                                   (default: true)
+  -w, --warp <true|false>        Warp                                                   (default: true)
+  -c, --cert <true|false>        Certificate issuance for domain                        (default: true)
+  -m, --mon <true|false>         Monitoring services (node_exporter)                    (default: false)
+  -n, --nginx <true|false>       NGINX installation                                     (default: true)
+  -p, --panel <true|false>       Panel installation for user management                 (default: true)
+  -f, --firewall <true|false>    Firewall configuration                                 (default: true)
+  -s, --ssh <true|false>         SSH access                                             (default: true)
+  -t, --tgbot <true|false>       Telegram bot integration for user management           (default: false)
   -h, --help                     Display this help message
+
 
 ```
 
