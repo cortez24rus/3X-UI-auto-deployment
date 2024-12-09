@@ -59,6 +59,30 @@ This script is designed to quickly and easily set up a hidden proxy server, with
 
 -----
 
+## Options
+
+| Option                  | Description                                                       | Default                          |
+|-------------------------|-------------------------------------------------------------------|----------------------------------|
+| `-u, --utils <true|false>`       | Enable additional utilities                                        | `${defaults[utils]}`             |
+| `-d, --dns <true|false>`         | Enable DNS encryption                                              | `${defaults[dns]}`               |
+| `-a, --addu <true|false>`        | Enable user addition                                               | `${defaults[addu]}`              |
+| `-r, --autoupd <true|false>`     | Enable automatic updates                                           | `${defaults[autoupd]}`           |
+| `-b, --bbr <true|false>`         | Enable BBR (TCP Congestion Control)                                | `${defaults[bbr]}`               |
+| `-i, --ipv6 <true|false>`        | Disable IPv6 support                                              | `${defaults[ipv6]}`              |
+| `-w, --warp <true|false>`        | Enable Warp                                                       | `${defaults[warp]}`              |
+| `-c, --cert <true|false>`        | Enable certificate issuance for domain                             | `${defaults[cert]}`              |
+| `-m, --mon <true|false>`         | Enable monitoring services (e.g., node_exporter)                   | `${defaults[mon]}`               |
+| `-n, --nginx <true|false>`       | Enable NGINX installation                                          | `${defaults[nginx]}`             |
+| `-p, --panel <true|false>`       | Enable panel installation for user management                      | `${defaults[panel]}`             |
+| `-f, --firewall <true|false>`    | Enable firewall configuration                                      | `${defaults[firewall]}`          |
+| `-s, --ssh <true|false>`         | Enable SSH access                                                 | `${defaults[ssh]}`               |
+| `-t, --tgbot <true|false>`       | Enable Telegram bot integration for user management                | `${defaults[tgbot]}`             |
+| `-h, --help`                   | Display this help message                                           |                                  |
+
+## Examples
+To enable DNS encryption and automatic updates:
+
+
 ### Installation of XUI-RP:
 
 To begin configuring the server, simply run the following command in a terminal:
