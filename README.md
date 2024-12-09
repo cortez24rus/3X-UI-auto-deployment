@@ -93,7 +93,7 @@ To begin configuring the server, simply run the following command in a terminal:
 bash <(curl -Ls https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/main/xui-rp-install-server.sh)
 ```
 
-### Selecting and installing a random template for the website:
+### Installing a random template for the website:
 ```sh
 bash <(curl -Ls https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/main/xui-rp-random-site.sh)
 ```
