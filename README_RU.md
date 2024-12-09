@@ -94,7 +94,7 @@
 bash <(curl -Ls https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/main/xui-rp-install-server.sh)
 ```
 
-### Выбор и установка случайного шаблона для веб-сайта:
+### Установка случайного шаблона для веб-сайта:
 ```sh
 bash <(curl -Ls https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/main/xui-rp-random-site.sh)
 ```
