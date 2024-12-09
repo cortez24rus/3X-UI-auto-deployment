@@ -14,11 +14,11 @@
 
 ### Supported Operating Systems:
 
-<table style="border-collapse: collapse;">
+<table style="border-collapse: collapse; width: 100%;">
   <tr>
-    <th style="padding: 8px;">**Ubuntu**</th>
-    <th style="padding: 8px;">**Debian**</th>
-    <th style="padding: 8px;">**CentOS**</th>
+    <th style="padding: 8px; text-align: left; width: 33%;">**Ubuntu**</th>
+    <th style="padding: 8px; text-align: left; width: 33%;">**Debian**</th>
+    <th style="padding: 8px; text-align: left; width: 33%;">**CentOS**</th>
   </tr>
   <tr>
     <td style="padding: 8px;">24.04 (upcoming)</td>
