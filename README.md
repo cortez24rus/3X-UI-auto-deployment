@@ -83,7 +83,6 @@ Usage: xui-rp-install-server.sh [-u|--utils <true|false>] [-d|--dns <true|false>
   -t, --tgbot <true|false>       Telegram bot integration for user management           (default: false)
   -h, --help                     Display this help message
 
-
 ```
 
 ### Installation of XUI-RP:
