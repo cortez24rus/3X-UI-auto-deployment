@@ -1,23 +1,6 @@
 #!/usr/bin/env bash
-# wget -N https://git && bash .sh d
+
 export DEBIAN_FRONTEND=noninteractive
-
-declare -A defaults
-declare -A args
-declare -A regex
-
-regex[domain]="^([a-zA-Z0-9-]+)\.([a-zA-Z0-9-]+\.[a-zA-Z]{2,})$"
-regex[port]="^[1-9][0-9]*$"
-regex[warp_license]="^[a-zA-Z0-9]{8}-[a-zA-Z0-9]{8}-[a-zA-Z0-9]{8}$"
-regex[username]="^[a-zA-Z0-9]+$"
-regex[ip]="^([0-9]{1,3}\.){3}[0-9]{1,3}$"
-regex[tgbot_token]="^[0-9]{8,10}:[a-zA-Z0-9_-]{35}$"
-regex[tgbot_admins]="^[a-zA-Z][a-zA-Z0-9_]{4,31}(,[a-zA-Z][a-zA-Z0-9_]{4,31})*$"
-regex[domain_port]="^[a-zA-Z0-9]+([-.][a-zA-Z0-9]+)*\.[a-zA-Z]{2,}(:[1-9][0-9]*)?$"
-regex[file_path]="^[a-zA-Z0-9_/.-]+$"
-regex[url]="^(http|https)://([a-zA-Z0-9.-]+\.[a-zA-Z]{2,})(:[0-9]{1,5})?(/.*)?$"
-
-defaults_file="/usr/local/xui-rp/reinstall_defaults.conf"
 
 ### INFO ###
 out_data()   { echo -e "\e[1;33m$1\033[0m \033[1;37m$2\033[0m"; }
@@ -31,7 +14,7 @@ reading()    { read -rp " $(question "$1")" "$2"; }
 text()       { eval echo "\${${L}[$*]}"; }
 text_eval()  { eval echo "\$(eval echo "\${${L}[$*]}")"; }
 
-E[0]="Language:\n  1. English (default) \n  2. Русский"
+E[0]="2Language:\n  1. English (default) \n  2. Русский"
 R[0]="Язык:\n  1. English (по умолчанию) \n  2. Русский"
 E[1]="Choose:"
 R[1]="Выбери:"
@@ -57,8 +40,8 @@ E[11]="Enter username:"
 R[11]="Введите имя пользователя:"
 E[12]="Enter user password:"
 R[12]="Введите пароль пользователя:"
-E[13]="Enter the domain (with or without a subdomain):"
-R[13]="Введите домен (с поддоменом или без):"
+E[13]="Enter your domain:"
+R[13]="Введите ваш домен:"
 E[14]="Error: the entered address '$temp_value' is incorrectly formatted."
 R[14]="Ошибка: введённый адрес '$temp_value' имеет неверный формат."
 E[15]="Enter your email registered with Cloudflare:"
@@ -181,298 +164,6 @@ E[73]="All dependencies already exist and do not need to be installed additional
 R[73]="Все зависимости уже установлены и не требуют дополнительной установки."
 E[74]="OS - $SYS"
 R[74]="OS - $SYS"
-E[75]="Invalid option for --$key: $value. Use 'true' or 'false'."
-R[75]="Неверная опция для --$key: $value. Используйте 'true' или 'false'."
-E[76]="Unknown option: $1"
-R[76]="Неверная опция: $1"
-E[77]=""
-R[77]="Список зависимостей для установки:"
-E[78]=""
-R[78]="Все зависимости уже установлены и не требуют дополнительной установки."
-E[79]=""
-R[79]="Настройка шаблона сайта."
-E[80]="Random template name:"
-R[80]="Случайное имя шаблона:"
-E[81]=""
-R[81]=""
-E[82]=""
-R[82]=""
-E[83]=""
-R[83]=""
-E[84]=""
-R[84]=""
-E[85]=""
-R[85]=""
-E[86]=""
-R[86]=""
-E[87]=""
-R[87]=""
-E[88]=""
-R[88]=""
-E[89]=""
-R[89]=""
-E[90]=""
-R[90]=""
-E[91]=""
-R[91]=""
-E[92]=""
-R[92]=""
-E[93]=""
-R[93]=""
-E[94]=""
-R[94]=""
-E[95]=""
-R[95]=""
-E[96]=""
-R[96]=""
-E[97]=""
-R[97]=""
-E[98]=""
-R[98]=""
-E[99]=""
-R[99]=""
-E[100]="  -u, --utils <true|false>       Additional utilities (default: ${defaults[utils]})"
-R[100]="  -u, --utils <true|false>       Дополнительные утилиты (по умолчанию: ${defaults[utils]})"
-E[101]="  -d, --dns <true|false>         DNS encryption (default: ${defaults[dns]})"
-R[101]="  -d, --dns <true|false>         Шифрование DNS (по умолчанию: ${defaults[dns]})"
-E[102]="  -a, --addu <true|false>        User addition (default: ${defaults[addu]})"
-R[102]="  -a, --addu <true|false>        Добавление пользователя (по умолчанию: ${defaults[addu]})"
-E[103]="  -r, --autoupd <true|false>     Automatic updates (default: ${defaults[autoupd]})"
-R[103]="  -r, --autoupd <true|false>     Автоматические обновления (по умолчанию: ${defaults[autoupd]})"
-E[104]="  -b, --bbr <true|false>         BBR (TCP Congestion Control) (default: ${defaults[bbr]})"
-R[104]="  -b, --bbr <true|false>         BBR (управление перегрузкой TCP) (по умолчанию: ${defaults[bbr]})"
-E[105]="  -i, --ipv6 <true|false>        Disable IPv6 support (default: ${defaults[ipv6]})"
-R[105]="  -i, --ipv6 <true|false>        Отключить поддержку IPv6 (по умолчанию: ${defaults[ipv6]})"
-E[106]="  -w, --warp <true|false>        Warp (default: ${defaults[warp]})"
-R[106]="  -w, --warp <true|false>        Warp (по умолчанию: ${defaults[warp]})"
-E[107]="  -c, --cert <true|false>        Certificate issuance for domain (default: ${defaults[cert]})"
-R[107]="  -c, --cert <true|false>        Выпуск сертификатов для домена (по умолчанию: ${defaults[cert]})"
-E[108]="  -m, --mon <true|false>         Monitoring services (e.g., node_exporter) (default: ${defaults[mon]})"
-R[108]="  -m, --mon <true|false>         Сервисы мониторинга (например, node_exporter) (по умолчанию: ${defaults[mon]})"
-E[109]="  -n, --nginx <true|false>       NGINX installation (default: ${defaults[nginx]})"
-R[109]="  -n, --nginx <true|false>       Установка NGINX (по умолчанию: ${defaults[nginx]})"
-E[110]="  -p, --panel <true|false>       Panel installation for user management (default: ${defaults[panel]})"
-R[110]="  -p, --panel <true|false>       Установка панели для управления пользователями (по умолчанию: ${defaults[panel]})"
-E[111]="  -f, --firewall <true|false>    Firewall configuration (default: ${defaults[ufw]})"
-R[111]="  -f, --firewall <true|false>    Настройка файрвола (по умолчанию: ${defaults[ufw]})"
-E[112]="  -s, --ssh <true|false>         SSH access (default: ${defaults[ssh]})"
-R[112]="  -s, --ssh <true|false>         SSH доступ (по умолчанию: ${defaults[ssh]})"
-E[113]="  -t, --tgbot <true|false>       Telegram bot integration for user management (default: ${defaults[tgbot]})"
-R[113]="  -t, --tgbot <true|false>       Интеграция Telegram бота для управления пользователями (по умолчанию: ${defaults[tgbot]})"
-E[114]="  -h, --help                     Display this help message"
-R[114]="  -h, --help                     Показать это сообщение помощи"
-
-# Функция для отображения справки
-show_help() {
-  echo
-  info "Usage: xui-rp-install-server.sh [-u|--utils <true|false>] [-d|--dns <true|false>] [-a|--addu <true|false>]"
-  info "       [-r|--autoupd <true|false>] [-b|--bbr <true|false>] [-i|--ipv6 <true|false>] [-w|--warp <true|false>]"
-  info "       [-c|--cert <true|false>] [-m|--mon <true|false>] [-n|--nginx <true|false>] [-p|--panel <true|false>]"
-  info "       [-f|--firewall <true|false>] [-s|--ssh <true|false>] [-t|--tgbot <true|false>] [-h|--help]"
-  echo
-  info " $(text 100) "
-  info " $(text 101) "
-  info " $(text 102) "
-  info " $(text 103) "
-  info " $(text 104) "
-  info " $(text 105) "
-  info " $(text 106) "
-  info " $(text 107) "
-  info " $(text 108) "
-  info " $(text 109) "
-  info " $(text 110) "
-  info " $(text 111) "
-  info " $(text 112) "
-  info " $(text 113) "
-  info " $(text 114) "
-  echo
-  exit 0
-}
-
-# Функция для чтения значений из файла
-read_defaults_from_file() {
-  if [[ -f $defaults_file ]]; then
-    # Чтение и выполнение строк из файла
-    while IFS= read -r line; do
-      # Пропускаем пустые строки и комментарии
-      [[ -z "$line" || "$line" =~ ^# ]] && continue
-      eval "$line"
-    done < $defaults_file
-  else
-    # Если файл не найден, используем значения по умолчанию
-    defaults[utils]=true
-    defaults[dns]=true
-    defaults[addu]=true
-    defaults[autoupd]=true
-    defaults[bbr]=true
-    defaults[ipv6]=true
-    defaults[warp]=true
-    defaults[cert]=true
-    defaults[mon]=false
-    defaults[nginx]=true
-    defaults[panel]=true
-    defaults[ufw]=true
-    defaults[ssh]=true
-    defaults[tgbot]=false
-  fi
-}
-
-# Функция для записи значений в файл
-write_defaults_to_file() {
-  cat > ${defaults_file}<<EOF
-defaults[utils]=false
-defaults[dns]=false
-defaults[addu]=false
-defaults[autoupd]=false
-defaults[bbr]=false
-defaults[ipv6]=false
-defaults[warp]=false
-defaults[cert]=false
-defaults[mon]=false
-defaults[nginx]=true
-defaults[panel]=true
-defaults[ufw]=false
-defaults[ssh]=false
-defaults[tgbot]=false
-EOF
-}
-
-normalize_case() {
-  local key=$1
-  args[$key]="${args[$key],,}"
-}
-
-# Функция для проверки правильности значения true/false
-validate_true_false() {
-  local key=$1
-  local value=$2
-  case ${value} in
-    true)
-      args[$key]=true
-      ;;
-    false)
-      args[$key]=false
-      ;;
-    *)
-      warning " $(text 75) "
-      return 1
-      ;;
-  esac
-}
-
-parse_args() {
-  local opts
-  opts=$(getopt -o i:w:m:u:s:t:f:a:r:b:h:l:d:p:c:n --long utils:,dns:,addu:,autoupd:,bbr:,ipv6:,warp:,cert:,mon:,nginx:,panel:,ufw:,ssh:,tgbot:,help -- "$@")
-  if [[ $? -ne 0 ]]; then
-    return 1
-  fi
-  eval set -- "$opts"
-  while true; do
-    case $1 in
-      -f|--utils)
-        args[utils]="$2"
-        normalize_case utils
-        validate_true_false utils "$2" || return 1
-        shift 2
-        ;;
-      -d|--dns)
-        args[dns]="$2"
-        normalize_case dns
-        validate_true_false dns "$2" || return 1
-        shift 2
-        ;;
-      -a|--addu)
-        args[addu]="$2"
-        normalize_case addu
-        validate_true_false addu "$2" || return 1
-        shift 2
-        ;;
-      -r|--autoupd)
-        args[autoupd]="$2"
-        normalize_case autoupd
-        validate_true_false autoupd "$2" || return 1
-        shift 2
-        ;;
-      -b|--bbr)
-        args[bbr]="$2"
-        normalize_case bbr
-        validate_true_false bbr "$2" || return 1
-        shift 2
-        ;;
-      -i|--ipv6)
-        args[ipv6]="$2"
-        normalize_case ipv6
-        validate_true_false ipv6 "$2" || return 1
-        shift 2
-        ;;
-      -w|--warp)
-        args[warp]="$2"
-        normalize_case warp
-        validate_true_false warp "$2" || return 1
-        shift 2
-        ;;
-      -c|--cert)
-        args[cert]="$2"
-        normalize_case cert
-        validate_true_false cert "$2" || return 1
-        shift 2
-        ;;
-      -m|--mon)
-        args[mon]="$2"
-        normalize_case mon
-        validate_true_false mon "$2" || return 1
-        shift 2
-        ;;
-      -n|--nginx)
-        args[nginx]="$2"
-        normalize_case nginx
-        validate_true_false nginx "$2" || return 1
-        shift 2
-        ;;
-      -p|--panel)
-        args[panel]="$2"
-        normalize_case panel
-        validate_true_false panel "$2" || return 1
-        shift 2
-        ;;
-      -u|--ufw)
-        args[ufw]="$2"
-        normalize_case ufw
-        validate_true_false ufw "$2" || return 1
-        shift 2
-        ;;
-      -s|--ssh)
-        args[ssh]="$2"
-        normalize_case ssh
-        validate_true_false ssh "$2" || return 1
-        shift 2
-        ;;
-      -t|--tgbot)
-        args[tgbot]="$2"
-        normalize_case tgbot
-        validate_true_false tgbot "$2" || return 1
-        shift 2
-        ;;
-      -h|--help)
-        return 1
-        ;;
-      --)
-        shift
-        break
-        ;;
-      *)
-        warning " $(text 76) "
-        return 1
-        ;;
-    esac
-  done
-  
-  for key in "${!defaults[@]}"; do
-    if [[ -z "${args[$key]}" ]]; then
-      args[$key]=${defaults[$key]}
-    fi
-  done
-}
 
 # Логирование
 log_entry() {
@@ -497,6 +188,15 @@ select_language() {
   esac
 }
 
+### Проверка рута ###
+check_root() {
+  if [[ $EUID -ne 0 ]]; then
+    error " $(text 8) "
+  fi
+}
+
+# Многоступенчатая проверка операционной системы, пробуем до тех пор, пока не получим значение. Поддерживаются только Debian 10/11, Ubuntu 18.04/20.04 или CentOS 7/8. Если это не одна из перечисленных операционных систем, скрипт завершится.
+# Благодарность котику за техническую помощь и оптимизацию повторяющихся команд. https://github.com/Oreomeow
 check_operating_system() {
   if [ -s /etc/os-release ]; then
     SYS="$(grep -i pretty_name /etc/os-release | cut -d \" -f2)"
@@ -515,7 +215,7 @@ check_operating_system() {
   REGEX=("debian" "ubuntu" "centos|red hat|kernel|alma|rocky")
   RELEASE=("Debian" "Ubuntu" "CentOS")
   EXCLUDE=("---")
-  MAJOR=("10" "20" "7")
+  MAJOR=("9" "16" "7")
   PACKAGE_UPDATE=("apt -y update" "apt -y update" "yum -y update --skip-broken")
   PACKAGE_INSTALL=("apt -y install" "apt -y install" "yum -y install")
   PACKAGE_UNINSTALL=("apt -y autoremove" "apt -y autoremove" "yum -y autoremove")
@@ -539,9 +239,8 @@ check_operating_system() {
 
 check_dependencies() {
   # Зависимости, необходимые для трех основных систем
-  [ "${SYSTEM}" = 'CentOS' ] && ${PACKAGE_INSTALL[int]} vim-common epel-release
-  DEPS_CHECK=("ping" "wget" "curl" "systemctl" "ip" "sudo")
-  DEPS_INSTALL=("iputils-ping" "wget" "curl" "systemctl" "iproute2" "sudo")
+  DEPS_CHECK=("ping" "wget" "curl" "systemctl" "ip")
+  DEPS_INSTALL=("iputils-ping" "wget" "curl" "systemctl" "iproute2")
 
   for g in "${!DEPS_CHECK[@]}"; do
     [ ! -x "$(type -p ${DEPS_CHECK[g]})" ] && [[ ! "${DEPS[@]}" =~ "${DEPS_INSTALL[g]}" ]] && DEPS+=(${DEPS_INSTALL[g]})
@@ -555,13 +254,7 @@ check_dependencies() {
     info "\n $(text 73) \n"
   fi
 }
-
-### Проверка рута ###
-check_root() {
-  if [[ $EUID -ne 0 ]]; then
-    error " $(text 8) "
-  fi
-}
+#wget -N https://git && bash .sh d
 
 ### Проверка IP-адреса ###
 check_ip() {
@@ -609,6 +302,32 @@ start_installation() {
   esac
 }
 
+# Функция для обрезки домена (удаление http://, https:// и www)
+crop_domain() {
+  local input_value="$1"
+  local temp_value
+  temp_value=$(echo "$input_value" | sed -e 's|https\?://||' -e 's|/.*$||')
+  
+  if ! [[ "$temp_value" =~ ^([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$ ]]; then
+    echo "Ошибка: введённый адрес '$temp_value' имеет неверный формат."
+    return 1
+  fi
+
+  local multi_level_domains=("co.uk" "com.au" "gov.ru" "edu.ru" "org.uk" "net.uk" "gov.uk" "co.in" "com.br" "org.br")
+  IFS='.' read -r -a domain_parts <<< "$temp_value"
+  local domain_second_level="${domain_parts[-2]}.${domain_parts[-1]}"
+  
+  for tld in "${multi_level_domains[@]}"; do
+    if [[ "$domain_second_level" == "$tld" ]]; then
+      echo "${domain_parts[-3]}.${domain_second_level}"
+      return 0
+    fi
+  done
+
+  echo "$domain_second_level"
+  return 0
+}
+
 # Запрос и ответ от API Cloudflare
 get_test_response() {
   testdomain=$(echo "${DOMAIN}" | rev | cut -d '.' -f 1-2 | rev)
@@ -622,25 +341,20 @@ get_test_response() {
 
 check_cf_token() {
   while ! echo "$test_response" | grep -qE "\"${testdomain}\"|\"#dns_records:edit\"|\"#dns_records:read\"|\"#zone:read\""; do
-    local temp_domain
-    local DOMAIN
-    local SUBDOMAIN
-
-    while [[ -z "$temp_domain" ]]; do
-        reading " $(text 13) " temp_domain
-        echo
+    DOMAIN=""
+    EMAIL=""
+    CFTOKEN=""
+    while [[ -z $DOMAIN ]]; do
+      reading " $(text 13) " DOMAIN
+	  echo ${DOMAIN}
+      echo
     done
 
-    # Удаляем http:// или https:// (если они есть), порты и пути
-    temp_domain=$(echo "$temp_domain" | sed -E 's/^https?:\/\///' | sed -E 's/(:[0-9]+)?(\/[a-zA-Z0-9_\-\/]+)?$//')
-
-    # Проверка на наличие домена третьего уровня (например, grf.x.com)
-    if [[ "$temp_domain" =~ ${regex[domain]} ]]; then
-      SUBDOMAIN="$temp_domain"           # Весь домен сохраняем в SUBDOMAIN
-      DOMAIN="${BASH_REMATCH[2]}"        # Извлекаем домен второго уровня (x.com)
-    else
-      DOMAIN="$temp_domain"              # Если это домен второго уровня, то просто сохраняем
-      SUBDOMAIN="www.$temp_domain"       # Для домена второго уровня подставляем www в SUBDOMAIN
+    DOMAIN=$(crop_domain "$DOMAIN")
+    
+    if [[ $? -ne 0 ]]; then
+      DOMAIN=""
+      continue
     fi
 
     while [[ -z $EMAIL ]]; do
@@ -695,47 +409,43 @@ validate_path() {
     esac
 
     if [[ -z "$PATH_VALUE" ]]; then
-      error " $(text 29) "
+      warning " $(text 29) "
       echo
     elif [[ $PATH_VALUE =~ ['{}\$/\\'] ]]; then
-      error " $(text 30) "
+      warning " $(text 30) "
       echo
     else
       break
     fi
   done
-  
-  # Экранируем пробелы в пути
-  local ESCAPED_PATH=$(echo "$PATH_VALUE" | sed 's/ /\\ /g')
 
-  # Присваиваем значение переменной
   case "$VARIABLE_NAME" in
     CDNGRPC)
-      export CDNGRPC="$ESCAPED_PATH"
+      export CDNGRPC="$PATH_VALUE"
       ;;
     CDNSPLIT)
-      export CDNSPLIT="$ESCAPED_PATH"
+      export CDNSPLIT="$PATH_VALUE"
       ;;
     CDNHTTPU)
-      export CDNHTTPU="$ESCAPED_PATH"
+      export CDNHTTPU="$PATH_VALUE"
       ;;
     CDNWS)
-      export CDNWS="$ESCAPED_PATH"
+      export CDNWS="$PATH_VALUE"
       ;;
     METRICS)
-      export METRICS="$ESCAPED_PATH"
+      export METRICS="$PATH_VALUE"
       ;;
     ADGUARDPATH)
-      export ADGUARDPATH="$ESCAPED_PATH"
+      export ADGUARDPATH="$PATH_VALUE"
       ;;
     WEB_BASE_PATH)
-      export WEB_BASE_PATH="$ESCAPED_PATH"
+      export WEB_BASE_PATH="$PATH_VALUE"
       ;;
     SUB_PATH)
-      export SUB_PATH="$ESCAPED_PATH"
+      export SUB_PATH="$PATH_VALUE"
       ;;
     SUB_JSON_PATH)
-      export SUB_JSON_PATH="$ESCAPED_PATH"
+      export SUB_JSON_PATH="$PATH_VALUE"
       ;;
   esac
 }
@@ -766,23 +476,16 @@ choise_dns () {
 ### Ввод данных ###
 data_entry() {
   tilda "$(text 10)"
-  reading " $(text 70) " SECRET_PASSWORD
-
-  tilda "$(text 10)"
-
   reading " $(text 11) " USERNAME
   echo
   reading " $(text 12) " PASSWORD
-  [[ ${args[addu]} == "true" ]] && add_user
-  
   tilda "$(text 10)"
-
   check_cf_token
-  
   tilda "$(text 10)"
-
+  reading " $(text 70) " SECRET_PASSWORD
+  tilda "$(text 10)"
   reading " $(text 19) " REALITY
-  echo
+  tilda "$(text 10)"
   validate_path "CDNGRPC"
   echo
   validate_path "CDNSPLIT"
@@ -790,292 +493,111 @@ data_entry() {
   validate_path "CDNHTTPU"
   echo
   validate_path "CDNWS"
-  if [[ ${args[mon]} == "true" ]]; then
-    echo
-    validate_path "METRICS"
-  fi
-
+  echo
+  validate_path "METRICS"
   tilda "$(text 10)"
-
   choise_dns
-
   validate_path WEB_BASE_PATH
   echo
   validate_path SUB_PATH
   echo
   validate_path SUB_JSON_PATH
-
   tilda "$(text 10)"
-
-  if [[ ${args[ssh]} == "true" ]]; then
-    reading " $(text 54) " ANSWER_SSH
-    if [[ "${ANSWER_SSH,,}" == "y" ]]; then
-      info " $(text 48) "
-      out_data " $(text 49) "
+  reading " $(text 67) " ENABLE_BOT_CHOISE
+  case "${ENABLE_BOT_CHOISE,,}" in
+    y|"")  
+      reading " $(text 35) " ADMIN_ID
       echo
-      out_data " $(text 50) "
-      out_data " $(text 51) "
-      echo
-      out_data " $(text 52)" "type \$env:USERPROFILE\.ssh\id_rsa.pub | ssh -p 22 ${USERNAME}@${IP4} \"cat >> ~/.ssh/authorized_keys\""
-      out_data " $(text 53)" "ssh-copy-id -p 22 ${USERNAME}@${IP4}"
-      echo
-
-      # Цикл проверки наличия ключей
-      while true; do
-        if [[ -s "/home/${USERNAME}/.ssh/authorized_keys" || -s "/root/.ssh/authorized_keys" ]]; then
-          info " $(text 56) " # Ключи найдены
-          SSH_OK=true
-          break
-        else
-          warning " $(text 55) " # Ключи отсутствуют
-          echo
-          reading " $(text 54) " ANSWER_SSH
-          if [[ "${ANSWER_SSH,,}" != "y" ]]; then
-            warning " $(text 9) " # Настройка отменена
-            SSH_OK=false
-            break
-          fi
-        fi
-      done
-      tilda "$(text 10)"
-    else
-      warning " $(text 9) " # Настройка пропущена
-      SSH_OK=false
-    fi
-  fi
-
-  if [[ ${args[tgbot]} == "true" ]]; then
-    reading " $(text 35) " ADMIN_ID
-    echo
-    reading " $(text 34) " BOT_TOKEN
-    tilda "$(text 10)"
-  fi
+      reading " $(text 34) " BOT_TOKEN
+      ;;
+    *)
+      ;;
+  esac
+  tilda "$(text 10)"
 
   SUB_URI=https://${DOMAIN}/${SUB_PATH}/
   SUB_JSON_URI=https://${DOMAIN}/${SUB_JSON_PATH}/
 }
 
-nginx_make() {
-  case "$SYSTEM" in
-    Debian|Ubuntu)
-      DEPS_BUILD_CHECK=("git" "gcc" "make" "libpcre2-dev" "libssl-dev" "libgeoip-dev" "libxslt1-dev" "zlib1g-dev" "libgd-dev" "libmaxminddb0" "libmaxminddb-dev" "mmdb-bin")
-      DEPS_BUILD_INSTALL=("git" "build-essential" "libpcre2-dev" "libssl-dev" "libgeoip-dev" "libxslt1-dev" "zlib1g-dev" "libgd-dev" "libmaxminddb0" "libmaxminddb-dev" "mmdb-bin")
-    
-      for g in "${!DEPS_BUILD_CHECK[@]}"; do
-        [ ! -x "$(type -p ${DEPS_BUILD_CHECK[g]})" ] && [[ ! "${DEPS_BUILD[@]}" =~ "${DEPS_BUILD_INSTALL[g]}" ]] && DEPS_BUILD+=(${DEPS_BUILD_INSTALL[g]})
-      done
-    
-      if [ "${#DEPS_BUILD[@]}" -ge 1 ]; then
-        echo "Список зависимостей для установки ${DEPS_BUILD[@]}"
-        ${PACKAGE_UPDATE[int]} >/dev/null 2>&1
-        ${PACKAGE_INSTALL[int]} ${DEPS_BUILD[@]} >/dev/null 2>&1
+install() {
+  
+case "$SYSTEM" in
+    Debian )
+      local DEBIAN_VERSION=$(echo $SYS | sed "s/[^0-9.]//g" | cut -d. -f1)
+      if [ "$DEBIAN_VERSION" = '9' ]; then
+        echo "deb http://deb.debian.org/debian/ unstable main" > /etc/apt/sources.list.d/unstable-wireguard.list
+        echo -e "Package: *\nPin: release a=unstable\nPin-Priority: 150\n" > /etc/apt/preferences.d/limit-unstable
+      elif
+        [ "$DEBIAN_VERSION" = '10' ]; then
+        echo 'deb http://archive.debian.org/debian buster-backports main' > /etc/apt/sources.list.d/backports.list
       else
-        echo "Все зависимости уже установлены и не требуют дополнительной установки."
+        echo "deb http://deb.debian.org/debian $(awk -F '=' '/VERSION_CODENAME/{print $2}' /etc/os-release)-backports main" > /etc/apt/sources.list.d/backports.list
       fi
+
+      ${PACKAGE_UPDATE[int]}
+      ${PACKAGE_INSTALL[int]} --no-install-recommends net-tools openresolv dnsutils iptables
       ;;
 
-    CentOS|Fedora)
-      DEPS_BUILD_CHECK=("git" "gcc" "make" "pcre-devel" "openssl-devel" "GeoIP-devel" "libxslt-devel" "zlib-devel" "gd-devel" "libmaxminddb" "libmaxminddb-devel" "mmdblookup")
-      DEPS_BUILD_INSTALL=("git" "gcc" "make" "pcre-devel" "openssl-devel" "GeoIP-devel" "libxslt-devel" "zlib-devel" "gd-devel" "libmaxminddb" "libmaxminddb-devel" "mmdb-bin")
-    
-      for g in "${!DEPS_BUILD_CHECK[@]}"; do
-        [ ! -x "$(type -p ${DEPS_BUILD_CHECK[g]})" ] && [[ ! "${DEPS_BUILD[@]}" =~ "${DEPS_BUILD_INSTALL[g]}" ]] && DEPS_BUILD+=(${DEPS_BUILD_INSTALL[g]})
-      done
-    
-      if [ "${#DEPS_BUILD[@]}" -ge 1 ]; then
-        echo "Список зависимостей для установки ${DEPS_BUILD[@]}"
-        ${PACKAGE_UPDATE[int]} >/dev/null 2>&1
-        ${PACKAGE_INSTALL[int]} ${DEPS_BUILD[@]} >/dev/null 2>&1
-      else
-        echo "Все зависимости уже установлены и не требуют дополнительной установки."
-      fi
+    Ubuntu )
+      ${PACKAGE_UPDATE[int]}
+      ${PACKAGE_INSTALL[int]} --no-install-recommends net-tools openresolv dnsutils iptables
+      ;;
+
+    CentOS|Fedora 
+      [ "$SYSTEM" = 'CentOS' ] && ${PACKAGE_INSTALL[int]} epel-release
+      ${PACKAGE_INSTALL[int]} net-tools iptables
+      ${PACKAGE_UPDATE[int]}
       ;;
   esac
-
-  NGINX_VERSION="1.27.3"
-  wget https://nginx.org/download/nginx-$NGINX_VERSION.tar.gz
-  tar -xvf nginx-$NGINX_VERSION.tar.gz
-  cd nginx-$NGINX_VERSION
-  git clone https://github.com/leev/ngx_http_geoip2_module.git
-  
-  ./configure \
-    --prefix=/etc/nginx \
-    --sbin-path=/usr/sbin/nginx \
-    --modules-path=/usr/lib/nginx/modules \
-    --conf-path=/etc/nginx/nginx.conf \
-    --error-log-path=/var/log/nginx/error.log \
-    --http-log-path=/var/log/nginx/access.log \
-    --pid-path=/run/nginx.pid \
-    --lock-path=/run/nginx.lock \
-    --http-client-body-temp-path=/var/cache/nginx/client_temp \
-    --http-proxy-temp-path=/var/cache/nginx/proxy_temp \
-    --http-fastcgi-temp-path=/var/cache/nginx/fastcgi_temp \
-    --http-uwsgi-temp-path=/var/cache/nginx/uwsgi_temp \
-    --http-scgi-temp-path=/var/cache/nginx/scgi_temp \
-    --user=nginx \
-    --group=nginx \
-    --with-compat \
-    --with-file-aio \
-    --with-threads \
-    --with-http_addition_module \
-    --with-http_auth_request_module \
-    --with-http_dav_module \
-    --with-http_flv_module \
-    --with-http_gunzip_module \
-    --with-http_gzip_static_module \
-    --with-http_mp4_module \
-    --with-http_random_index_module \
-    --with-http_realip_module \
-    --with-http_secure_link_module \
-    --with-http_slice_module \
-    --with-http_ssl_module \
-    --with-http_stub_status_module \
-    --with-http_sub_module \
-    --with-http_v2_module \
-    --with-http_v3_module \
-    --with-mail \
-    --with-mail_ssl_module \
-    --with-stream \
-    --with-stream_realip_module \
-    --with-stream_ssl_module \
-    --with-stream_ssl_preread_module \
-    --add-dynamic-module=./ngx_http_geoip2_module \
-    --with-cc-opt="-g -O2 -ffile-prefix-map=$(pwd)/${NGINX_VERSION}=${PWD}/${NGINX_VERSION} -fstack-protector-strong -Wformat -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -fPIC" \
-    --with-ld-opt="-Wl,-z,relro -Wl,-z,now -Wl,--as-needed -pie"
-  
-  make
-  make install
-  
-  mkdir -p /var/cache/nginx/
-  mkdir -p /var/lib/nginx/body
-  chown -R www-data:www-data /var/lib/nginx
-  chmod -R 700 /var/lib/nginx
-  
-  cat > /etc/systemd/system/nginx.service <<EOF
-[Unit]
-Description=The NGINX HTTP and reverse proxy server
-After=syslog.target network-online.target remote-fs.target nss-lookup.target
-Wants=network-online.target
-
-[Service]
-Type=forking
-PIDFile=/run/nginx.pid
-ExecStartPre=/usr/sbin/nginx -t
-ExecStart=/usr/sbin/nginx -c /etc/nginx/nginx.conf
-ExecReload=/bin/sh -c "/bin/kill -s HUP $(/bin/cat /run/nginx.pid)"
-ExecStop=/bin/sh -c "/bin/kill -s TERM $(/bin/cat /run/nginx.pid)"
-#PrivateTmp=true
-
-[Install]
-WantedBy=multi-user.target
-EOF
-  
-  systemctl daemon-reload
-  systemctl start nginx
-  systemctl enable nginx
-  systemctl restart nginx
-  systemctl status nginx --no-pager
-  cd ..
-  rm -rf nginx-$NGINX_VERSION.tar.gz nginx-$NGINX_VERSION ngx_http_geoip2_module
 }
 
-nginx_gpg() {
-  case "$SYSTEM" in
-    Debian)
-      ${PACKAGE_INSTALL[int]} debian-archive-keyring
-      curl https://nginx.org/keys/nginx_signing.key | gpg --dearmor \
-        | tee /usr/share/keyrings/nginx-archive-keyring.gpg >/dev/null
-      gpg --dry-run --quiet --no-keyring --import --import-options import-show /usr/share/keyrings/nginx-archive-keyring.gpg
-      echo "deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] \
-      http://nginx.org/packages/debian `lsb_release -cs` nginx" \
-        | tee /etc/apt/sources.list.d/nginx.list
-      echo -e "Package: *\nPin: origin nginx.org\nPin: release o=nginx\nPin-Priority: 900\n" \
-        | tee /etc/apt/preferences.d/99nginx
-      ;;
-
-    Ubuntu)
-      ${PACKAGE_INSTALL[int]} ubuntu-keyring
-      curl https://nginx.org/keys/nginx_signing.key | gpg --dearmor \
-        | tee /usr/share/keyrings/nginx-archive-keyring.gpg >/dev/null
-      gpg --dry-run --quiet --no-keyring --import --import-options import-show /usr/share/keyrings/nginx-archive-keyring.gpg
-      echo "deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] \
-      http://nginx.org/packages/ubuntu `lsb_release -cs` nginx" \
-        | tee /etc/apt/sources.list.d/nginx.list
-      echo -e "Package: *\nPin: origin nginx.org\nPin: release o=nginx\nPin-Priority: 900\n" \
-        | tee /etc/apt/preferences.d/99nginx
-      ;;
-
-    CentOS|Fedora)
-      ${PACKAGE_INSTALL[int]} yum-utils
-      cat <<EOL > /etc/yum.repos.d/nginx.repo
-[nginx-stable]
-name=nginx stable repo
-baseurl=http://nginx.org/packages/centos/\$releasever/\$basearch/
-gpgcheck=1
-enabled=1
-gpgkey=https://nginx.org/keys/nginx_signing.key
-module_hotfixes=true
-
-[nginx-mainline]
-name=nginx mainline repo
-baseurl=http://nginx.org/packages/mainline/centos/\$releasever/\$basearch/
-gpgcheck=1
-enabled=0
-gpgkey=https://nginx.org/keys/nginx_signing.key
-module_hotfixes=true
-EOL
-      ;;
-  esac
-  ${PACKAGE_UPDATE[int]}
-  ${PACKAGE_INSTALL[int]} nginx
-  systemctl daemon-reload
-  systemctl start nginx
-  systemctl enable nginx
-  systemctl restart nginx
-  systemctl status nginx --no-pager
-}
-
+### Обновление системы и установка пакетов ###
 installation_of_utilities() {
   info " $(text 36) "
-  case "$SYSTEM" in
-    Debian|Ubuntu)
-      DEPS_PACK_CHECK=("jq" "ufw" "zip" "wget" "gpg" "cron" "sqlite3" "certbot" "openssl" "netstat" "htpasswd" "update-ca-certificates" "add-apt-repository" "certbot-dns-cloudflare")
-      DEPS_PACK_INSTALL=("jq" "ufw" "zip" "wget" "gnupg2" "cron" "sqlite3" "certbot" "openssl" "net-tools" "apache2-utils" "ca-certificates" "software-properties-common" "python3-certbot-dns-cloudflare")
+  apt-get update && apt-get upgrade -y && apt-get install -y \
+    jq \
+    ufw \
+    zip \
+    wget \
+    sudo \
+    curl \
+    screen \
+    gnupg2 \
+    sqlite3 \
+    certbot \
+    net-tools \
+	  lsb-release \
+    apache2-utils \
+  	ca-certificates \
+    unattended-upgrades \
+    software-properties-common \
+    python3-certbot-dns-cloudflare
+    
+  mkdir -p /usr/share/keyrings
+  OS=$(lsb_release -is | tr '[:upper:]' '[:lower:]')
+  DISTRO=$(lsb_release -cs)
 
-      for g in "${!DEPS_PACK_CHECK[@]}"; do
-        [ ! -x "$(type -p ${DEPS_PACK_CHECK[g]})" ] && [[ ! "${DEPS_PACK[@]}" =~ "${DEPS_PACK_INSTALL[g]}" ]] && DEPS_PACK+=(${DEPS_PACK_INSTALL[g]})
-      done
+  echo "Обнаружена операционная система: $OS ($DISTRO)"
 
-      if [ "${#DEPS_PACK[@]}" -ge 1 ]; then
-        info " $(text 77) ": ${DEPS_PACK[@]}
-        ${PACKAGE_UPDATE[int]} >/dev/null 2>&1
-        ${PACKAGE_INSTALL[int]} ${DEPS_PACK[@]} >/dev/null 2>&1
-      else
-        info " $(text 78) "
-      fi
-      ;;
+  echo "Добавление ключа репозитория Nginx..."
+  curl -fsSL https://nginx.org/keys/nginx_signing.key | gpg --dearmor -o /usr/share/keyrings/nginx-archive-keyring.gpg
 
-    CentOS|Fedora)
-      DEPS_PACK_CHECK=("jq" "zip" "tar" "wget" "gpg" "crontab" "sqlite3" "openssl" "netstat" "nslookup" "htpasswd" "certbot" "update-ca-certificates" "certbot-dns-cloudflare")
-      DEPS_PACK_INSTALL=("jq" "zip" "tar" "wget" "gnupg2" "cronie" "sqlite" "openssl" "net-tools" "bind-utils" "httpd-tools" "certbot" "ca-certificates" "python3-certbot-dns-cloudflare")
+  if [[ "$OS" == "ubuntu" ]]; then
+    echo "Добавление репозитория для Ubuntu..."
+    echo "deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] https://nginx.org/packages/ubuntu/ $DISTRO nginx" > /etc/apt/sources.list.d/nginx.list
+  elif [[ "$OS" == "debian" ]]; then
+    echo "Добавление репозитория для Debian..."
+    echo "deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] https://nginx.org/packages/debian/ $DISTRO nginx" > /etc/apt/sources.list.d/nginx.list
+  else
+    echo "Неизвестная или неподдерживаемая операционная система: $OS"
+  exit 1
+  fi
 
-      for g in "${!DEPS_PACK_CHECK[@]}"; do
-        [ ! -x "$(type -p ${DEPS_PACK_CHECK[g]})" ] && [[ ! "${DEPS_PACK[@]}" =~ "${DEPS_PACK_INSTALL[g]}" ]] && DEPS_PACK+=(${DEPS_PACK_INSTALL[g]})
-      done
-
-      if [ "${#DEPS_PACK[@]}" -ge 1 ]; then
-        info " $(text 77) ": ${DEPS_PACK[@]}
-        ${PACKAGE_UPDATE[int]} >/dev/null 2>&1
-        ${PACKAGE_INSTALL[int]} ${DEPS_PACK[@]} >/dev/null 2>&1
-      else
-        info " $(text 78) "
-      fi
-      ;;
-  esac
-
-  #nginx_make
-  nginx_gpg
-  ${PACKAGE_INSTALL[int]} systemd-resolved
+  echo -e "Package: *\nPin: origin nginx.org\nPin: release o=nginx\nPin-Priority: 900\n" | tee /etc/apt/preferences.d/99nginx
+  apt-get update && apt-get install -y nginx systemd-resolved
+  systemctl start nginx
+  systemctl enable nginx
+  systemctl status nginx
   tilda "$(text 10)"
 }
 
@@ -1166,56 +688,24 @@ dns_encryption() {
 ### Добавление пользователя ###
 add_user() {
   info " $(text 39) "
-
-  case "$SYSTEM" in
-    Debian|Ubuntu)
-      useradd -m -s $(which bash) -G sudo ${USERNAME}
-      ;;
-
-    CentOS|Fedora)
-      useradd -m -s $(which bash) -G wheel ${USERNAME}
-      ;;
-  esac
+  useradd -m -s $(which bash) -G sudo ${USERNAME}
   echo "${USERNAME}:${PASSWORD}" | chpasswd
   mkdir -p /home/${USERNAME}/.ssh/
   touch /home/${USERNAME}/.ssh/authorized_keys
-  chown -R ${USERNAME}: /home/${USERNAME}/.ssh
-  chmod -R 700 /home/${USERNAME}/.ssh
+  chown ${USERNAME}: /home/${USERNAME}/.ssh
+  chmod 700 /home/${USERNAME}/.ssh
+  chown ${USERNAME}:${USERNAME} /home/${USERNAME}/.ssh/authorized_keys
   echo ${USERNAME}
-
   tilda "$(text 10)"
 }
 
 ### Безопасность ###
-setup_auto_updates() {
+unattended_upgrade() {
   info " $(text 40) "
-
-  case "$SYSTEM" in
-    Debian|Ubuntu)
-      echo 'Unattended-Upgrade::Mail "root";' >> /etc/apt/apt.conf.d/50unattended-upgrades
-      echo unattended-upgrades unattended-upgrades/enable_auto_updates boolean true | debconf-set-selections
-      dpkg-reconfigure -f noninteractive unattended-upgrades
-      systemctl restart unattended-upgrades
-      ;;
-
-    CentOS|Fedora)
-      cat > /etc/dnf/automatic.conf <<EOF
-[commands]
-upgrade_type = security
-random_sleep = 0
-download_updates = yes
-apply_updates = yes
-
-[email]
-email_from = root@localhost
-email_to = root
-email_host = localhost
-EOF
-      systemctl enable --now dnf-automatic.timer
-      systemctl status dnf-automatic.timer
-      ;;
-  esac
-
+  echo 'Unattended-Upgrade::Mail "root";' >> /etc/apt/apt.conf.d/50unattended-upgrades
+  echo unattended-upgrades unattended-upgrades/enable_auto_updates boolean true | debconf-set-selections
+  dpkg-reconfigure -f noninteractive unattended-upgrades
+  systemctl restart unattended-upgrades
   tilda "$(text 10)"
 }
 
@@ -1229,7 +719,6 @@ enable_bbr() {
   if [[ ! "$(sysctl net.ipv4.tcp_congestion_control)" == *"bbr" ]]; then
     echo "net.ipv4.tcp_congestion_control = bbr" >> /etc/sysctl.conf
   fi
-  sysctl -p
 }
 
 ### Отключение IPv6 ###
@@ -1257,61 +746,7 @@ disable_ipv6() {
 ### WARP ###
 warp() {
   info " $(text 43) "
-  
-  mkdir -p /usr/local/xui-rp/
-  mkdir -p /etc/systemd/system/warp-svc.service.d
-  cd /usr/local/xui-rp/
-
-  case "$SYSTEM" in
-    Debian|Ubuntu)
-      while ! wget --progress=dot:mega --timeout=30 --tries=10 --retry-connrefused "https://pkg.cloudflareclient.com/pool/$(grep "VERSION_CODENAME=" /etc/os-release | cut -d "=" -f 2)/main/c/cloudflare-warp/cloudflare-warp_2024.6.497-1_amd64.deb"; do
-        warning " $(text 38) "
-        sleep 3
-      done
-      apt install -y ./cloudflare-warp_2024.6.497-1_amd64.deb
-      ;;
-
-    CentOS|Fedora)
-      while ! wget --progress=dot:mega --timeout=30 --tries=10 --retry-connrefused "https://pkg.cloudflareclient.com/rpm/x86_64/cloudflare-warp-2024.6.497-1.x86_64.rpm"; do
-        warning " $(text 38) "
-        sleep 3
-      done
-      sudo yum localinstall -y cloudflare-warp-2024.6.497-1.x86_64.rpm
-      ;;
-  esac
-
-  rm -rf cloudflare-warp_*
-  cd ~
-
-  cat > /etc/systemd/system/warp-svc.service.d/override.conf <<EOF
-[Service]
-LogLevelMax=3
-EOF
-
-  echo
-  systemctl daemon-reload
-  systemctl restart warp-svc.service
-  sleep 3
-
-  systemctl status warp-svc || echo "Служба warp-svc не найдена или не запустилась."
-
-  warp-cli --accept-tos disconnect || true
-  warp-cli --accept-tos registration delete || true
-  script -q -c "echo y | warp-cli registration new"
-  warp-cli --accept-tos mode proxy
-  warp-cli --accept-tos proxy port 40000
-  warp-cli --accept-tos connect
-
-  echo
-  sleep 3
-  warp-cli tunnel stats
-
-  if curl -x socks5h://localhost:40000 https://2ip.io; then
-    echo "Настройка завершена: WARP подключен и работает."
-  else
-    echo "Ошибка: не удалось подключиться к WARP через прокси. Проверьте настройки."
-  fi
-
+  bash <(curl -Ls https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/main/warp/xui-rp-warp.sh)
   tilda "$(text 10)"
 }
 
@@ -1324,14 +759,10 @@ issuance_of_certificates() {
   chmod 600 cloudflare.credentials
 
   if [[ "$CFTOKEN" =~ [A-Z] ]]; then
-    cat > ${CF_CREDENTIALS_PATH} <<EOF
-dns_cloudflare_api_token = ${CFTOKEN}
-EOF
+    echo "dns_cloudflare_api_token = ${CFTOKEN}" >> ${CF_CREDENTIALS_PATH}
   else
-    cat > ${CF_CREDENTIALS_PATH} <<EOF
-dns_cloudflare_email = ${EMAIL}
-dns_cloudflare_api_key = ${CFTOKEN}
-EOF
+    echo "dns_cloudflare_email = ${EMAIL}" >> ${CF_CREDENTIALS_PATH}
+    echo "dns_cloudflare_api_key = ${CFTOKEN}" >> ${CF_CREDENTIALS_PATH}
   fi
 
   attempt=0
@@ -1366,65 +797,38 @@ EOF
 monitoring() {
   info " $(text 66) "
   bash <(curl -Ls https://github.com/cortez24rus/grafana-prometheus/raw/refs/heads/main/prometheus_node_exporter.sh)
-  
-  COMMENT_METRIC="location /${METRICS} {
-    auth_basic \"Restricted Content\";
-    auth_basic_user_file /etc/nginx/.htpasswd;
-    proxy_pass http://127.0.0.1:9100/metrics;
-    proxy_set_header Host \$host;
-    proxy_set_header X-Real-IP \$remote_addr;
-    proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-    proxy_set_header X-Forwarded-Proto \$scheme;
-    break;
-  }"
-  
   tilda "$(text 10)"
 }
 
 ### NGINX ###
 nginx_setup() {
   info " $(text 45) "
-
   mkdir -p /etc/nginx/stream-enabled/
-  mkdir -p /etc/nginx/conf.d/
   rm -rf /etc/nginx/conf.d/default.conf
   touch /etc/nginx/.htpasswd
   htpasswd -nb "$USERNAME" "$PASSWORD" > /etc/nginx/.htpasswd
-
-  case "$SYSTEM" in
-    Debian|Ubuntu)
-      usernginx="www-data"
-      ;;
-
-    CentOS|Fedora)
-      usernginx="nginx"
-      ;;
-  esac
 
   nginx_conf
   stream_conf
   local_conf
   random_site
 
-  sleep 2
-  systemctl restart nginx
-  sleep 2
+  sudo systemctl restart nginx
   nginx -s reload
-
   tilda "$(text 10)"
 }
 
 nginx_conf() {
   cat > /etc/nginx/nginx.conf <<EOF
-user                                   ${usernginx};
-pid                                    /var/run/nginx.pid;
-worker_processes                       auto;
-worker_rlimit_nofile                   65535; 
-error_log                              /var/log/nginx/error.log;
-include                                /etc/nginx/modules-enabled/*.conf;
+user                                 www-data;
+pid                                  /run/nginx.pid;
+worker_processes                     auto;
+worker_rlimit_nofile                 65535;
+error_log                            /var/log/nginx/error.log;
+include                              /etc/nginx/modules-enabled/*.conf;
 events {
-  multi_accept                         on;
-  worker_connections                   1024;
+  multi_accept                       on;
+  worker_connections                 1024;
 }
 
 http {
@@ -1516,13 +920,13 @@ EOF
 
 local_conf() {
   cat > /etc/nginx/conf.d/local.conf <<EOF
-#server {
-#  listen                               80;
-#  server_name                          ${DOMAIN} www.${DOMAIN};
-#  location / {
-#    return 301                         https://${DOMAIN}\$request_uri;
-#  }
-#}
+server {
+  listen                               80;
+  server_name                          ${DOMAIN} www.${DOMAIN};
+  location / {
+    return 301                         https://${DOMAIN}\$request_uri;
+  }
+}
 server {
   listen                               9090 default_server;
   server_name                          ${DOMAIN} www.${DOMAIN};
@@ -1561,7 +965,15 @@ server {
   if (\$host = ${IP4}) {
     return 444;
   }
-  ${COMMENT_METRIC}
+  location /${METRICS} {
+    auth_basic "Restricted Content";
+    auth_basic_user_file /etc/nginx/.htpasswd;
+    proxy_pass http://127.0.0.1:9100/metrics;
+    proxy_set_header Host \$host;
+    proxy_set_header X-Real-IP \$remote_addr;
+    proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto \$scheme;
+  }
   location /${WEB_BASE_PATH} {
     proxy_redirect off;
     proxy_set_header Host \$host;
@@ -1619,43 +1031,14 @@ server {
     proxy_pass http://127.0.0.1:\$fwdport\$is_args\$args;
     break;
   }
+  # Adguard home
   ${COMMENT_AGH}
 }
 EOF
 }
 
 random_site() {
-  info " $(text 79) "
-  mkdir -p /var/www/html/ /usr/local/xui-rp/
-
-  cd /usr/local/xui-rp/ || { echo "Не удалось перейти в /usr/local/xui-rp/"; exit 1; }
-
-  if [[ ! -d "simple-web-templates-main" ]]; then
-      while ! wget -q --progress=dot:mega --timeout=30 --tries=10 --retry-connrefused "https://github.com/cortez24rus/simple-web-templates/archive/refs/heads/main.zip"; do
-        warning " $(text 38) "
-        sleep 3
-      done
-      unzip -q main.zip &>/dev/null && rm -f main.zip
-  fi
-
-  cd simple-web-templates-main || { echo "Не удалось перейти в папку с шаблонами"; exit 1; }
-
-  rm -rf assets ".gitattributes" "README.md" "_config.yml"
-
-  RandomHTML=$(ls -d */ | shuf -n1)  # Обновил для выбора случайного подкаталога
-  info " $(text 80) ${RandomHTML}"
-
-  # Если шаблон существует, копируем его в /var/www/html
-  if [[ -d "${RandomHTML}" && -d "/var/www/html/" ]]; then
-      echo "Копируем шаблон в /var/www/html/..."
-      rm -rf /var/www/html/*  # Очищаем старую папку
-      cp -a "${RandomHTML}/." /var/www/html/ || { echo "Ошибка при копировании шаблона"; exit 1; }
-  else
-      echo "Ошибка при извлечении шаблона!"
-      exit 1
-  fi
-
-  cd ~ || { echo "Не удалось вернуться в домашнюю директорию"; exit 1; }
+  bash <(curl -Ls https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/main/xui-rp-random-site.sh)
 }
 
 generate_keys() {
@@ -1931,6 +1314,14 @@ EOF
   )
 }
 
+#json_rules() {
+#  SUB_JSON_RULES=$(cat <<EOF
+#[{"type":"field","outboundTag":"direct","domain":["keyword:xn--","keyword:ru","keyword:su","keyword:kg","keyword:by","keyword:kz","keyword:rt","keyword:yandex","keyword:avito.","keyword:2gis.","keyword:gismeteo.","keyword:livejournal."]},{"type":"field","outboundTag":"direct","domain":["domain:ru","domain:su","domain:kg","domain:by","domain:kz"]},{"type":"field","outboundTag":"direct","domain":["geosite:category-ru","geosite:category-gov-ru","geosite:yandex","geosite:vk","geosite:whatsapp","geosite:apple","geosite:mailru","geosite:github","geosite:gitlab","geosite:duckduckgo","geosite:google","geosite:wikimedia","geosite:mozilla"]},{"type":"field","outboundTag":"direct","ip":["geoip:private","geoip:ru"]}]
+#EOF
+#  )
+#}
+#UPDATE settings SET value = '${SUB_JSON_RULES}' WHERE LOWER(key) LIKE '%subjsonrules%';
+
 database_change() {
   DB_PATH="x-ui.db"
 
@@ -1955,16 +1346,8 @@ UPDATE settings SET value = '${SUB_JSON_URI}' WHERE LOWER(key) LIKE '%subjsonuri
 EOF
 }
 
-#json_rules() {
-#  SUB_JSON_RULES=$(cat <<EOF
-#[{"type":"field","outboundTag":"direct","domain":["keyword:xn--","keyword:ru","keyword:su","keyword:kg","keyword:by","keyword:kz","keyword:rt","keyword:yandex","keyword:avito.","keyword:2gis.","keyword:gismeteo.","keyword:livejournal."]},{"type":"field","outboundTag":"direct","domain":["domain:ru","domain:su","domain:kg","domain:by","domain:kz"]},{"type":"field","outboundTag":"direct","domain":["geosite:category-ru","geosite:category-gov-ru","geosite:yandex","geosite:vk","geosite:whatsapp","geosite:apple","geosite:mailru","geosite:github","geosite:gitlab","geosite:duckduckgo","geosite:google","geosite:wikimedia","geosite:mozilla"]},{"type":"field","outboundTag":"direct","ip":["geoip:private","geoip:ru"]}]
-#EOF
-#  )
-#}
-#UPDATE settings SET value = '${SUB_JSON_RULES}' WHERE LOWER(key) LIKE '%subjsonrules%';
-
 ### Установка 3x-ui ###
-install_panel() {
+panel_installation() {
   info " $(text 46) "
   touch /usr/local/xui-rp/reinstallation_check
 
@@ -2001,33 +1384,46 @@ install_panel() {
 ### UFW ###
 enabling_security() {
   info " $(text 47) "
-  BLOCK_ZONE_IP=$(echo ${IP4} | cut -d '.' -f 1-3).0/22
-
-  case "$SYSTEM" in
-    Debian|Ubuntu )  
-      ufw --force reset
-      ufw allow 36079/tcp
-      ufw allow 443/tcp
-      ufw insert 1 deny from "$BLOCK_ZONE_IP"
-      ufw --force enable
-      ;;
-
-    CentOS|Fedora )
-      systemctl enable --now firewalld
-      firewall-cmd --permanent --zone=public --add-port=36079/tcp
-      firewall-cmd --permanent --zone=public --add-port=443/tcp
-      firewall-cmd --permanent --zone=public --add-rich-rule="rule family='ipv4' source address='$BLOCK_ZONE_IP' reject"
-      firewall-cmd --reload
-      ;;
-  esac
-
+  ufw --force reset
+  ufw allow 36079/tcp
+  ufw allow 443/tcp
+  ufw allow 22/tcp
+  ufw insert 1 deny from $(echo ${IP4} | cut -d '.' -f 1-3).0/22
+  ufw --force enable
   tilda "$(text 10)"
 }
 
 ### SSH ####
 ssh_setup() {
-  if [[ "${ANSWER_SSH,,}" == "y" ]]; then
-    info " $(text 48) "
+  exec > /dev/tty 2>&1
+  info " $(text 48) "
+  out_data " $(text 49) "
+  echo
+  out_data " $(text 50) "
+  out_data " $(text 51) "
+  echo
+  out_data " $(text 52)" "type \$env:USERPROFILE\.ssh\id_rsa.pub | ssh -p 22 ${USERNAME}@${IP4} \"cat >> ~/.ssh/authorized_keys\""
+  out_data " $(text 53)" "ssh-copy-id -p 22 ${USERNAME}@${IP4}"
+  echo
+  while read -r -t 0.1 -n 1; do :; done
+  reading " $(text 54) " ANSWER_SSH
+  if [[ "${ANSWER_SSH}" == [yY] ]]; then
+    # Цикл проверки наличия ключа
+    while true; do
+      if [[ -n $(grep -v '^[[:space:]]*$' "/home/${USERNAME}/.ssh/authorized_keys") || -n $(grep -v '^[[:space:]]*$' "/root/.ssh/authorized_keys") ]]; then
+        info " $(text 56) "
+        break
+      else
+        warning " $(text 55) "
+        echo
+        reading " $(text 54) " CONTINUE_SSH
+        if [[ "${CONTINUE_SSH}" != [yY] ]]; then
+          warning " $(text 9) " # Настройка отменена
+          return 0
+        fi
+      fi
+    done
+    # Если ключ найден, продолжаем настройку SSH
     sed -i -e "
       s/#Port/Port/g;
       s/Port 22/Port 36079/g;
@@ -2045,7 +1441,7 @@ ssh_setup() {
     cat > /etc/motd <<EOF
 
 ################################################################################
-                        WARNING: AUTHORIZED ACCESS ONLY                         
+             WARNING: AUTHORIZED ACCESS ONLY
 ################################################################################
 
 This system is for the use of authorized users only. Individuals using this
@@ -2065,33 +1461,41 @@ to the fullest extent of the law.
 
 ################################################################################
 
-            +----------------------------------------------------+
-            | █████ █████ ███████████     █████████   █████ █████|
-            |░░███ ░░███ ░░███░░░░░███   ███░░░░░███ ░░███ ░░███ |
-            | ░░███ ███   ░███    ░███  ░███    ░███  ░░███ ███  |
-            |  ░░█████    ░██████████   ░███████████   ░░█████   |
-            |   ███░███   ░███░░░░░███  ░███░░░░░███    ░░███    |
-            |  ███ ░░███  ░███    ░███  ░███    ░███     ░███    |
-            | █████ █████ █████   █████ █████   █████    █████   |
-            |░░░░░ ░░░░░ ░░░░░   ░░░░░ ░░░░░   ░░░░░    ░░░░░    |
-            +----------------------------------------------------+
+       +----------------------------------------------------+
+       | █████ █████ ███████████   █████████   █████ █████|
+       |░░███ ░░███ ░░███░░░░░███   ███░░░░░███ ░░███ ░░███ |
+       | ░░███ ███   ░███  ░███  ░███  ░███  ░░███ ███  |
+       |  ░░█████  ░██████████   ░███████████   ░░█████   |
+       |   ███░███   ░███░░░░░███  ░███░░░░░███  ░░███  |
+       |  ███ ░░███  ░███  ░███  ░███  ░███   ░███  |
+       | █████ █████ █████   █████ █████   █████  █████   |
+       |░░░░░ ░░░░░ ░░░░░   ░░░░░ ░░░░░   ░░░░░  ░░░░░  |
+       +----------------------------------------------------+
 
 
 EOF
-    systemctl restart sshd
-    tilda "$(text 10)"
+    systemctl restart ssh.service
+  else
+    warning " $(text 9) "
+    return 0
   fi
 }
 
 # Установока xui бота
 install_bot() {
-  info " $(text 57) "
-  bash <(curl -Ls https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/main/xui-rp-install-bot.sh) "$BOT_TOKEN" "$ADMIN_ID" "$DOMAIN"
-  tilda "$(text 10)"
+  case "${ENABLE_BOT_CHOISE,,}" in
+    y|"")  
+      info " $(text 57) "
+      bash <(curl -Ls https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/main/xui-rp-install-bot.sh) "$BOT_TOKEN" "$ADMIN_ID" "$DOMAIN"
+      ;;
+    *)
+      ;;
+  esac
 }
 
 ### Окончание ###
 data_output() {
+  tilda "$(text 10)"
   info " $(text 58) "
   printf '0\n' | x-ui | grep --color=never -i ':'
   echo
@@ -2109,7 +1513,6 @@ data_output() {
   echo
   out_data " $(text 65) " "$LOGFILE"
   tilda "$(text 10)"
-  exec > /dev/tty 2>&1
 }
 
 # Удаление всех управляющих последовательностей
@@ -2117,39 +1520,63 @@ log_clear() {
   sed -i -e 's/\x1b\[[0-9;]*[a-zA-Z]//g' "$LOGFILE"
 }
 
-main() {
-  log_entry
-  read_defaults_from_file
-  parse_args "$@" || show_help
-  check_root
-  check_ip
-  check_operating_system
-  select_language
-  if [ -f ${defaults_file} ]; then
-    tilda "$(text 4)"
-  fi
-  sleep 2
+### Первый запуск ###
+main_script_first() {
   clear
+  check_ip
   banner_1
   start_installation
   data_entry
-  [[ ${args[utils]} == "true" ]] && installation_of_utilities
-  [[ ${args[dns]} == "true" ]] && dns_encryption
-  [[ ${args[autoupd]} == "true" ]] && setup_auto_updates
-  [[ ${args[bbr]} == "true" ]] && enable_bbr
-  [[ ${args[ipv6]} == "true" ]] && disable_ipv6
-  [[ ${args[warp]} == "true" ]] && warp
-  [[ ${args[cert]} == "true" ]] && issuance_of_certificates
-  [[ ${args[mon]} == "true" ]] && monitoring
-  write_defaults_to_file
-  [[ ${args[nginx]} == "true" ]] && nginx_setup
-  [[ ${args[panel]} == "true" ]] && install_panel
-  [[ ${args[ufw]} == "true" ]] && enabling_security
-  [[ ${args[ssh]} == "true" ]] && ssh_setup
-  [[ ${args[tgbot]} == "true" ]] && install_bot
+  installation_of_utilities
+  dns_encryption
+  add_user
+  unattended_upgrade
+  enable_bbr
+  disable_ipv6
+  warp
+  issuance_of_certificates
+  monitoring
+  nginx_setup
+  panel_installation
+  enabling_security
+  ssh_setup
+  install_bot
   data_output
   banner_1
   log_clear
 }
 
-main "$@"
+### Повторный запуск ###
+main_script_repeat() {
+  clear
+  check_ip
+  banner_1
+  start_installation
+  data_entry
+  warp
+  dns_encryption
+  nginx_setup
+  panel_installation
+  ssh_setup
+  install_bot
+  data_output
+  banner_1
+  log_clear
+}
+
+### Проверка запуска ###
+main_choise() {
+  log_entry
+  check_root
+  check_operating_system
+  select_language
+  if [ -f /usr/local/xui-rp/reinstallation_check ]; then
+    info " $(text 4) "
+    sleep 2
+    main_script_repeat
+  else
+    main_script_first
+  fi
+}
+
+main_choise
