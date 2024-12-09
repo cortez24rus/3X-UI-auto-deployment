@@ -16,12 +16,12 @@
 
 <table style="border-collapse: collapse; width: 100%; table-layout: fixed;">
   <tr>
-    <th style="padding: 8px; text-align: left;">**Ubuntu**</th>
-    <th style="padding: 8px; text-align: left;">**Debian**</th>
-    <th style="padding: 8px; text-align: left;">**CentOS**</th>
+    <th style="padding: 8px; text-align: left;">Ubuntu</th>
+    <th style="padding: 8px; text-align: left;">Debian</th>
+    <th style="padding: 8px; text-align: left;">CentOS</th>
   </tr>
   <tr>
-    <td style="padding: 8px;">24.04 (upcoming)</td>
+    <td style="padding: 8px;">24.04 LTS</td>
     <td style="padding: 8px;">12 (bookworm)</td>
     <td style="padding: 8px;">Stream 9</td>
   </tr>
