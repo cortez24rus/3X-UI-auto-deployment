@@ -76,7 +76,7 @@
   -i, --ipv6 <true|false>        Отключить поддержку IPv6 (по умолчанию: true)
   -w, --warp <true|false>        Warp (по умолчанию: true)
   -c, --cert <true|false>        Выпуск сертификатов для домена (по умолчанию: true)
-  -m, --mon <true|false>         Сервисы мониторинга (например, node_exporter) (по умолчанию: false)
+  -m, --mon <true|false>         Сервисы мониторинга (node_exporter) (по умолчанию: false)
   -n, --nginx <true|false>       Установка NGINX (по умолчанию: true)
   -p, --panel <true|false>       Установка панели для управления пользователями (по умолчанию: true)
   -f, --firewall <true|false>    Настройка файрвола (по умолчанию: true)

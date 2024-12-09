@@ -76,7 +76,7 @@ Usage: xui-rp-install-server.sh [-u|--utils <true|false>] [-d|--dns <true|false>
   -i, --ipv6 <true|false>        Disable IPv6 support (default: true)
   -w, --warp <true|false>        Warp (default: true)
   -c, --cert <true|false>        Certificate issuance for domain (default: true)
-  -m, --mon <true|false>         Monitoring services (e.g., node_exporter) (default: false)
+  -m, --mon <true|false>         Monitoring services (node_exporter) (default: false)
   -n, --nginx <true|false>       NGINX installation (default: true)
   -p, --panel <true|false>       Panel installation for user management (default: true)
   -f, --firewall <true|false>    Firewall configuration (default: true)
