@@ -14,8 +14,6 @@
 
 ### Supported Operating Systems:
 
-### Supported Operating Systems:
-
 | **Ubuntu**       | **Debian**        | **CentOS**       |
 |------------------|-------------------|------------------|
 | 24.04 LTS        | 12 (bookworm)     | Stream 9         |
