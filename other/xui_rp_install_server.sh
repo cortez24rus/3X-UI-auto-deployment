@@ -2110,7 +2110,6 @@ data_output() {
   echo
   out_data " $(text 65) " "$LOGFILE"
   tilda "$(text 10)"
-  exec > /dev/tty 2>&1
 }
 
 # Удаление всех управляющих последовательностей
@@ -2150,6 +2149,7 @@ main() {
   [[ ${args[tgbot]} == "true" ]] && install_bot
   data_output
   banner_1
+  exec > /dev/tty 2>&1
   log_clear
 }
 
