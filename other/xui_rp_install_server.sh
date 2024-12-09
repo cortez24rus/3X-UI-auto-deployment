@@ -5,6 +5,7 @@ export DEBIAN_FRONTEND=noninteractive
 declare -A defaults
 declare -A args
 declare -A regex
+declare -A generate
 
 regex[domain]="^([a-zA-Z0-9-]+)\.([a-zA-Z0-9-]+\.[a-zA-Z]{2,})$"
 regex[port]="^[1-9][0-9]*$"
@@ -16,6 +17,7 @@ regex[tgbot_admins]="^[a-zA-Z][a-zA-Z0-9_]{4,31}(,[a-zA-Z][a-zA-Z0-9_]{4,31})*$"
 regex[domain_port]="^[a-zA-Z0-9]+([-.][a-zA-Z0-9]+)*\.[a-zA-Z]{2,}(:[1-9][0-9]*)?$"
 regex[file_path]="^[a-zA-Z0-9_/.-]+$"
 regex[url]="^(http|https)://([a-zA-Z0-9.-]+\.[a-zA-Z]{2,})(:[0-9]{1,5})?(/.*)?$"
+generate[path]="tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 30"
 
 defaults_file="/usr/local/xui-rp/reinstall_defaults.conf"
 
@@ -271,6 +273,7 @@ read_defaults_from_file() {
     defaults[ufw]=true
     defaults[ssh]=true
     defaults[tgbot]=false
+    defaults[generate]=false
   fi
 }
 
@@ -291,6 +294,7 @@ defaults[panel]=true
 defaults[ufw]=false
 defaults[ssh]=false
 defaults[tgbot]=false
+defaults[generate]=false
 EOF
 }
 
@@ -319,7 +323,7 @@ validate_true_false() {
 
 parse_args() {
   local opts
-  opts=$(getopt -o i:w:m:u:s:t:f:a:r:b:hl:d:p:c:n --long utils:,dns:,addu:,autoupd:,bbr:,ipv6:,warp:,cert:,mon:,nginx:,panel:,ufw:,ssh:,tgbot:,help -- "$@")
+  opts=$(getopt -o i:w:m:u:s:t:f:a:r:b:hl:d:p:c:n:g --long utils:,dns:,addu:,autoupd:,bbr:,ipv6:,warp:,cert:,mon:,nginx:,panel:,ufw:,ssh:,tgbot:,generate:,help -- "$@")
   if [[ $? -ne 0 ]]; then
     return 1
   fi
@@ -408,6 +412,12 @@ parse_args() {
         args[tgbot]="$2"
         normalize_case tgbot
         validate_true_false tgbot "$2" || return 1
+        shift 2
+        ;;
+      -g|--generate)
+        args[generate]="$2"
+        normalize_case generate
+        validate_true_false generate "$2" || return 1
         shift 2
         ;;
       -h|--help)
@@ -709,7 +719,12 @@ choise_dns () {
       2)
         info " $(text 25) "
         tilda "$(text 10)"
-        validate_path ADGUARDPATH
+        if [[ ${args[generate]} == "true" ]]; then
+          ADGUARDPATH=$(eval ${generate[path]})
+        else
+          echo
+          validate_path ADGUARDPATH
+        fi        
         echo
         break
         ;;
@@ -731,36 +746,49 @@ data_entry() {
   echo
   reading " $(text 12) " PASSWORD
   [[ ${args[addu]} == "true" ]] && add_user
-  
-  tilda "$(text 10)"
 
   check_cf_token
   
   tilda "$(text 10)"
 
-  reading " $(text 19) " REALITY
-  echo
-  validate_path "CDNGRPC"
-  echo
-  validate_path "CDNSPLIT"
-  echo
-  validate_path "CDNHTTPU"
-  echo
-  validate_path "CDNWS"
-  if [[ ${args[mon]} == "true" ]]; then
-    echo
-    validate_path "METRICS"
-  fi
-
-  tilda "$(text 10)"
-
   choise_dns
 
-  validate_path WEB_BASE_PATH
+  reading " $(text 19) " REALITY
   echo
-  validate_path SUB_PATH
-  echo
-  validate_path SUB_JSON_PATH
+
+  if [[ ${args[generate]} == "true" ]]; then
+    CDNGRPC=$(eval ${generate[path]})
+    CDNSPLIT=$(eval ${generate[path]})
+    CDNHTTPU=$(eval ${generate[path]})
+    CDNWS=$(eval ${generate[path]})
+    WEB_BASE_PATH=$(eval ${generate[path]})
+    SUB_PATH=$(eval ${generate[path]})
+    SUB_JSON_PATH=$(eval ${generate[path]})
+    CDNWS=$(eval ${generate[path]})
+  else
+    validate_path CDNGRPC
+    echo
+    validate_path CDNSPLIT
+    echo
+    validate_path CDNHTTPU
+    echo
+    validate_path CDNWS
+    tilda "$(text 10)"
+    validate_path WEB_BASE_PATH
+    echo
+    validate_path SUB_PATH
+    echo
+    validate_path SUB_JSON_PATH
+  fi
+
+  if [[ ${args[mon]} == "true" ]]; then
+    if [[ ${args[generate]} == "true" ]]; then
+      METRICS=$(eval ${generate[path]})
+    else
+      echo
+      validate_path METRICS
+    fi
+  fi
 
   tilda "$(text 10)"
 
