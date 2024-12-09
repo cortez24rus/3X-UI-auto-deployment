@@ -1,6 +1,23 @@
 #!/usr/bin/env bash
-#wget -N https://git && bash .sh d
+# wget -N https://git && bash .sh d
 export DEBIAN_FRONTEND=noninteractive
+
+declare -A defaults
+declare -A args
+declare -A regex
+
+regex[domain]="^([a-zA-Z0-9-]+)\.([a-zA-Z0-9-]+\.[a-zA-Z]{2,})$"
+regex[port]="^[1-9][0-9]*$"
+regex[warp_license]="^[a-zA-Z0-9]{8}-[a-zA-Z0-9]{8}-[a-zA-Z0-9]{8}$"
+regex[username]="^[a-zA-Z0-9]+$"
+regex[ip]="^([0-9]{1,3}\.){3}[0-9]{1,3}$"
+regex[tgbot_token]="^[0-9]{8,10}:[a-zA-Z0-9_-]{35}$"
+regex[tgbot_admins]="^[a-zA-Z][a-zA-Z0-9_]{4,31}(,[a-zA-Z][a-zA-Z0-9_]{4,31})*$"
+regex[domain_port]="^[a-zA-Z0-9]+([-.][a-zA-Z0-9]+)*\.[a-zA-Z]{2,}(:[1-9][0-9]*)?$"
+regex[file_path]="^[a-zA-Z0-9_/.-]+$"
+regex[url]="^(http|https)://([a-zA-Z0-9.-]+\.[a-zA-Z]{2,})(:[0-9]{1,5})?(/.*)?$"
+
+defaults_file="/usr/local/xui-rp/reinstall_defaults.conf"
 
 ### INFO ###
 out_data()   { echo -e "\e[1;33m$1\033[0m \033[1;37m$2\033[0m"; }
@@ -244,10 +261,6 @@ E[113]="  -t, --tgbot <true|false>       Telegram bot integration for user manag
 R[113]="  -t, --tgbot <true|false>       Интеграция Telegram бота для управления пользователями (по умолчанию: ${defaults[tgbot]})"
 E[114]="  -h, --help                     Display this help message"
 R[114]="  -h, --help                     Показать это сообщение помощи"
-
-declare -A defaults
-declare -A args
-defaults_file="/usr/local/xui-rp/reinstall_defaults.conf"
 
 # Функция для отображения справки
 show_help() {
@@ -596,32 +609,6 @@ start_installation() {
   esac
 }
 
-# Функция для обрезки домена (удаление http://, https:// и www)
-crop_domain() {
-  local input_value="$1"
-  local temp_value
-  temp_value=$(echo "$input_value" | sed -e 's|https\?://||' -e 's|/.*$||')
-  
-  if ! [[ "$temp_value" =~ ^([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$ ]]; then
-    echo "Ошибка: введённый адрес '$temp_value' имеет неверный формат."
-    return 1
-  fi
-
-  local multi_level_domains=("co.uk" "com.au" "gov.ru" "edu.ru" "org.uk" "net.uk" "gov.uk" "co.in" "com.br" "org.br")
-  IFS='.' read -r -a domain_parts <<< "$temp_value"
-  local domain_second_level="${domain_parts[-2]}.${domain_parts[-1]}"
-  
-  for tld in "${multi_level_domains[@]}"; do
-    if [[ "$domain_second_level" == "$tld" ]]; then
-      echo "${domain_parts[-3]}.${domain_second_level}"
-      return 0
-    fi
-  done
-
-  echo "$domain_second_level"
-  return 0
-}
-
 # Запрос и ответ от API Cloudflare
 get_test_response() {
   testdomain=$(echo "${DOMAIN}" | rev | cut -d '.' -f 1-2 | rev)
@@ -635,19 +622,22 @@ get_test_response() {
 
 check_cf_token() {
   while ! echo "$test_response" | grep -qE "\"${testdomain}\"|\"#dns_records:edit\"|\"#dns_records:read\"|\"#zone:read\""; do
-    DOMAIN=""
-    EMAIL=""
-    CFTOKEN=""
-    while [[ -z $DOMAIN ]]; do
-      reading " $(text 13) " DOMAIN
-      echo
-    done
+    local temp_domain
+    local DOMAIN
+    local SUBDOMAIN
 
-    DOMAIN=$(crop_domain "$DOMAIN")
-    
-    if [[ $? -ne 0 ]]; then
-      DOMAIN=""
-      continue
+    reading " $(text 13) " temp_domain
+
+    # Удаляем http:// или https:// (если они есть), порты и пути
+    temp_domain=$(echo "$temp_domain" | sed -E 's/^https?:\/\///' | sed -E 's/(:[0-9]+)?(\/[a-zA-Z0-9_\-\/]+)?$//')
+
+    # Проверка на наличие домена третьего уровня (например, grf.x.com)
+    if [[ "$temp_domain" =~ ${regex[domain]} ]]; then
+      SUBDOMAIN="$temp_domain"           # Весь домен сохраняем в SUBDOMAIN
+      DOMAIN="${BASH_REMATCH[2]}"        # Извлекаем домен второго уровня (x.com)
+    else
+      DOMAIN="$temp_domain"              # Если это домен второго уровня, то просто сохраняем
+      SUBDOMAIN="www.$temp_domain"       # Для домена второго уровня подставляем www в SUBDOMAIN
     fi
 
     while [[ -z $EMAIL ]]; do
