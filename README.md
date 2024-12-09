@@ -7,10 +7,20 @@
 This script is designed to quickly and easily set up a hidden proxy server, with masking via NGINX. In this variant, all incoming requests are handled by NGINX, and the server acts as a proxy server only if the request contains the correct path (URI). This increases security and helps to hide the true purpose of the server.
 
 > [!IMPORTANT]
->  This script has been tested on Debian 12 in a KVM virtualization environment. You will need your own domain, which needs to be bound to Cloudflare for it to work correctly. It is recommended to run the script as root on a freshly installed system.
+>  This script has been tested in a KVM virtualization environment. You will need your own domain, which needs to be bound to Cloudflare for it to work correctly. It is recommended to run the script as root on a freshly installed system.
 
 > [!NOTE]
 > The script is configured according to routing rules for users in Russia.
+
+### Supported Operating Systems:
+
+| **Ubuntu**       | **Debian**        | **CentOS**       |
+|------------------|-------------------|------------------|
+| 24.04 LTS        | 12 (bookworm)     | Stream 9         |
+| 22.04 LTS        | 11 (bullseye)     | Stream 8         |
+| 20.04 LTS        | 10 (buster)       | 7                |
+
+-----
 
 ### Setting up cloudflare
 1. Upgrade the system and reboot the server.
