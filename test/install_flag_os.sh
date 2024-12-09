@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-
+#wget -N https://git && bash .sh d
 export DEBIAN_FRONTEND=noninteractive
 
 ### INFO ###
@@ -404,15 +404,6 @@ select_language() {
   esac
 }
 
-### Проверка рута ###
-check_root() {
-  if [[ $EUID -ne 0 ]]; then
-    error " $(text 8) "
-  fi
-}
-
-# Многоступенчатая проверка операционной системы, пробуем до тех пор, пока не получим значение. Поддерживаются только Debian 10/11, Ubuntu 18.04/20.04 или CentOS 7/8. Если это не одна из перечисленных операционных систем, скрипт завершится.
-# Благодарность котику за техническую помощь и оптимизацию повторяющихся команд. https://github.com/Oreomeow
 check_operating_system() {
   if [ -s /etc/os-release ]; then
     SYS="$(grep -i pretty_name /etc/os-release | cut -d \" -f2)"
@@ -471,7 +462,13 @@ check_dependencies() {
     info "\n $(text 73) \n"
   fi
 }
-#wget -N https://git && bash .sh d
+
+### Проверка рута ###
+check_root() {
+  if [[ $EUID -ne 0 ]]; then
+    error " $(text 8) "
+  fi
+}
 
 ### Проверка IP-адреса ###
 check_ip() {
