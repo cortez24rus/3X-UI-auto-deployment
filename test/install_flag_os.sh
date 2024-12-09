@@ -773,7 +773,8 @@ data_entry() {
   reading " $(text 11) " USERNAME
   echo
   reading " $(text 12) " PASSWORD
-
+  [[ ${args[addu]} == "true" ]] && add_user
+  
   tilda "$(text 10)"
 
   check_cf_token
@@ -2142,7 +2143,6 @@ main() {
   data_entry
   [[ ${args[utils]} == "true" ]] && installation_of_utilities
   [[ ${args[dns]} == "true" ]] && dns_encryption
-  [[ ${args[addu]} == "true" ]] && add_user
   [[ ${args[autoupd]} == "true" ]] && unattended_upgrade
   [[ ${args[bbr]} == "true" ]] && enable_bbr
   [[ ${args[ipv6]} == "true" ]] && disable_ipv6
