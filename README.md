@@ -61,7 +61,6 @@ This script is designed to quickly and easily set up a hidden proxy server, with
 
 ### Help message of the script:
 ```
-
 Usage: xui-rp-install-server.sh [-u|--utils <true|false>] [-d|--dns <true|false>] [-a|--addu <true|false>]
                          [-r|--autoupd <true|false>] [-b|--bbr <true|false>] [-i|--ipv6 <true|false>]
                          [-w|--warp <true|false>] [-c|--cert <true|false>] [-m|--mon <true|false>]
