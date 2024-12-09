@@ -1519,14 +1519,14 @@ local_conf() {
   cat > /etc/nginx/conf.d/local.conf <<EOF
 #server {
 #  listen                               80;
-#  server_name                          ${DOMAIN} ${SUBDOMAIN};
+#  server_name                          ${DOMAIN} *.${DOMAIN};
 #  location / {
 #    return 301                         https://${DOMAIN}\$request_uri;
 #  }
 #}
 server {
   listen                               9090 default_server;
-  server_name                          ${DOMAIN} ${SUBDOMAIN};
+  server_name                          ${DOMAIN} *.${DOMAIN};
   location / {
     return 301                         https://${DOMAIN}\$request_uri;
   }
@@ -1538,7 +1538,7 @@ server {
 server {
   listen                               36077 ssl proxy_protocol;
   http2                                on;
-  server_name                          ${DOMAIN} ${SUBDOMAIN};
+  server_name                          ${DOMAIN} *.${DOMAIN};
 
   # SSL
   ssl_certificate                      /etc/letsencrypt/live/${DOMAIN}/fullchain.pem;
