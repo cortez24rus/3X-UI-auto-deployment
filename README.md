@@ -105,5 +105,20 @@ The script will then prompt you for the necessary configuration information:
 - Once the configuration is complete, the script will display all the necessary links and login information for the XUI administration panel.
 - All configurations can be modified as needed due to the flexibility of the settings.
 
+-----
+
+> [!IMPORTANT]
+> 
+> ### Important Notice:
+> This repository is for educational purposes only and is intended to demonstrate the principles of reverse proxy servers and network security. The script shows how to set up a hidden proxy server using > technologies such as NGINX for reverse proxy, SSL/TLS encryption, traffic management, and attack protection.
+> 
+> We strongly remind you that using this tool to bypass network restrictions or censorship is illegal in several countries that have laws regulating the use of technologies to circumvent internet limitations.
+> 
+> This project is not intended for use in any activities that violate information protection laws or interfere with censorship mechanisms. We are not responsible for any legal consequences related to the use of > this script.
+> 
+> Please use this tool exclusively for educational purposes, to learn about network security, reverse proxy operations, and data protection.
+
+-----
+
 ## Stargazers over time
 [![Stargazers over time](https://starchart.cc/cortez24rus/xui-reverse-proxy.svg?variant=adaptive)](https://starchart.cc/cortez24rus/xui-reverse-proxy)
