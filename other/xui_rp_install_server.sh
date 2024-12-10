@@ -209,11 +209,13 @@ R[85]=""
 # Функция для отображения справки
 show_help() {
   echo
-  info "Usage: xui-rp-install-server.sh [-u|--utils <true|false>] [-d|--dns <true|false>] [-a|--addu <true|false>]"
+  info "Usage: xui-rp-install-server.sh [-g|--generate <true|false>] [-u|--utils <true|false>] [-d|--dns <true|false>] [-a|--addu <true|false>]"
   info "       [-r|--autoupd <true|false>] [-b|--bbr <true|false>] [-i|--ipv6 <true|false>] [-w|--warp <true|false>]"
   info "       [-c|--cert <true|false>] [-m|--mon <true|false>] [-n|--nginx <true|false>] [-p|--panel <true|false>]"
   info "       [-f|--firewall <true|false>] [-s|--ssh <true|false>] [-t|--tgbot <true|false>] [-h|--help]"
   echo
+  echo "  -g, --generate <true|false>    Generate a random string for configuration       (default: ${defaults[generate]})"
+  echo "                                 Генерация случайных путей для конфигурации"
   echo "  -u, --utils <true|false>       Additional utilities                             (default: ${defaults[utils]})"
   echo "                                 Дополнительные утилиты"
   echo "  -d, --dns <true|false>         DNS encryption                                   (default: ${defaults[dns]})"
@@ -259,6 +261,7 @@ read_defaults_from_file() {
     done < $defaults_file
   else
     # Если файл не найден, используем значения по умолчанию
+    defaults[generate]=true
     defaults[utils]=true
     defaults[dns]=true
     defaults[addu]=true
@@ -273,13 +276,13 @@ read_defaults_from_file() {
     defaults[ufw]=true
     defaults[ssh]=true
     defaults[tgbot]=false
-    defaults[generate]=false
   fi
 }
 
 # Функция для записи значений в файл
 write_defaults_to_file() {
   cat > ${defaults_file}<<EOF
+defaults[generate]=true
 defaults[utils]=false
 defaults[dns]=false
 defaults[addu]=false
@@ -294,7 +297,6 @@ defaults[panel]=true
 defaults[ufw]=false
 defaults[ssh]=false
 defaults[tgbot]=false
-defaults[generate]=false
 EOF
 }
 
@@ -754,9 +756,9 @@ data_entry() {
   choise_dns
 
   reading " $(text 19) " REALITY
-  echo
 
   if [[ ${args[generate]} == "true" ]]; then
+    echo
     CDNGRPC=$(eval ${generate[path]})
     CDNSPLIT=$(eval ${generate[path]})
     CDNHTTPU=$(eval ${generate[path]})
@@ -764,7 +766,6 @@ data_entry() {
     WEB_BASE_PATH=$(eval ${generate[path]})
     SUB_PATH=$(eval ${generate[path]})
     SUB_JSON_PATH=$(eval ${generate[path]})
-    CDNWS=$(eval ${generate[path]})
   else
     validate_path CDNGRPC
     echo
@@ -934,7 +935,6 @@ installation_of_utilities() {
       ;;
   esac
 
-  nginx_make
   nginx_gpg
   ${PACKAGE_INSTALL[int]} systemd-resolved
   tilda "$(text 10)"
@@ -1267,9 +1267,8 @@ nginx_setup() {
   local_conf
   random_site
 
-  sleep 2
+  systemctl daemon-reload
   systemctl restart nginx
-  sleep 2
   nginx -s reload
 
   tilda "$(text 10)"

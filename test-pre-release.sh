@@ -209,11 +209,13 @@ R[85]=""
 # Функция для отображения справки
 show_help() {
   echo
-  info "Usage: xui-rp-install-server.sh [-u|--utils <true|false>] [-d|--dns <true|false>] [-a|--addu <true|false>]"
+  info "Usage: xui-rp-install-server.sh [-g|--generate <true|false>] [-u|--utils <true|false>] [-d|--dns <true|false>] [-a|--addu <true|false>]"
   info "       [-r|--autoupd <true|false>] [-b|--bbr <true|false>] [-i|--ipv6 <true|false>] [-w|--warp <true|false>]"
   info "       [-c|--cert <true|false>] [-m|--mon <true|false>] [-n|--nginx <true|false>] [-p|--panel <true|false>]"
   info "       [-f|--firewall <true|false>] [-s|--ssh <true|false>] [-t|--tgbot <true|false>] [-h|--help]"
   echo
+  echo "  -g, --generate <true|false>    Generate a random string for configuration       (default: ${defaults[generate]})"
+  echo "                                 Генерация случайных путей для конфигурации"
   echo "  -u, --utils <true|false>       Additional utilities                             (default: ${defaults[utils]})"
   echo "                                 Дополнительные утилиты"
   echo "  -d, --dns <true|false>         DNS encryption                                   (default: ${defaults[dns]})"
@@ -259,6 +261,7 @@ read_defaults_from_file() {
     done < $defaults_file
   else
     # Если файл не найден, используем значения по умолчанию
+    defaults[generate]=true
     defaults[utils]=true
     defaults[dns]=true
     defaults[addu]=true
@@ -273,13 +276,13 @@ read_defaults_from_file() {
     defaults[ufw]=true
     defaults[ssh]=true
     defaults[tgbot]=false
-    defaults[generate]=false
   fi
 }
 
 # Функция для записи значений в файл
 write_defaults_to_file() {
   cat > ${defaults_file}<<EOF
+defaults[generate]=true
 defaults[utils]=false
 defaults[dns]=false
 defaults[addu]=false
@@ -294,7 +297,6 @@ defaults[panel]=true
 defaults[ufw]=false
 defaults[ssh]=false
 defaults[tgbot]=false
-defaults[generate]=false
 EOF
 }
 
@@ -753,27 +755,26 @@ data_entry() {
 
   choise_dns
 
-  reading " $(text 19) " REALITY
-  echo
+#  reading " $(text 19) " REALITY
 
   if [[ ${args[generate]} == "true" ]]; then
-    CDNGRPC=$(eval ${generate[path]})
-    CDNSPLIT=$(eval ${generate[path]})
-    CDNHTTPU=$(eval ${generate[path]})
-    CDNWS=$(eval ${generate[path]})
+#    echo
+#    CDNGRPC=$(eval ${generate[path]})
+#    CDNSPLIT=$(eval ${generate[path]})
+#    CDNHTTPU=$(eval ${generate[path]})
+#    CDNWS=$(eval ${generate[path]})
     WEB_BASE_PATH=$(eval ${generate[path]})
     SUB_PATH=$(eval ${generate[path]})
     SUB_JSON_PATH=$(eval ${generate[path]})
-    CDNWS=$(eval ${generate[path]})
   else
-    validate_path CDNGRPC
-    echo
-    validate_path CDNSPLIT
-    echo
-    validate_path CDNHTTPU
-    echo
-    validate_path CDNWS
-    tilda "$(text 10)"
+#    validate_path CDNGRPC
+#    echo
+#    validate_path CDNSPLIT
+#    echo
+#    validate_path CDNHTTPU
+#    echo
+#    validate_path CDNWS
+#    tilda "$(text 10)"
     validate_path WEB_BASE_PATH
     echo
     validate_path SUB_PATH
@@ -934,7 +935,6 @@ installation_of_utilities() {
       ;;
   esac
 
-  nginx_make
   nginx_gpg
   ${PACKAGE_INSTALL[int]} systemd-resolved
   tilda "$(text 10)"
@@ -1267,9 +1267,8 @@ nginx_setup() {
   local_conf
   random_site
 
-  sleep 2
+  systemctl daemon-reload
   systemctl restart nginx
-  sleep 2
   nginx -s reload
 
   tilda "$(text 10)"
@@ -1351,7 +1350,6 @@ stream_conf() {
 map \$ssl_preread_server_name \$backend {
   ${DOMAIN}                            web;
   ${SUBDOMAIN}                         xtls;
-  ${REALITY}                           reality;
   default                              block;
 }
 upstream block {
@@ -1359,9 +1357,6 @@ upstream block {
 }
 upstream web {
   server 127.0.0.1:7443;
-}
-upstream reality {
-  server 127.0.0.1:8443;
 }
 upstream xtls {
   server 127.0.0.1:9443;
@@ -1377,13 +1372,13 @@ EOF
 
 local_conf() {
   cat > /etc/nginx/conf.d/local.conf <<EOF
-#server {
-#  listen                               80;
-#  server_name                          ${DOMAIN} *.${DOMAIN};
-#  location / {
-#    return 301                         https://${DOMAIN}\$request_uri;
-#  }
-#}
+server {
+  listen                               80;
+  server_name                          ${DOMAIN} *.${DOMAIN};
+  location / {
+    return 301                         https://${DOMAIN}\$request_uri;
+  }
+}
 server {
   listen                               9090 default_server;
   server_name                          ${DOMAIN} *.${DOMAIN};
@@ -1422,7 +1417,6 @@ server {
   if (\$host = ${IP4}) {
     return 444;
   }
-  ${COMMENT_METRIC}
   location /${WEB_BASE_PATH} {
     proxy_redirect off;
     proxy_set_header Host \$host;
@@ -1452,34 +1446,7 @@ server {
     proxy_pass http://127.0.0.1:36074/${SUB_JSON_PATH};
     break;
   }
-  location /${CDNSPLIT} {
-    proxy_pass http://127.0.0.1:2063;
-    proxy_http_version 1.1;
-    proxy_redirect off;
-  }
-  location ~ ^/(?<fwdport>\d+)/(?<fwdpath>.*)\$ {
-    if (\$hack = 1) {return 404;}
-    client_max_body_size 0;
-    client_body_timeout 1d;
-    grpc_read_timeout 1d;
-    grpc_socket_keepalive on;
-    proxy_read_timeout 1d;
-    proxy_http_version 1.1;
-    proxy_buffering off;
-    proxy_request_buffering off;
-    proxy_socket_keepalive on;
-    proxy_set_header Upgrade \$http_upgrade;
-    proxy_set_header Connection "upgrade";
-    proxy_set_header Host \$host;
-    proxy_set_header X-Real-IP \$remote_addr;
-    proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-    if (\$content_type ~* "GRPC") {
-      grpc_pass grpc://127.0.0.1:\$fwdport\$is_args\$args;
-      break;
-    }
-    proxy_pass http://127.0.0.1:\$fwdport\$is_args\$args;
-    break;
-  }
+  ${COMMENT_METRIC}
   ${COMMENT_AGH}
 }
 EOF
@@ -1529,113 +1496,6 @@ generate_keys() {
   echo "$PRIVATE_KEY $PUBLIC_KEY"
 }
 
-settings_grpc() {
-  STREAM_SETTINGS_GRPC=$(cat <<EOF
-{
-  "network": "grpc",
-  "security": "none",
-  "externalProxy": [
-  {
-    "forceTls": "tls",
-    "dest": "${DOMAIN}",
-    "port": 443,
-    "remark": ""
-  }
-  ],
-  "grpcSettings": {
-  "serviceName": "/2053/${CDNGRPC}",
-  "authority": "${DOMAIN}",
-  "multiMode": false
-  }
-}
-EOF
-  )
-}
-
-settings_split() {
-  STREAM_SETTINGS_SPLIT=$(cat <<EOF
-{
-  "network": "splithttp",
-  "security": "none",
-  "externalProxy": [
-  {
-    "forceTls": "tls",
-    "dest": "${DOMAIN}",
-    "port": 443,
-    "remark": ""
-  }
-  ],
-  "splithttpSettings": {
-  "path": "${CDNSPLIT}",
-  "host": "",
-  "headers": {},
-  "scMaxConcurrentPosts": "100-200",
-  "scMaxEachPostBytes": "1000000-2000000",
-  "scMinPostsIntervalMs": "10-50",
-  "noSSEHeader": false,
-  "xPaddingBytes": "100-1000",
-  "xmux": {
-    "maxConcurrency": "16-32",
-    "maxConnections": 0,
-    "cMaxReuseTimes": "64-128",
-    "cMaxLifetimeMs": 0
-  },
-  "mode": "auto",
-  "noGRPCHeader": false
-  }
-}
-EOF
-  )
-}
-
-settings_httpu() {
-  STREAM_SETTINGS_HTTPU=$(cat <<EOF
-{
-  "network": "httpupgrade",
-  "security": "none",
-  "externalProxy": [
-  {
-    "forceTls": "tls",
-    "dest": "${DOMAIN}",
-    "port": 443,
-    "remark": ""
-  }
-  ],
-  "httpupgradeSettings": {
-  "acceptProxyProtocol": false,
-  "path": "/2073/${CDNHTTPU}",
-  "host": "${DOMAIN}",
-  "headers": {}
-  }
-}
-EOF
-  )
-}
-
-settings_ws() {
-  STREAM_SETTINGS_WS=$(cat <<EOF
-{
-  "network": "ws",
-  "security": "none",
-  "externalProxy": [
-  {
-    "forceTls": "tls",
-    "dest": "${DOMAIN}",
-    "port": 443,
-    "remark": ""
-  }
-  ],
-  "wsSettings": {
-  "acceptProxyProtocol": false,
-  "path": "/2083/${CDNWS}",
-  "host": "${DOMAIN}",
-  "headers": {}
-  }
-}
-EOF
-  )
-}
-
 settings_steal() {
   read PRIVATE_KEY0 PUBLIC_KEY0 <<< "$(generate_keys)"
   STREAM_SETTINGS_STEAL=$(cat <<EOF
@@ -1673,59 +1533,6 @@ settings_steal() {
   ],
   "settings": {
     "publicKey": "${PUBLIC_KEY0}",
-    "fingerprint": "random",
-    "serverName": "",
-    "spiderX": "/"
-  }
-  },
-  "tcpSettings": {
-  "acceptProxyProtocol": true,
-  "header": {
-    "type": "none"
-  }
-  }
-}
-EOF
-  )
-}
-
-settings_reality() {
-  read PRIVATE_KEY1 PUBLIC_KEY1 <<< "$(generate_keys)"
-  STREAM_SETTINGS_REALITY=$(cat <<EOF
-{
-  "network": "tcp",
-  "security": "reality",
-  "externalProxy": [
-  {
-    "forceTls": "same",
-    "dest": "${SUBDOMAIN}",
-    "port": 443,
-    "remark": ""
-  }
-  ],
-  "realitySettings": {
-  "show": false,
-  "xver": 0,
-  "dest": "${REALITY}:443",
-  "serverNames": [
-    "${REALITY}"
-  ],
-  "privateKey": "${PRIVATE_KEY1}",
-  "minClient": "",
-  "maxClient": "",
-  "maxTimediff": 0,
-  "shortIds": [
-    "c7c487",
-    "cf",
-    "248c16289e",
-    "ae60608a67d1a367",
-    "21221b811591",
-    "648bc6ab5ba1bc",
-    "73d1",
-    "3028618d"
-  ],
-  "settings": {
-    "publicKey": "${PUBLIC_KEY1}",
     "fingerprint": "random",
     "serverName": "",
     "spiderX": "/"
@@ -1800,12 +1607,7 @@ UPDATE users
 SET username = '$USERNAME', password = '$PASSWORD' 
 WHERE id = 1;
 
-UPDATE inbounds SET stream_settings = '$STREAM_SETTINGS_GRPC' WHERE LOWER(remark) LIKE '%grpc%';
-UPDATE inbounds SET stream_settings = '$STREAM_SETTINGS_SPLIT' WHERE LOWER(remark) LIKE '%split%';
-UPDATE inbounds SET stream_settings = '$STREAM_SETTINGS_HTTPU' WHERE LOWER(remark) LIKE '%httpu%';
-UPDATE inbounds SET stream_settings = '$STREAM_SETTINGS_WS' WHERE LOWER(remark) LIKE '%ws%';
 UPDATE inbounds SET stream_settings = '$STREAM_SETTINGS_STEAL' WHERE LOWER(remark) LIKE '%steal%';
-UPDATE inbounds SET stream_settings = '$STREAM_SETTINGS_REALITY' WHERE LOWER(remark) LIKE '%whatsapp%';
 UPDATE inbounds SET stream_settings = '$STREAM_SETTINGS_XTLS' WHERE LOWER(remark) LIKE '%xtls%';
 
 UPDATE settings SET value = '/${WEB_BASE_PATH}/' WHERE LOWER(key) LIKE '%webbasepath%';
@@ -1837,12 +1639,12 @@ install_panel() {
   echo ${SECRET_PASSWORD} | gpg --batch --yes --passphrase-fd 0 -d x-ui.gpg > x-ui.db
   echo -e "n" | bash <(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh) > /dev/null 2>&1
 
-  settings_grpc
-  settings_split
-  settings_httpu
-  settings_ws
+#  settings_grpc
+#  settings_split
+#  settings_httpu
+#  settings_ws
   settings_steal
-  settings_reality
+#  settings_reality
   settings_xtls
 #  json_rules
   database_change
@@ -1867,7 +1669,8 @@ enabling_security() {
   case "$SYSTEM" in
     Debian|Ubuntu )  
       ufw --force reset
-      ufw allow 36079/tcp
+      ufw allow 22/tcp
+      ufw allow 80/tcp
       ufw allow 443/tcp
       ufw insert 1 deny from "$BLOCK_ZONE_IP"
       ufw --force enable
@@ -1875,7 +1678,8 @@ enabling_security() {
 
     CentOS|Fedora )
       systemctl enable --now firewalld
-      firewall-cmd --permanent --zone=public --add-port=36079/tcp
+      firewall-cmd --permanent --zone=public --add-port=22/tcp
+      firewall-cmd --permanent --zone=public --add-port=80/tcp
       firewall-cmd --permanent --zone=public --add-port=443/tcp
       firewall-cmd --permanent --zone=public --add-rich-rule="rule family='ipv4' source address='$BLOCK_ZONE_IP' reject"
       firewall-cmd --reload
@@ -1891,7 +1695,7 @@ ssh_setup() {
     info " $(text 48) "
     sed -i -e "
       s/#Port/Port/g;
-      s/Port 22/Port 36079/g;
+      s/Port 22/Port 22/g;
       s/#PermitRootLogin/PermitRootLogin/g;
       s/PermitRootLogin yes/PermitRootLogin prohibit-password/g;
       s/#PubkeyAuthentication/PubkeyAuthentication/g;
@@ -1963,7 +1767,7 @@ data_output() {
     
   fi
   echo
-  out_data " $(text 62) " "ssh -p 36079 ${USERNAME}@${IP4}"
+  out_data " $(text 62) " "ssh -p 22 ${USERNAME}@${IP4}"
   echo
   out_data " $(text 63) " "$USERNAME"
   out_data " $(text 64) " "$PASSWORD"
