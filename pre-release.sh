@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-# wget -N https://git && bash .sh d
 export DEBIAN_FRONTEND=noninteractive
 
 declare -A defaults
