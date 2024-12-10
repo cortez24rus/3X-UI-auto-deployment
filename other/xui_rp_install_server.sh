@@ -1827,7 +1827,6 @@ EOF
 ### Установка 3x-ui ###
 install_panel() {
   info " $(text 46) "
-  touch /usr/local/xui-rp/reinstallation_check
 
   while ! wget -q --progress=dot:mega --timeout=30 --tries=10 --retry-connrefused https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/main/other/x-ui.gpg; do
     warning " $(text 38) "

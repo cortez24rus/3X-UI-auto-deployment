@@ -1630,29 +1630,20 @@ EOF
 ### Установка 3x-ui ###
 install_panel() {
   info " $(text 46) "
-  touch /usr/local/xui-rp/reinstallation_check
 
-  while ! wget -q --progress=dot:mega --timeout=30 --tries=10 --retry-connrefused https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/main/other/x-ui.gpg; do
-    warning " $(text 38) "
-    sleep 3
+  while ! wget -q --progress=dot:mega --timeout=30 --tries=10 --retry-connrefused https://raw.githubusercontent.com/cortez24rus/xui-reverse-proxy/refs/heads/main/database/x-ui.db; do
+      warning " $(text 38) "
+      sleep 3
   done
   
-  echo ${SECRET_PASSWORD} | gpg --batch --yes --passphrase-fd 0 -d x-ui.gpg > x-ui.db
   echo -e "n" | bash <(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh) > /dev/null 2>&1
 
-#  settings_grpc
-#  settings_split
-#  settings_httpu
-#  settings_ws
   settings_steal
-#  settings_reality
   settings_xtls
-#  json_rules
   database_change
 
   x-ui stop
   
-  rm -rf x-ui.gpg
   rm -rf /etc/x-ui/x-ui.db.backup
   [ -f /etc/x-ui/x-ui.db ] && mv /etc/x-ui/x-ui.db /etc/x-ui/x-ui.db.backup
   mv x-ui.db /etc/x-ui/
