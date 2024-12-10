@@ -519,8 +519,8 @@ check_dependencies() {
 
   if [ "${#DEPS[@]}" -ge 1 ]; then
     info "\n $(text 72) ${DEPS[@]} \n"
-    ${PACKAGE_UPDATE[int]} >/dev/null 2>&1
-    ${PACKAGE_INSTALL[int]} ${DEPS[@]} >/dev/null 2>&1
+    ${PACKAGE_UPDATE[int]}
+    ${PACKAGE_INSTALL[int]} ${DEPS[@]}
   else
     info "\n $(text 73) \n"
   fi
@@ -790,9 +790,8 @@ data_entry() {
       echo
       validate_path METRICS
     fi
+    tilda "$(text 10)"
   fi
-
-  tilda "$(text 10)"
 
   if [[ ${args[ssh]} == "true" ]]; then
     reading " $(text 54) " ANSWER_SSH
@@ -911,8 +910,8 @@ installation_of_utilities() {
 
       if [ "${#DEPS_PACK[@]}" -ge 1 ]; then
         info " $(text 77) ": ${DEPS_PACK[@]}
-        ${PACKAGE_UPDATE[int]} >/dev/null 2>&1
-        ${PACKAGE_INSTALL[int]} ${DEPS_PACK[@]} >/dev/null 2>&1
+        ${PACKAGE_UPDATE[int]}
+        ${PACKAGE_INSTALL[int]} ${DEPS_PACK[@]}
       else
         info " $(text 78) "
       fi
@@ -928,8 +927,8 @@ installation_of_utilities() {
 
       if [ "${#DEPS_PACK[@]}" -ge 1 ]; then
         info " $(text 77) ": ${DEPS_PACK[@]}
-        ${PACKAGE_UPDATE[int]} >/dev/null 2>&1
-        ${PACKAGE_INSTALL[int]} ${DEPS_PACK[@]} >/dev/null 2>&1
+        ${PACKAGE_UPDATE[int]}
+        ${PACKAGE_INSTALL[int]} ${DEPS_PACK[@]
       else
         info " $(text 78) "
       fi
