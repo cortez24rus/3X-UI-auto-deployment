@@ -741,9 +741,9 @@ choise_dns () {
 ### Ввод данных ###
 data_entry() {
   tilda "$(text 10)"
- # reading " $(text 70) " SECRET_PASSWORD
+#  reading " $(text 70) " SECRET_PASSWORD
 
-  tilda "$(text 10)"
+#  tilda "$(text 10)"
 
   reading " $(text 11) " USERNAME
   echo
