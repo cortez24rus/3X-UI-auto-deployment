@@ -109,13 +109,18 @@ The script will then prompt you for the necessary configuration information:
 -----
 
 > [!IMPORTANT]
-> This repository is intended exclusively for educational purposes and for studying the principles of reverse proxy servers and network security. The script demonstrates the setup of a hidden proxy server using technologies such as NGINX for reverse proxying, SSL/TLS encryption, traffic management, and protection against attacks.
-> 
-> We strongly remind you that using this tool to bypass network restrictions or censorship is illegal in several countries that have laws regulating the use of technologies to circumvent internet limitations.
-> 
 > This project is not intended for use in any activities that violate information protection laws or interfere with censorship mechanisms. We are not responsible for any legal consequences related to the use of > this script.
 > 
 > Please use this tool exclusively for educational purposes, to learn about network security, reverse proxy operations, and data protection.
+>This repository is intended solely for educational purposes and to study the principles of reverse proxy servers and network security. The script demonstrates the setup of a hidden proxy server using technologies such as NGINX for reverse proxy, SSL/TLS encryption, traffic management, and attack protection.
+>
+>We strongly remind you that using this tool to bypass network restrictions or censorship is illegal in certain countries that have laws regulating the use of technologies to circumvent internet restrictions.
+>
+>This project is not intended for use in ways that violate information protection laws or interfere with censorship mechanisms. We take no responsibility for any legal consequences arising from the use of this script.
+>
+>Use this tool/script only for demonstration purposes, as an example of reverse proxy operation and data protection. We strongly recommend removing the script after reviewing it. Further use is at your own risk.
+>
+>If you are unsure whether the use of this tool or its components violates the laws of your country, refrain from interacting with this tool.
 
 -----
 
