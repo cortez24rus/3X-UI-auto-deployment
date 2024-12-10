@@ -790,8 +790,9 @@ data_entry() {
       echo
       validate_path METRICS
     fi
-    tilda "$(text 10)"
   fi
+
+  tilda "$(text 10)"
 
   if [[ ${args[ssh]} == "true" ]]; then
     reading " $(text 54) " ANSWER_SSH
