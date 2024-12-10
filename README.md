@@ -109,10 +109,7 @@ The script will then prompt you for the necessary configuration information:
 -----
 
 > [!IMPORTANT]
-> This project is not intended for use in any activities that violate information protection laws or interfere with censorship mechanisms. We are not responsible for any legal consequences related to the use of > this script.
-> 
-> Please use this tool exclusively for educational purposes, to learn about network security, reverse proxy operations, and data protection.
->This repository is intended solely for educational purposes and to study the principles of reverse proxy servers and network security. The script demonstrates the setup of a hidden proxy server using technologies such as NGINX for reverse proxy, SSL/TLS encryption, traffic management, and attack protection.
+> This repository is intended solely for educational purposes and for studying the principles of reverse proxy servers and network security. The script demonstrates the setup of a proxy server using NGINX for reverse proxy, traffic management, and attack protection.
 >
 >We strongly remind you that using this tool to bypass network restrictions or censorship is illegal in certain countries that have laws regulating the use of technologies to circumvent internet restrictions.
 >
