@@ -911,8 +911,8 @@ installation_of_utilities() {
 
       if [ "${#DEPS_PACK[@]}" -ge 1 ]; then
         info " $(text 77) ": ${DEPS_PACK[@]}
-        ${PACKAGE_UPDATE[int]} >/dev/null 2>&1
-        ${PACKAGE_INSTALL[int]} ${DEPS_PACK[@]} >/dev/null 2>&1
+        ${PACKAGE_UPDATE[int]}
+        ${PACKAGE_INSTALL[int]} ${DEPS_PACK[@]}
       else
         info " $(text 78) "
       fi
@@ -929,8 +929,8 @@ installation_of_utilities() {
 
       if [ "${#DEPS_PACK[@]}" -ge 1 ]; then
         info " $(text 77) ": ${DEPS_PACK[@]}
-        ${PACKAGE_UPDATE[int]} >/dev/null 2>&1
-        ${PACKAGE_INSTALL[int]} ${DEPS_PACK[@]} >/dev/null 2>&1
+        ${PACKAGE_UPDATE[int]}
+        ${PACKAGE_INSTALL[int]} ${DEPS_PACK[@]}
       else
         info " $(text 78) "
       fi
