@@ -519,8 +519,8 @@ check_dependencies() {
 
   if [ "${#DEPS[@]}" -ge 1 ]; then
     info "\n $(text 72) ${DEPS[@]} \n"
-    ${PACKAGE_UPDATE[int]} >/dev/null 2>&1
-    ${PACKAGE_INSTALL[int]} ${DEPS[@]} >/dev/null 2>&1
+    ${PACKAGE_UPDATE[int]}
+    ${PACKAGE_INSTALL[int]} ${DEPS[@]}
   else
     info "\n $(text 73) \n"
   fi
@@ -902,7 +902,7 @@ installation_of_utilities() {
   info " $(text 36) "
   case "$SYSTEM" in
     Debian|Ubuntu)
-      DEPS_PACK_CHECK=("jq" "ufw" "zip" "wget" "gnupg" "cron" "sqlite3" "certbot" "openssl" "netstat" "htpasswd" "update-ca-certificates" "add-apt-repository" "python3-certbot-dns-cloudflare")
+      DEPS_PACK_CHECK=("jq" "ufw" "zip" "wget" "gpg" "cron" "sqlite3" "certbot" "openssl" "netstat" "htpasswd" "update-ca-certificates" "add-apt-repository" "python3-certbot-dns-cloudflare")
       DEPS_PACK_INSTALL=("jq" "ufw" "zip" "wget" "gnupg2" "cron" "sqlite3" "certbot" "openssl" "net-tools" "apache2-utils" "ca-certificates" "software-properties-common" "python3-certbot-dns-cloudflare")
 
       for g in "${!DEPS_PACK_CHECK[@]}"; do
