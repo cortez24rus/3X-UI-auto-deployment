@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# wget -N https://git && bash .sh d
 export DEBIAN_FRONTEND=noninteractive
 
 declare -A defaults
@@ -518,8 +519,8 @@ check_dependencies() {
 
   if [ "${#DEPS[@]}" -ge 1 ]; then
     info "\n $(text 72) ${DEPS[@]} \n"
-    ${PACKAGE_UPDATE[int]}
-    ${PACKAGE_INSTALL[int]} ${DEPS[@]}
+    ${PACKAGE_UPDATE[int]} >/dev/null 2>&1
+    ${PACKAGE_INSTALL[int]} ${DEPS[@]} >/dev/null 2>&1
   else
     info "\n $(text 73) \n"
   fi
@@ -901,7 +902,7 @@ installation_of_utilities() {
   info " $(text 36) "
   case "$SYSTEM" in
     Debian|Ubuntu)
-      DEPS_PACK_CHECK=("jq" "ufw" "zip" "wget" "gpg" "cron" "sqlite3" "certbot" "openssl" "netstat" "htpasswd" "update-ca-certificates" "add-apt-repository" "certbot-dns-cloudflare")
+      DEPS_PACK_CHECK=("jq" "ufw" "zip" "wget" "gnupg" "cron" "sqlite3" "certbot" "openssl" "netstat" "htpasswd" "update-ca-certificates" "add-apt-repository" "python3-certbot-dns-cloudflare")
       DEPS_PACK_INSTALL=("jq" "ufw" "zip" "wget" "gnupg2" "cron" "sqlite3" "certbot" "openssl" "net-tools" "apache2-utils" "ca-certificates" "software-properties-common" "python3-certbot-dns-cloudflare")
 
       for g in "${!DEPS_PACK_CHECK[@]}"; do
@@ -910,12 +911,13 @@ installation_of_utilities() {
 
       if [ "${#DEPS_PACK[@]}" -ge 1 ]; then
         info " $(text 77) ": ${DEPS_PACK[@]}
-        ${PACKAGE_UPDATE[int]}
-        ${PACKAGE_INSTALL[int]} ${DEPS_PACK[@]}
+        ${PACKAGE_UPDATE[int]} >/dev/null 2>&1
+        ${PACKAGE_INSTALL[int]} ${DEPS_PACK[@]} >/dev/null 2>&1
       else
         info " $(text 78) "
       fi
       ;;
+
 
     CentOS|Fedora)
       DEPS_PACK_CHECK=("jq" "zip" "tar" "wget" "gpg" "crontab" "sqlite3" "openssl" "netstat" "nslookup" "htpasswd" "certbot" "update-ca-certificates" "certbot-dns-cloudflare")
@@ -927,8 +929,8 @@ installation_of_utilities() {
 
       if [ "${#DEPS_PACK[@]}" -ge 1 ]; then
         info " $(text 77) ": ${DEPS_PACK[@]}
-        ${PACKAGE_UPDATE[int]}
-        ${PACKAGE_INSTALL[int]} ${DEPS_PACK[@]
+        ${PACKAGE_UPDATE[int]} >/dev/null 2>&1
+        ${PACKAGE_INSTALL[int]} ${DEPS_PACK[@]} >/dev/null 2>&1
       else
         info " $(text 78) "
       fi
