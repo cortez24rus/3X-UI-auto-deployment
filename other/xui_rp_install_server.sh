@@ -1488,7 +1488,7 @@ random_site() {
   info " $(text 79) "
   mkdir -p /var/www/html/ /usr/local/xui-rp/
 
-  cd /usr/local/xui-rp/ || { echo "Не удалось перейти в /usr/local/xui-rp/"; exit 1; }
+  cd /usr/local/xui-rp/ || echo "Не удалось перейти в /usr/local/xui-rp/"
 
   if [[ ! -d "simple-web-templates-main" ]]; then
       while ! wget -q --progress=dot:mega --timeout=30 --tries=10 --retry-connrefused "https://github.com/cortez24rus/simple-web-templates/archive/refs/heads/main.zip"; do
@@ -1498,7 +1498,7 @@ random_site() {
       unzip -q main.zip &>/dev/null && rm -f main.zip
   fi
 
-  cd simple-web-templates-main || { echo "Не удалось перейти в папку с шаблонами"; exit 1; }
+  cd simple-web-templates-main || echo "Не удалось перейти в папку с шаблонами"
 
   rm -rf assets ".gitattributes" "README.md" "_config.yml"
 
@@ -1509,13 +1509,12 @@ random_site() {
   if [[ -d "${RandomHTML}" && -d "/var/www/html/" ]]; then
       echo "Копируем шаблон в /var/www/html/..."
       rm -rf /var/www/html/*  # Очищаем старую папку
-      cp -a "${RandomHTML}/." /var/www/html/ || { echo "Ошибка при копировании шаблона"; exit 1; }
+      cp -a "${RandomHTML}/." /var/www/html/ || echo "Ошибка при копировании шаблона"
   else
       echo "Ошибка при извлечении шаблона!"
-      exit 1
   fi
 
-  cd ~ || { echo "Не удалось вернуться в домашнюю директорию"; exit 1; }
+  cd ~
 }
 
 generate_keys() {
