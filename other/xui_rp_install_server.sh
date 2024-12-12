@@ -239,7 +239,7 @@ show_help() {
   echo "                                 Установка NGINX"
   echo "  -p, --panel <true|false>       Panel installation for user management           (default: ${defaults[panel]})"
   echo "                                 Установка панели для управления пользователями"
-  echo "  -f, --firewall <true|false>    Firewall configuration                           (default: ${defaults[ufw]})"
+  echo "  -f, --firewall <true|false>    Firewall configuration                           (default: ${defaults[firewall]})"
   echo "                                 Настройка файрвола"
   echo "  -s, --ssh <true|false>         SSH access                                       (default: ${defaults[ssh]})"
   echo "                                 SSH доступ"
@@ -274,7 +274,7 @@ read_defaults_from_file() {
     defaults[mon]=false
     defaults[nginx]=true
     defaults[panel]=true
-    defaults[ufw]=true
+    defaults[firewall]=true
     defaults[ssh]=true
     defaults[tgbot]=false
   fi
@@ -295,7 +295,7 @@ defaults[cert]=false
 defaults[mon]=false
 defaults[nginx]=true
 defaults[panel]=true
-defaults[ufw]=false
+defaults[firewall]=false
 defaults[ssh]=false
 defaults[tgbot]=false
 EOF
@@ -326,7 +326,7 @@ validate_true_false() {
 
 parse_args() {
   local opts
-  opts=$(getopt -o i:w:m:u:s:t:f:a:r:b:hl:d:p:c:n:g --long utils:,dns:,addu:,autoupd:,bbr:,ipv6:,warp:,cert:,mon:,nginx:,panel:,ufw:,ssh:,tgbot:,generate:,help -- "$@")
+  opts=$(getopt -o i:w:m:u:s:t:f:a:r:b:hl:d:p:c:n:g --long utils:,dns:,addu:,autoupd:,bbr:,ipv6:,warp:,cert:,mon:,nginx:,panel:,firewall:,ssh:,tgbot:,generate:,help -- "$@")
   if [[ $? -ne 0 ]]; then
     return 1
   fi
@@ -399,10 +399,10 @@ parse_args() {
         validate_true_false panel "$2" || return 1
         shift 2
         ;;
-      -u|--ufw)
-        args[ufw]="$2"
-        normalize_case ufw
-        validate_true_false ufw "$2" || return 1
+      -u|--firewall)
+        args[firewall]="$2"
+        normalize_case firewall
+        validate_true_false firewall "$2" || return 1
         shift 2
         ;;
       -s|--ssh)
@@ -519,8 +519,8 @@ check_dependencies() {
 
   if [ "${#DEPS[@]}" -ge 1 ]; then
     info "\n $(text 72) ${DEPS[@]} \n"
-    ${PACKAGE_UPDATE[int]} >/dev/null 2>&1
-    ${PACKAGE_INSTALL[int]} ${DEPS[@]} >/dev/null 2>&1
+    ${PACKAGE_UPDATE[int]}
+    ${PACKAGE_INSTALL[int]} ${DEPS[@]}
   else
     info "\n $(text 73) \n"
   fi
@@ -790,9 +790,8 @@ data_entry() {
       echo
       validate_path METRICS
     fi
+    tilda "$(text 10)"
   fi
-
-  tilda "$(text 10)"
 
   if [[ ${args[ssh]} == "true" ]]; then
     reading " $(text 54) " ANSWER_SSH
@@ -911,8 +910,8 @@ installation_of_utilities() {
 
       if [ "${#DEPS_PACK[@]}" -ge 1 ]; then
         info " $(text 77) ": ${DEPS_PACK[@]}
-        ${PACKAGE_UPDATE[int]} >/dev/null 2>&1
-        ${PACKAGE_INSTALL[int]} ${DEPS_PACK[@]} >/dev/null 2>&1
+        ${PACKAGE_UPDATE[int]}
+        ${PACKAGE_INSTALL[int]} ${DEPS_PACK[@]}
       else
         info " $(text 78) "
       fi
@@ -928,8 +927,8 @@ installation_of_utilities() {
 
       if [ "${#DEPS_PACK[@]}" -ge 1 ]; then
         info " $(text 77) ": ${DEPS_PACK[@]}
-        ${PACKAGE_UPDATE[int]} >/dev/null 2>&1
-        ${PACKAGE_INSTALL[int]} ${DEPS_PACK[@]} >/dev/null 2>&1
+        ${PACKAGE_UPDATE[int]}
+        ${PACKAGE_INSTALL[int]} ${DEPS_PACK[@]}
       else
         info " $(text 78) "
       fi
@@ -2003,7 +2002,7 @@ main() {
   write_defaults_to_file
   [[ ${args[nginx]} == "true" ]] && nginx_setup
   [[ ${args[panel]} == "true" ]] && install_panel
-  [[ ${args[ufw]} == "true" ]] && enabling_security
+  [[ ${args[firewall]} == "true" ]] && enabling_security
   [[ ${args[ssh]} == "true" ]] && ssh_setup
   [[ ${args[tgbot]} == "true" ]] && install_bot
   data_output
