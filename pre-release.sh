@@ -1374,13 +1374,13 @@ EOF
 
 local_conf() {
   cat > /etc/nginx/conf.d/local.conf <<EOF
-server {
-  listen                               80;
-  server_name                          ${DOMAIN} *.${DOMAIN};
-  location / {
-    return 301                         https://${DOMAIN}\$request_uri;
-  }
-}
+#server {
+#  listen                               80;
+#  server_name                          ${DOMAIN} *.${DOMAIN};
+#  location / {
+#    return 301                         https://${DOMAIN}\$request_uri;
+#  }
+#}
 server {
   listen                               9090 default_server;
   server_name                          ${DOMAIN} *.${DOMAIN};
@@ -1663,7 +1663,6 @@ enabling_security() {
     Debian|Ubuntu )  
       ufw --force reset
       ufw allow 22/tcp
-      ufw allow 80/tcp
       ufw allow 443/tcp
       ufw insert 1 deny from "$BLOCK_ZONE_IP"
       ufw --force enable
