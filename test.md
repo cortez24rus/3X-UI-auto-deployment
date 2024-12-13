@@ -3,5 +3,5 @@
 
 -----
 
-![Total Views All-Time](https://img.shields.io/badge/Total%20Views%20All-Time-3-green)
-![Unique Views All-Time](https://img.shields.io/badge/Unique%20Views%20All-Time-2-blue)
+![Total Views All-Time](https://img.shields.io/badge/Total%20Views%20All-Time-513-blue)
+![Unique Views All-Time](https://img.shields.io/badge/Unique%20Views%20All-Time-36-blue)
