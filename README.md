@@ -1,6 +1,6 @@
 # XUI-REVERSE-PROXY ([Russian](/README_RU.md)) <img src="https://img.shields.io/github/stars/cortez24rus/xui-reverse-proxy?style=social" /> 
-![Total Views All Time](https://img.shields.io/badge/Total%20Views%20All%20Time-5151-blue)
-![Unique Views All Time](https://img.shields.io/badge/Unique%20Views%20All%20Time-358-green)
+![Total Views All Time](https://img.shields.io/badge/Total%20Views%20All%20Time-5681-blue)
+![Unique Views All Time](https://img.shields.io/badge/Unique%20Views%20All%20Time-396-green)
 <p align="center"><a href="#"><img src="./media/3X-UI.png" alt="Image" ></a></p>
 
 -----
