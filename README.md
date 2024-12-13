@@ -122,6 +122,7 @@ The script will then prompt you for the necessary configuration information:
 -----
 
 ![Total Views All Time](https://img.shields.io/badge/Total%20Views%20All%20Time-4119-blue)
+![Unique Views All Time](https://img.shields.io/badge/Unique%20Views%20All%20Time-286-green)
 
 ## Stargazers over time
 [![Stargazers over time](https://starchart.cc/cortez24rus/xui-reverse-proxy.svg?variant=adaptive)](https://starchart.cc/cortez24rus/xui-reverse-proxy)
