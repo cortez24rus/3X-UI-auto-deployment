@@ -34,8 +34,20 @@ jobs:
         badge_url="https://img.shields.io/badge/Unique%20Views-$unique_views-blue"
         echo "Badge URL: $badge_url"
 
-        # Обновляем test.md с новым значением
+    - name: Check test.md content before update
+      run: |
+        echo "Contents of test.md before update:"
+        cat test.md
+
+    - name: Update badge in test.md
+      run: |
+        # Обновляем тестовый файл с новым значением для уникальных просмотров
         sed -i "s|https://img.shields.io/badge/Unique%20Views-[0-9]\+%-blue|$badge_url|" test.md
+
+    - name: Check test.md content after update
+      run: |
+        echo "Contents of test.md after update:"
+        cat test.md
 
     - name: Set git configuration
       run: |
