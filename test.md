@@ -1,5 +1,5 @@
-![Total Views Month Badge](https://img.shields.io/badge/Total%20Views-21-blue)
-![Unique Views Month Badge](https://img.shields.io/badge/Unique%20Views-3-green)
+![Total Views Month Badge](https://img.shields.io/badge/Total%20Views-2195-blue)
+![Unique Views Month Badge](https://img.shields.io/badge/Unique%20Views-338-green)
 
 echo "-------------------------------------"
 
