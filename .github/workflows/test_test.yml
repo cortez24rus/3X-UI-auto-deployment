@@ -27,12 +27,22 @@ jobs:
         unique_views=$(echo "$response" | jq '.uniques')
 
         # Формируем URL для картинки с уникальными просмотрами
-        badge_url="https://img.shields.io/badge/Unique%20Views-$unique_views-blue"
+        echo "::set-output name=badge_url::https://img.shields.io/badge/Unique%20Views-$unique_views-blue"
+
+    - name: Update badge in test.md
+      env:
+        BADGE_URL: ${{ steps.fetch_traffic.outputs.badge_url }}
+      run: |
+        # Убедимся, что BADGE_URL не пустой
+        if [ -z "$BADGE_URL" ]; then
+          echo "Error: Badge URL is empty."
+          exit 1
+        fi
 
     - name: Update badge in test.md
       run: |
         # Обновляем тестовый файл с новым значением для уникальных просмотров
-        sed -i "s|!\[Unique Views Badge](.*)|![Unique Views Badge](${badge_url})|" test.md
+        sed -i "s|!\[Unique Views Badge](.*)|![Unique Views Badge](${BADGE_URL})|" test.md
 
     - name: Set git configuration
       run: |
