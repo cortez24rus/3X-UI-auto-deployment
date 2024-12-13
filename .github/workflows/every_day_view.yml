@@ -49,10 +49,14 @@ jobs:
         # Прибавляем новые значения к текущим
         new_total_views=$((TOTAL_VIEWS + CURRENT_TOTAL))
         new_total_uniques=$((UNIQUE_VIEWS + CURRENT_UNIQUE))
+        echo ${new_total_views}
+        echo ${new_total_uniques}
       
         # Формируем URL для картинки с уникальными просмотрами
         BADGE_TOTAL_URL="https://img.shields.io/badge/Total%20Views%20All-Time-$new_total_views-blue"
         BADGE_UNIQUE_URL="https://img.shields.io/badge/Unique%20Views%20All-Time-$new_total_uniques-blue"
+        echo ${BADGE_TOTAL_URL}
+        echo ${BADGE_UNIQUE_URL}
 
         # Обновляем файл с новым значением
         sed -i \
