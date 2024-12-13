@@ -1,4 +1,4 @@
-name: Fetch Traffic Data
+name: day_view
 
 on:
   push:

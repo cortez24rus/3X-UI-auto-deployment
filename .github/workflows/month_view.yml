@@ -1,4 +1,4 @@
-name: Fetch Traffic Data
+name: month_view
 
 on:
   push:
