@@ -14,8 +14,29 @@ jobs:
       uses: actions/checkout@v2
 
     - name: Fetch traffic data from GitHub API
+      id: fetch_traffic
       run: |
-        curl -H "Authorization: token ${{ secrets.PUBLIC_REPO_TOKEN }}" \
-             -H "Accept: application/vnd.github.v3+json" \
-             https://api.github.com/repos/${{ github.repository }}/traffic/views
+        # Получаем данные о трафике с GitHub API, используя переменную ${{ github.repository }}
+        response=$(curl -H "Authorization: token ${{ secrets.PUBLIC_REPO_TOKEN }}" \
+                         -H "Accept: application/vnd.github.v3+json" \
+                         https://api.github.com/repos/${{ github.repository }}/traffic/views)
 
+        # Извлекаем общее количество просмотров и уникальных просмотров
+        total_views=$(echo "$response" | jq '.count')
+        unique_views=$(echo "$response" | jq '.uniques')
+
+        # Форматируем данные для записи в READMEview.md
+        echo "Общее количество просмотров: $total_views" > READMEview.md
+        echo "Уникальные просмотры: $unique_views" >> READMEview.md
+
+    - name: Set up git config
+      run: |
+        git config --global user.name "cortez24rus"
+        git config --global user.email "cortez24rus@gmail.com"
+
+    - name: Commit and push changes to READMEview.md
+      run: |
+        # Добавляем файл в git и выполняем коммит
+        git add READMEview.md
+        git commit -m "Update traffic data in READMEview.md"
+        git push
