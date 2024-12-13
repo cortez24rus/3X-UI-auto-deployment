@@ -38,14 +38,14 @@ jobs:
         if [ -z "$uniques" ]; then
           uniques=0
         fi
-
+ 
         # Читаем текущие значения из READMEview.md
         current_views=$(grep -oP 'Общее количество просмотров за все время: \K\d+' READMEview.md)
         current_uniques=$(grep -oP 'Уникальные просмотры за все время: \K\d+' READMEview.md)
 
         echo "Current views: $count"
         echo "Current uniques: $uniques"
-        
+
         echo "Current views: $current_views"
         echo "Current uniques: $current_uniques"
 
