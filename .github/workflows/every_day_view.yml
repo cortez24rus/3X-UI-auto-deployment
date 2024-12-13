@@ -38,8 +38,8 @@ jobs:
       id: read_values
       run: |
         # Извлекаем текущие значения Total Views и Unique Views из test.md
-        current_total=$(grep -oP 'Total%20Views%20All-Time-\K\d+' test.md)
-        current_unique=$(grep -oP 'Unique%20Views%20All-Time-\K\d+' test.md)
+        current_total=$(grep -oP 'Total%20Views%20All%20Time-\K\d+' test.md)
+        current_unique=$(grep -oP 'Unique%20Views%20All%20Time-\K\d+' test.md)
 
         echo "CURRENT_TOTAL=$current_total" >> $GITHUB_ENV
         echo "CURRENT_UNIQUE=$current_unique" >> $GITHUB_ENV
@@ -53,15 +53,15 @@ jobs:
         echo ${new_total_uniques}
       
         # Формируем URL для картинки с уникальными просмотрами
-        BADGE_TOTAL_URL="https://img.shields.io/badge/Total%20Views%20All-Time-$new_total_views-blue"
-        BADGE_UNIQUE_URL="https://img.shields.io/badge/Unique%20Views%20All-Time-$new_total_uniques-blue"
+        BADGE_TOTAL_URL="https://img.shields.io/badge/Total%20Views%20All%20Time-$new_total_views-blue"
+        BADGE_UNIQUE_URL="https://img.shields.io/badge/Unique%20Views%20All%20Time-$new_total_uniques-blue"
         echo ${BADGE_TOTAL_URL}
         echo ${BADGE_UNIQUE_URL}
 
         # Обновляем файл с новым значением
         sed -i \
-          -e "s|!\[Total Views All-Time](.*)|![Total Views All-Time](${BADGE_TOTAL_URL})|" \
-          -e "s|!\[Unique Views All-Time](.*)|![Unique Views All-Time](${BADGE_UNIQUE_URL})|" \
+          -e "s|!\[Total Views All Time](.*)|![Total Views All%20Time](${BADGE_TOTAL_URL})|" \
+          -e "s|!\[Unique Views All Time](.*)|![Unique Views All%20Time](${BADGE_UNIQUE_URL})|" \
           test.md
 
     - name: Set git configuration
