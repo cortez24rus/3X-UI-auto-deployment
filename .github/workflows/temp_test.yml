@@ -31,9 +31,9 @@ jobs:
 
     - name: Set git configuration
       run: |
-        git config --global user.name "github-actions"
-        git config --global user.email "github-actions@github.com"
-        
+        git config --global user.name "cortez24rus"
+        git config --global user.email "cortez24rus@gmail.com"
+
     - name: Pull latest changes
       run: |
         git pull origin main || echo "No changes to pull"
