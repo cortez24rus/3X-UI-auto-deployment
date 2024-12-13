@@ -35,7 +35,7 @@ jobs:
         echo "Badge URL: $badge_url"
 
         # Обновляем test.md с новым значением
-        sed -i "s|https://img.shields.io/github/stars/cortez24rus/xui-reverse-proxy?style=social|$badge_url|" test.md
+        sed -i "s|https://img.shields.io/badge/Unique%20Views-[0-9]\+%-blue|$badge_url|" test.md
 
     - name: Set git configuration
       run: |
