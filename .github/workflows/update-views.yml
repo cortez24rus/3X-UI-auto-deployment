@@ -1,0 +1,37 @@
+name: Update Views Count in README
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # Работает раз в день, в полночь по UTC
+  workflow_dispatch:  # Дает возможность запускать задачу вручную
+
+jobs:
+  update-readme:
+    runs-on: ubuntu-latest
+    
+    steps:
+      # Получаем код из репозитория
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      # Получаем статистику просмотров репозитория
+      - name: Get views count
+        id: views
+        run: |
+          views=$(curl -s -H "Authorization: token ${{ secrets.GH_TOKEN }}" \
+          "https://api.github.com/repos/${{ github.repository }}/traffic/views" | jq '.count')
+          echo "views=$views" >> $GITHUB_ENV
+
+      # Обновляем README.md
+      - name: Update README with views count
+        run: |
+          sed -i "s/{{views}}/${{ env.views }}/g" README.md
+          
+      # Коммитим изменения в README.md
+      - name: Commit updated README
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+          git add README.md
+          git commit -m "Update views count in README"
+          git push
