@@ -23,11 +23,16 @@ jobs:
                          -H "Accept: application/vnd.github.v3+json" \
                          https://api.github.com/repos/${{ github.repository }}/traffic/views)
 
+        # Выводим данные для отладки
+        echo "Response from GitHub API: $response"
+
         # Извлекаем уникальные просмотры за все время
         unique_views=$(echo "$response" | jq '.uniques')
+        echo "Unique views: $unique_views"
 
         # Формируем URL для картинки с уникальными просмотрами
         badge_url="https://img.shields.io/badge/Unique%20Views-$unique_views-blue"
+        echo "Badge URL: $badge_url"
 
         # Обновляем test.md с новым значением
         sed -i "s|https://img.shields.io/github/stars/cortez24rus/xui-reverse-proxy?style=social|$badge_url|" test.md
