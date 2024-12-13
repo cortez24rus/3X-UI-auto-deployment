@@ -1,11 +1,11 @@
-name: every_day_view
+name: Update Views Every Day Badge
 
 on:
   push:
     branches:
       - main  # Этот workflow запускается при пуше в основную ветку
   schedule:
-    - cron: '0 0 * * *'  # Работает каждый день в полночь по UTC
+    - cron: '59 23 * * *'  # Работает каждый день в 23:59 UTC
 
 jobs:
   fetch_traffic:
