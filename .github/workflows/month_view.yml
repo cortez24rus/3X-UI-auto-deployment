@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - main  # Этот workflow запускается при пуше в основную ветку
+  schedule:
+    - cron: '0 0 * * *'  # Работает каждый день в полночь по UTC
 
 jobs:
   fetch_traffic:
@@ -27,12 +29,12 @@ jobs:
 
         if [ -f READMEview.md ]; then
           # Используем sed для замены строк, содержащих "Общее количество просмотров" и "Уникальные просмотры"
-          sed -i "s/Общее количество просмотров:.*/Общее количество просмотров: $total_views/" READMEview.md
-          sed -i "s/Уникальные просмотры:.*/Уникальные просмотры: $unique_views/" READMEview.md
+          sed -i "s/Общее количество просмотров за месяц:.*/Общее количество просмотров за месяц: $total_views/" READMEview.md
+          sed -i "s/Уникальные просмотры за месяц:.*/Уникальные просмотры за месяц: $unique_views/" READMEview.md
         else
           # Если файл не существует, создаем новый файл
-          echo "Общее количество просмотров: $total_views" > READMEview.md
-          echo "Уникальные просмотры: $unique_views" >> READMEview.md
+          echo "Общее количество просмотров за месяц: $total_views" > READMEview.md
+          echo "Уникальные просмотры за месяц: $unique_views" >> READMEview.md
         fi
 
 

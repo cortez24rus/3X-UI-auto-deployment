@@ -1,0 +1,75 @@
+name: Fetch Traffic Data
+
+on:
+  push:
+    branches:
+      - main  # Этот workflow запускается при пуше в основную ветку
+  schedule:
+    - cron: '0 0 * * *'  # Работает каждый день в полночь по UTC
+
+jobs:
+  fetch_traffic:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Fetch traffic data from GitHub API
+      id: fetch_traffic
+      run: |
+        # Получаем данные о трафике с GitHub API, используя переменную ${{ github.repository }}
+        response=$(curl -H "Authorization: token ${{ secrets.PUBLIC_REPO_TOKEN }}" \
+                         -H "Accept: application/vnd.github.v3+json" \
+                         https://api.github.com/repos/${{ github.repository }}/traffic/views)
+
+        # Извлекаем данные за текущий день
+        today=$(date -I)  # Получаем текущую дату в формате YYYY-MM-DD
+        today_data=$(echo "$response" | jq --arg today "$today" '.views[] | select(.timestamp | startswith($today))')
+
+        # Если данные за текущий день есть, извлекаем count и uniques
+        count=$(echo "$today_data" | jq '.count')
+        uniques=$(echo "$today_data" | jq '.uniques')
+
+        # Если данных за текущий день нет, задаем нулевые значения
+        if [ -z "$count" ]; then
+          count=0
+        fi
+        if [ -z "$uniques" ]; then
+          uniques=0
+        fi
+
+        # Читаем текущие значения из READMEview.md
+        current_views=$(grep -oP 'Общее количество просмотров за все время: \K\d+' READMEview.md)
+        current_uniques=$(grep -oP 'Уникальные просмотры за все время: \K\d+' READMEview.md)
+
+        # Если нет данных в файле, задаем начальные значения
+        if [ -z "$current_views" ]; then
+          current_views=0
+        fi
+        if [ -z "$current_uniques" ]; then
+          current_uniques=0
+        fi
+
+        # Прибавляем новые значения к текущим
+        new_total_views=$((current_views + count))
+        new_total_uniques=$((current_uniques + uniques))
+
+        # Обновляем данные в READMEview.md
+        sed -i "s/Общее количество просмотров за все время: .*/Общее количество просмотров за все время: $new_total_views/" READMEview.md
+        sed -i "s/Уникальные просмотры за все время: .*/Уникальные просмотры за все время: $new_total_uniques/" READMEview.md
+
+    - name: Set git configuration
+      run: |
+        git config --global user.name "cortez24rus"
+        git config --global user.email "cortez24rus@gmail.com"
+
+    - name: Pull latest changes
+      run: |
+        git pull origin main || echo "No changes to pull"
+
+    - name: Commit and push changes to day_view.md
+      run: |
+        git add day_view.md
+        git commit -m "Update traffic data for $today in READday_viewMEview.md" || echo "No changes to commit"
+        git push origin main
