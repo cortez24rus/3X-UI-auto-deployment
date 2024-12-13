@@ -14,6 +14,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - name: Check if GH_TOKEN is accessible
+        run: |
+          echo "GH_TOKEN is available: ${{ secrets.GH_TOKEN }}"      
+
       # Получаем статистику просмотров репозитория
       - name: Get views count
         id: views
