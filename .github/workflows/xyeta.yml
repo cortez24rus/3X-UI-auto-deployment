@@ -15,6 +15,6 @@ jobs:
 
     - name: Fetch traffic data from GitHub API
       run: |
-        curl -H "Authorization: token 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" \
+        curl -H "Authorization: token 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" \
             -H "Accept: application/vnd.github.v3+json" \
             https://api.github.com/repos/cortez24rus/xui-reverse-proxy/traffic/views
