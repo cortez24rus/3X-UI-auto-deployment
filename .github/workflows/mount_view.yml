@@ -3,9 +3,9 @@ name: Update Views Per Month Badge
 on:
   push:
     branches:
-      - main
+      - main  # Этот workflow запускается при пуше в основную ветку
   schedule:
-    - cron: '0 0 * * *'  # Каждый день в полночь
+    - cron: '0 * * * *'  # Работает каждый час
 
 jobs:
   fetch_traffic:
