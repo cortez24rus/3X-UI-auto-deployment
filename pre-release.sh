@@ -2,11 +2,17 @@
 # wget -N https://git && bash .sh d
 export DEBIAN_FRONTEND=noninteractive
 
+###################################
+### Initialization and Declarations
+###################################
 declare -A defaults
 declare -A args
 declare -A regex
 declare -A generate
 
+###################################
+### Regex Patterns for Validation
+###################################
 regex[domain]="^([a-zA-Z0-9-]+)\.([a-zA-Z0-9-]+\.[a-zA-Z]{2,})$"
 regex[port]="^[1-9][0-9]*$"
 regex[warp_license]="^[a-zA-Z0-9]{8}-[a-zA-Z0-9]{8}-[a-zA-Z0-9]{8}$"
