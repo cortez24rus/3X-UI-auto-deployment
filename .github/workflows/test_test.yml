@@ -24,27 +24,16 @@ jobs:
                          https://api.github.com/repos/${{ github.repository }}/traffic/views)
 
         # Извлекаем уникальные просмотры за все время
-        unique_views=$(echo "$response" | jq '.uniques // 0') # Если null, подставляем 0
+        unique_views=$(echo "$response" | jq '.uniques')
 
         # Формируем URL для картинки с уникальными просмотрами
         badge_url="https://img.shields.io/badge/Unique%20Views-$unique_views-blue"
 
         # Сохраняем URL в Environment File
         echo ${badge_url}
-        echo ${BADGE_URL}
-        echo "BADGE_URL=$badge_url" >> $GITHUB_ENV
-
-    - name: Update badge in test.md
-      run: |
-        echo ${BADGE_URL}
-        # Проверяем, что BADGE_URL не пустой
-        if [ -z "$BADGE_URL" ]; then
-          echo "Error: Badge URL is empty."
-          exit 1
-        fi
 
         # Обновляем файл с новым значением
-        sed -i "s|!\[Unique Views Badge](.*)|![Unique Views Badge](${BADGE_URL})|" test.md
+        sed -i "s|!\[Unique Views Badge](.*)|![Unique Views Badge](${badge_url})|" test.md
 
     - name: Set git configuration
       run: |
