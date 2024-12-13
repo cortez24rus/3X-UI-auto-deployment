@@ -61,8 +61,8 @@ jobs:
 
         # Обновляем файл с новым значением
         sed -i \
-          -e "s|!\[Total Views All Time](.*)|![Total Views All%20Time](${BADGE_TOTAL_URL})|" \
-          -e "s|!\[Unique Views All Time](.*)|![Unique Views All%20Time](${BADGE_UNIQUE_URL})|" \
+          -e "s|!\[Total Views All Time](.*)|![Total Views All Time](${BADGE_TOTAL_URL})|" \
+          -e "s|!\[Unique Views All Time](.*)|![Unique Views All Time](${BADGE_UNIQUE_URL})|" \
           test.md
 
     - name: Set git configuration
