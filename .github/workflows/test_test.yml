@@ -28,8 +28,8 @@ jobs:
         unique_views=$(echo "$response" | jq '.uniques')
 
         # Формируем URL для картинки с уникальными просмотрами
-        badge_total_url="https://img.shields.io/badge/Unique%20Views-$total_views-blue"
-        badge_unique_url="https://img.shields.io/badge/Unique%20Views-$unique_views-blue"
+        badge_total_url="https://img.shields.io/badge/Total%20Views-$total_views-blue"
+        badge_unique_url="https://img.shields.io/badge/Unique%20Views-$unique_views-green"
 
         # Сохраняем URL в Environment File
         echo "BADGE_TOTAL_URL=$badge_total_url" >> $GITHUB_ENV
