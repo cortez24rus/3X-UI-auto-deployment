@@ -17,4 +17,5 @@ jobs:
       run: |
         curl -H "Authorization: token ${{ secrets.PUBLIC_REPO_TOKEN }}" \
              -H "Accept: application/vnd.github.v3+json" \
-             https://api.github.com/repos/cortez24rus/xui-reverse-proxy/traffic/views
+             https://api.github.com/repos/${{ github.repository }}/traffic/views
+
