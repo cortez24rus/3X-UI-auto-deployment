@@ -42,7 +42,8 @@ jobs:
         # Читаем текущие значения из READMEview.md
         current_views=$(grep -oP 'Общее количество просмотров за все время: \K\d+' READMEview.md)
         current_uniques=$(grep -oP 'Уникальные просмотры за все время: \K\d+' READMEview.md)
-
+        echo "Current views: $current_views"
+        echo "Current uniques: $current_uniques"
         # Если нет данных в файле, задаем начальные значения
         if [ -z "$current_views" ]; then
           current_views=0
