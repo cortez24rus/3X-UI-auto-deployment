@@ -25,11 +25,10 @@ jobs:
 
         # Извлекаем уникальные просмотры за все время
         unique_views=$(echo "$response" | jq '.uniques')
+        echo ${unique_views}
 
         # Формируем URL для картинки с уникальными просмотрами
         badge_url="https://img.shields.io/badge/Unique%20Views-$unique_views-blue"
-
-        # Сохраняем URL в Environment File
         echo ${badge_url}
 
         # Обновляем файл с новым значением
