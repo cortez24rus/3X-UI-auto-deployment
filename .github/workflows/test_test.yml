@@ -42,7 +42,7 @@ jobs:
     - name: Update badge in test.md
       run: |
         # Обновляем тестовый файл с новым значением для уникальных просмотров
-        sed -i "s|\(\!\[.*\](\)[^)]*\)|\1$badge_url)|" test.md
+        sed -i "s|(\!\[.*\](\)[^)]*\)|(\!\[.*\]($badge_url))|" test.md
 
     - name: Check test.md content after update
       run: |
