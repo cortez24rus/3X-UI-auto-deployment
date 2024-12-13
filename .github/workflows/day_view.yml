@@ -49,5 +49,5 @@ jobs:
     - name: Commit and push changes to day_view.md
       run: |
         git add day_view.md
-        git commit -m "Update traffic data for $today in READday_viewMEview.md" || echo "No changes to commit"
+        git commit -m "Update traffic data for $today in day_view.md" || echo "No changes to commit"
         git push origin main
