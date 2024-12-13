@@ -28,10 +28,11 @@ jobs:
         today_data=$(echo "$response" | jq --arg today "$today" '.views[] | select(.timestamp | startswith($today))')
 
         # Если данные за текущий день есть, извлекаем count и uniques
-        count=$(echo "$today_data" | jq '.count')
-        uniques=$(echo "$today_data" | jq '.uniques')
-        echo "Count for today: $count"
-        echo "Uniques for today: $uniques"
+        total_views=$(echo "$today_data" | jq '.count')
+        unique_views=$(echo "$today_data" | jq '.uniques')
+
+        echo "TOTAL_VIEWS=$total_views" >> $GITHUB_ENV
+        echo "UNIQUE_VIEWS=$unique_views" >> $GITHUB_ENV
 
     - name: Read current values from test.md
       id: read_values
@@ -40,9 +41,25 @@ jobs:
         current_total=$(grep -oP 'Total%20Views%20All-Time-\K\d+' test.md)
         current_unique=$(grep -oP 'Unique%20Views%20All-Time-\K\d+' test.md)
 
-        echo "Current Total Views: $current_total"
-        echo "Current Unique Views: $current_unique"
-        
+        echo "CURRENT_TOTAL=$current_total" >> $GITHUB_ENV
+        echo "CURRENT_UNIQUE=$current_unique" >> $GITHUB_ENV
+
+    - name: Update badge in test.md
+      run: |
+        # Прибавляем новые значения к текущим
+        new_total_views=$((TOTAL_VIEWS + CURRENT_TOTAL))
+        new_total_uniques=$((UNIQUE_VIEWS + CURRENT_UNIQUE))
+      
+        # Формируем URL для картинки с уникальными просмотрами
+        BADGE_TOTAL_URL="https://img.shields.io/badge/Total%20Views%20All-Time-$new_total_views-blue"
+        BADGE_UNIQUE_URL="https://img.shields.io/badge/Unique%20Views%20All-Time-$new_total_uniques-blue"
+
+        # Обновляем файл с новым значением
+        sed -i \
+          -e "s|!\[Total Views All-Time](.*)|![Total Views All-Time](${BADGE_TOTAL_URL})|" \
+          -e "s|!\[Unique Views All-Time](.*)|![Unique Views All-Time](${BADGE_UNIQUE_URL})|" \
+          test.md
+
     - name: Set git configuration
       run: |
         git config --global user.name "cortez24rus"
