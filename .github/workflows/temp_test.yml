@@ -25,9 +25,16 @@ jobs:
         total_views=$(echo "$response" | jq '.count')
         unique_views=$(echo "$response" | jq '.uniques')
 
-        # Форматируем данные для записи в READMEview.md
-        echo "Общее количество просмотров: $total_views" > READMEview.md
-        echo "Уникальные просмотры: $unique_views" >> READMEview.md
+        if [ -f READMEview.md ]; then
+          # Используем sed для замены строк, содержащих "Общее количество просмотров" и "Уникальные просмотры"
+          sed -i "s/Общее количество просмотров:.*/Общее количество просмотров: $total_views/" READMEview.md
+          sed -i "s/Уникальные просмотры:.*/Уникальные просмотры: $unique_views/" READMEview.md
+        else
+          # Если файл не существует, создаем новый файл
+          echo "Общее количество просмотров: $total_views" > READMEview.md
+          echo "Уникальные просмотры: $unique_views" >> READMEview.md
+        fi
+
 
     - name: Set git configuration
       run: |
