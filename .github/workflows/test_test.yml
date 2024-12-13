@@ -30,10 +30,12 @@ jobs:
         badge_url="https://img.shields.io/badge/Unique%20Views-$unique_views-blue"
 
         # Сохраняем URL в Environment File
+        echo ${BADGE_URL}
         echo "BADGE_URL=$badge_url" >> $GITHUB_ENV
 
     - name: Update badge in test.md
       run: |
+        echo ${BADGE_URL}
         # Проверяем, что BADGE_URL не пустой
         if [ -z "$BADGE_URL" ]; then
           echo "Error: Badge URL is empty."
