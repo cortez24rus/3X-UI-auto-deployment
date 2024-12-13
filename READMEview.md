@@ -4,7 +4,6 @@ This script is designed to quickly and easily set up a hidden proxy server, with
 > [!IMPORTANT]
 >  This script has been tested in a KVM virtualization environment. You will need your own domain, which needs to be bound to Cloudflare for it to work correctly. It is recommended to run the script as root on a freshly installed system.
 
-<<<<<<< HEAD
 ### Общее количество просмотров за все время: 455
 ### Уникальные просмотры за все время: 86
 ### Общее количество просмотров за месяц: 1870
