@@ -30,7 +30,7 @@ jobs:
         BADGE_URL="https://img.shields.io/badge/Unique%20Views-$unique_views-blue"
 
         # Обновляем тестовый файл с новым значением для уникальных просмотров
-        sed -i "s|!\[Unique Views Badge](.*)|![Unique Views Badge]($BADGE_URL)|" test.md
+        sed -i "s|!\[Unique Views Badge](.*)|![Unique Views Badge](${BADGE_URL})|" test.md
 
     - name: Set git configuration
       run: |
