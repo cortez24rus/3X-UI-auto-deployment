@@ -42,7 +42,7 @@ jobs:
     - name: Update badge in test.md
       run: |
         # Обновляем тестовый файл с новым значением для уникальных просмотров
-        sed -i "s|https://img.shields.io/badge/Unique%20Views-[0-9]\+%-blue|$badge_url|" test.md
+        sed -i "s/\(\![^ ]* [^ ]*\)([^)]*)/\1($badge_url)/" test.md
 
     - name: Check test.md content after update
       run: |
