@@ -1,0 +1,48 @@
+name: Update Unique Views Badge
+
+on:
+  push:
+    branches:
+      - main
+  schedule:
+    - cron: '0 0 * * *'  # Каждый день в полночь
+
+jobs:
+  fetch_traffic:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Fetch traffic data from GitHub API
+      id: fetch_traffic
+      run: |
+        # Получаем данные о трафике с GitHub API
+        response=$(curl -H "Authorization: token ${{ secrets.PUBLIC_REPO_TOKEN }}" \
+                         -H "Accept: application/vnd.github.v3+json" \
+                         https://api.github.com/repos/${{ github.repository }}/traffic/views)
+
+        # Извлекаем уникальные просмотры за все время
+        unique_views=$(echo "$response" | jq '.uniques')
+
+        # Формируем URL для картинки с уникальными просмотрами
+        badge_url="https://img.shields.io/badge/Unique%20Views-$unique_views-blue"
+
+        # Обновляем test.md с новым значением
+        sed -i "s|https://img.shields.io/github/stars/cortez24rus/xui-reverse-proxy?style=social|$badge_url|" test.md
+
+    - name: Set git configuration
+      run: |
+        git config --global user.name "cortez24rus"
+        git config --global user.email "cortez24rus@gmail.com"
+
+    - name: Pull latest changes
+      run: |
+        git pull origin main || echo "No changes to pull"
+
+    - name: Commit and push changes to test.md
+      run: |
+        git add test.md
+        git commit -m "Update unique views badge in test.md" || echo "No changes to commit"
+        git push origin main
