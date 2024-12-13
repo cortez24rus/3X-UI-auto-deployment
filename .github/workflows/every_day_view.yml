@@ -49,8 +49,9 @@ jobs:
         # Прибавляем новые значения к текущим
         new_total_views=$((TOTAL_VIEWS + CURRENT_TOTAL))
         new_total_uniques=$((UNIQUE_VIEWS + CURRENT_UNIQUE))
-        echo ${new_total_views}
-        echo ${new_total_uniques}
+
+        echo "${TOTAL_VIEWS}+${CURRENT_TOTAL}=${new_total_views}"
+        echo "${UNIQUE_VIEWS}+${CURRENT_UNIQUE}=${new_total_uniques}"
       
         # Формируем URL для картинки с уникальными просмотрами
         BADGE_TOTAL_URL="https://img.shields.io/badge/Total%20Views%20All%20Time-$new_total_views-blue"
