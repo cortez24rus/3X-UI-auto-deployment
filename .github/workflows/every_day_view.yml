@@ -20,51 +20,25 @@ jobs:
       run: |
         # Получаем данные о трафике с GitHub API, используя переменную ${{ github.repository }}
         response=$(curl -H "Authorization: token ${{ secrets.PUBLIC_REPO_TOKEN }}" \
-                         -H "Accept: application/vnd.github.v3+json" \
-                         https://api.github.com/repos/${{ github.repository }}/traffic/views)
+          -H "Accept: application/vnd.github.v3+json" \
+          https://api.github.com/repos/${{ github.repository }}/traffic/views)
 
         # Извлекаем данные за текущий день
-        today=$(date -I)  # Получаем текущую дату в формате YYYY-MM-DD
+        today=$(date -I) # Получаем текущую дату в формате YYYY-MM-DD
         today_data=$(echo "$response" | jq --arg today "$today" '.views[] | select(.timestamp | startswith($today))')
+        echo ${today}
+        echo ${today_data}
 
         # Если данные за текущий день есть, извлекаем count и uniques
         count=$(echo "$today_data" | jq '.count')
         uniques=$(echo "$today_data" | jq '.uniques')
-
-        # Если данных за текущий день нет, задаем нулевые значения
-        if [ -z "$count" ]; then
-          count=0
-        fi
-        if [ -z "$uniques" ]; then
-          uniques=0
-        fi
-
-        # Читаем текущие значения из READMEview.md
-        current_views=$(grep -oP 'Общее количество просмотров за все время: \K\d+' READMEview.md)
-        current_uniques=$(grep -oP 'Уникальные просмотры за все время: \K\d+' READMEview.md)
-
-        echo "Current views: $count"
-        echo "Current uniques: $uniques"
-        
-        echo "Current views: $current_views"
-        echo "Current uniques: $current_uniques"
-
-        # Если нет данных в файле, задаем начальные значения
-        if [ -z "$current_views" ]; then
-          current_views=0
-        fi
-        if [ -z "$current_uniques" ]; then
-          current_uniques=0
-        fi
+        echo ${count}
+        echo ${uniques}
 
         # Прибавляем новые значения к текущим
-        new_total_views=$((current_views + count))
-        new_total_uniques=$((current_uniques + uniques))
-
-        # Обновляем данные в READMEview.md
-        sed -i "s/Общее количество просмотров за все время: .*/Общее количество просмотров за все время: $new_total_views/" READMEview.md
-        sed -i "s/Уникальные просмотры за все время: .*/Уникальные просмотры за все время: $new_total_uniques/" READMEview.md
-
+        new_total_views=$((count))
+        new_total_uniques=$((uniques))
+      
     - name: Set git configuration
       run: |
         git config --global user.name "cortez24rus"
