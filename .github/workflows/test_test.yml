@@ -20,10 +20,9 @@ jobs:
       run: |
         # Получаем данные о трафике с GitHub API
         response=$(curl -H "Authorization: token ${{ secrets.PUBLIC_REPO_TOKEN }}" \
-                         -H "Accept: application/vnd.github.v3+json" \
-                         https://api.github.com/repos/${{ github.repository }}/traffic/views)
+          -H "Accept: application/vnd.github.v3+json" \
+          https://api.github.com/repos/cortez24rus/xui-reverse-proxy/traffic/views)
 
-        # Извлекаем уникальные просмотры за все время
         unique_views=$(echo "$response" | jq '.uniques')
         echo ${unique_views}
 
