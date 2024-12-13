@@ -49,25 +49,16 @@ jobs:
         # Прибавляем новые значения к текущим
         new_total_views=$((TOTAL_VIEWS + CURRENT_TOTAL))
         new_total_uniques=$((UNIQUE_VIEWS + CURRENT_UNIQUE))
-
-        echo "${TOTAL_VIEWS}+${CURRENT_TOTAL}=${new_total_views}"
-        echo "${UNIQUE_VIEWS}+${CURRENT_UNIQUE}=${new_total_uniques}"
       
         # Формируем URL для картинки с уникальными просмотрами
         BADGE_TOTAL_URL="https://img.shields.io/badge/Total%20Views%20All%20Time-$new_total_views-blue"
         BADGE_UNIQUE_URL="https://img.shields.io/badge/Unique%20Views%20All%20Time-$new_total_uniques-green"
-        echo ${BADGE_TOTAL_URL}
-        echo ${BADGE_UNIQUE_URL}
 
         # Обновляем файл с новым значением
         sed -i \
           -e "s|!\[Total Views All Time](.*)|![Total Views All Time](${BADGE_TOTAL_URL})|" \
           -e "s|!\[Unique Views All Time](.*)|![Unique Views All Time](${BADGE_UNIQUE_URL})|" \
           README.md
-        sed -i \
-          -e "s|!\[Total Views All Time](.*)|![Total Views All Time](${BADGE_TOTAL_URL})|" \
-          -e "s|!\[Unique Views All Time](.*)|![Unique Views All Time](${BADGE_UNIQUE_URL})|" \
-          README_RU.md
 
     - name: Set git configuration
       run: |
