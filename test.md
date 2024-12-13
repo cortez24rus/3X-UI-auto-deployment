@@ -1,5 +1,5 @@
-![Total Views Month Badge](https://img.shields.io/badge/Total%20V%20Per%20Month-2195-blue)
-![Unique Views Month Badge](https://img.shields.io/badge/Unique%20V%20Per%20Month-338-green)
+![Total Views Month Badge](https://img.shields.io/badge/Total%20V%20Per%20Month-2194-blue)
+![Unique Views Month Badge](https://img.shields.io/badge/Unique%20V%20Per%20Month-337-green)
 
 -----
 
