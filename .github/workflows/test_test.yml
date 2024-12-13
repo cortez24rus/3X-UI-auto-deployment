@@ -26,10 +26,12 @@ jobs:
         # Извлекаем общее количество просмотров и уникальных просмотров
         total_views=$(echo "$response" | jq '.count')
         unique_views=$(echo "$response" | jq '.uniques')
+        echo ${total_views}
 
         # Формируем URL для картинки с уникальными просмотрами
         badge_total_url="https://img.shields.io/badge/Unique%20Views-$total_views-blue"
         badge_unique_url="https://img.shields.io/badge/Unique%20Views-$unique_views-blue"
+        echo ${badge_total_url}
 
         # Сохраняем URL в Environment File
         echo "BADGE_TOTAL_URL=$badge_total_url" >> $GITHUB_ENV
@@ -47,10 +49,16 @@ jobs:
           echo "Error: Badge URL is empty."
           exit 1
         fi
-        
+        echo ${BADGE_TOTAL_URL}
+          
         # Обновляем файл с новым значением
         sed -i "s|!\[Total Views Badge](.*)|![Total Views Badge](${BADGE_TOTAL_URL})|" test.md
         sed -i "s|!\[Unique Views Badge](.*)|![Unique Views Badge](${BADGE_UNIQUE_URL})|" test.md
+
+        #sed -i \
+        #  -e "s/\${USERNAME}/username/g" \
+        #  -e "s/\${HASH}/hash/g" \
+        #  AdGuardHome/AdGuardHome.yaml
 
     - name: Set git configuration
       run: |
