@@ -26,22 +26,29 @@ jobs:
         # Извлекаем уникальные просмотры за все время
         unique_views=$(echo "$response" | jq '.uniques')
 
+        # Проверяем, что значение уникальных просмотров получено
+        if [ -z "$unique_views" ]; then
+          echo "Error: Unique views could not be retrieved."
+          exit 1
+        fi
+
         # Формируем URL для картинки с уникальными просмотрами
-        echo "::set-output name=badge_url::https://img.shields.io/badge/Unique%20Views-$unique_views-blue"
+        badge_url="https://img.shields.io/badge/Unique%20Views-$unique_views-blue"
+
+        # Передаем URL как output
+        echo "::set-output name=badge_url::$badge_url"
 
     - name: Update badge in test.md
       env:
         BADGE_URL: ${{ steps.fetch_traffic.outputs.badge_url }}
       run: |
-        # Убедимся, что BADGE_URL не пустой
+        # Проверяем, что BADGE_URL не пустой
         if [ -z "$BADGE_URL" ]; then
           echo "Error: Badge URL is empty."
           exit 1
         fi
 
-    - name: Update badge in test.md
-      run: |
-        # Обновляем тестовый файл с новым значением для уникальных просмотров
+        # Обновляем файл с новым значением
         sed -i "s|!\[Unique Views Badge](.*)|![Unique Views Badge](${BADGE_URL})|" test.md
 
     - name: Set git configuration
