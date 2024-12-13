@@ -55,7 +55,7 @@ jobs:
       
         # Формируем URL для картинки с уникальными просмотрами
         BADGE_TOTAL_URL="https://img.shields.io/badge/Total%20Views%20All%20Time-$new_total_views-blue"
-        BADGE_UNIQUE_URL="https://img.shields.io/badge/Unique%20Views%20All%20Time-$new_total_uniques-blue"
+        BADGE_UNIQUE_URL="https://img.shields.io/badge/Unique%20Views%20All%20Time-$new_total_uniques-green"
         echo ${BADGE_TOTAL_URL}
         echo ${BADGE_UNIQUE_URL}
 
