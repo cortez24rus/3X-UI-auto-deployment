@@ -29,14 +29,17 @@ jobs:
         echo "Общее количество просмотров: $total_views" > READMEview.md
         echo "Уникальные просмотры: $unique_views" >> READMEview.md
 
-    - name: Set up git config
+    - name: Set git configuration
       run: |
-        git config --global user.name "cortez24rus"
-        git config --global user.email "cortez24rus@gmail.com"
+        git config --global user.name "github-actions"
+        git config --global user.email "github-actions@github.com"
+        
+    - name: Pull latest changes
+      run: |
+        git pull origin main || echo "No changes to pull"
 
     - name: Commit and push changes to READMEview.md
       run: |
-        # Добавляем файл в git и выполняем коммит
         git add READMEview.md
-        git commit -m "Update traffic data in READMEview.md"
-        git push
+        git commit -m "Update traffic data in READMEview.md" || echo "No changes to commit"
+        git push origin main
