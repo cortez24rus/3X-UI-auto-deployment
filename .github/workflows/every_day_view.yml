@@ -26,26 +26,22 @@ jobs:
         # Извлекаем данные за текущий день
         today=$(date -I) # Получаем текущую дату в формате YYYY-MM-DD
         today_data=$(echo "$response" | jq --arg today "$today" '.views[] | select(.timestamp | startswith($today))')
-        echo ${today}
-        echo ${today_data}
 
         # Если данные за текущий день есть, извлекаем count и uniques
         count=$(echo "$today_data" | jq '.count')
         uniques=$(echo "$today_data" | jq '.uniques')
-        echo ${count}
-        echo ${uniques}
+        echo "Count for today: $count"
+        echo "Uniques for today: $uniques"
 
+    - name: Read current values from test.md
+      id: read_values
+      run: |
         # Извлекаем текущие значения Total Views и Unique Views из test.md
         current_total=$(grep -oP 'Total Views All-Time-\K\d+' test.md)
         current_unique=$(grep -oP 'Unique Views All-Time-\K\d+' test.md)
-        echo ${current_total}
-        echo ${current_unique}
 
-        # Прибавляем новые значения к текущим
-        new_total_views=$((current_total + count))
-        new_total_uniques=$((current_unique + uniques))
-        echo ${new_total_views}
-        echo ${new_total_uniques}
+        echo "Current Total Views: $current_total"
+        echo "Current Unique Views: $current_unique"
         
     - name: Set git configuration
       run: |
