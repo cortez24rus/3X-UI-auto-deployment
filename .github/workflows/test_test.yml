@@ -32,7 +32,7 @@ jobs:
     - name: Update badge in test.md
       run: |
         # Обновляем тестовый файл с новым значением для уникальных просмотров
-        sed -i "s|\!\[Unique Views Badge](.*)|![Unique Views Badge]($badge_url)|" test.md
+        sed -i "s|!\[Unique Views Badge](.*)|![Unique Views Badge](${badge_url})|" test.md
 
     - name: Set git configuration
       run: |
