@@ -1,4 +1,6 @@
 # XUI-REVERSE-PROXY ([English](/README.md)) <img src="https://img.shields.io/github/stars/cortez24rus/xui-reverse-proxy?style=social" />
+![Total Views All Time](https://img.shields.io/badge/Total%20Views%20All%20Time-4635-blue)
+![Unique Views All Time](https://img.shields.io/badge/Unique%20Views%20All%20Time-322-green)
 <p align="center"><a href="#"><img src="./media/3X-UI.png" alt="Image"></a></p>
 
 -----
@@ -121,6 +123,9 @@ bash <(curl -Ls https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/
 >Если вы не уверены, нарушает ли использование данного инструмента или его компонентов законодательство вашей страны- откажитесь от любого взаимодействия с данным инструментом.
 
 -----
+
+![Total Views Month Badge](https://img.shields.io/badge/Total%20V%20Per%20Month-2194-blue)
+![Unique Views Month Badge](https://img.shields.io/badge/Unique%20V%20Per%20Month-334-green)
 
 ## Количество звезд по времени
 [![Stargazers over time](https://starchart.cc/cortez24rus/xui-reverse-proxy.svg?variant=adaptive)](https://starchart.cc/cortez24rus/xui-reverse-proxy)

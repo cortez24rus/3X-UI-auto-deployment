@@ -53,6 +53,10 @@ jobs:
           -e "s|!\[Total Views Month Badge](.*)|![Total Views Month Badge](${BADGE_TOTAL_URL})|" \
           -e "s|!\[Unique Views Month Badge](.*)|![Unique Views Month Badge](${BADGE_UNIQUE_URL})|" \
           README.md
+        sed -i \
+          -e "s|!\[Total Views Month Badge](.*)|![Total Views Month Badge](${BADGE_TOTAL_URL})|" \
+          -e "s|!\[Unique Views Month Badge](.*)|![Unique Views Month Badge](${BADGE_UNIQUE_URL})|" \
+          README_RU.md
 
     - name: Set git configuration
       run: |

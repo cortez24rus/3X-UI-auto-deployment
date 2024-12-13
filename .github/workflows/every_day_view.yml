@@ -64,6 +64,10 @@ jobs:
           -e "s|!\[Total Views All Time](.*)|![Total Views All Time](${BADGE_TOTAL_URL})|" \
           -e "s|!\[Unique Views All Time](.*)|![Unique Views All Time](${BADGE_UNIQUE_URL})|" \
           README.md
+        sed -i \
+          -e "s|!\[Total Views All Time](.*)|![Total Views All Time](${BADGE_TOTAL_URL})|" \
+          -e "s|!\[Unique Views All Time](.*)|![Unique Views All Time](${BADGE_UNIQUE_URL})|" \
+          README_RU.md
 
     - name: Set git configuration
       run: |
