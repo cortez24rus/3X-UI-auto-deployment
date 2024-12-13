@@ -1,4 +1,4 @@
-name: test
+name: every_day_view
 
 on:
   push:
