@@ -22,30 +22,35 @@ jobs:
         response=$(curl -H "Authorization: token ${{ secrets.PUBLIC_REPO_TOKEN }}" \
                          -H "Accept: application/vnd.github.v3+json" \
                          https://api.github.com/repos/${{ github.repository }}/traffic/views)
-        echo ${response}
 
-        # Извлекаем общее количество уникальных просмотров
-    
+        # Извлекаем общее количество просмотров и уникальных просмотров
+        total_views=$(echo "$response" | jq '.count')
         unique_views=$(echo "$response" | jq '.uniques')
-        echo ${unique_views}
 
         # Формируем URL для картинки с уникальными просмотрами
-        badge_url="https://img.shields.io/badge/Unique%20Views-$unique_views-blue"
-        echo ${badge_url}
+        badge_total_url="https://img.shields.io/badge/Unique%20Views-$total_views-blue"
+        badge_unique_url="https://img.shields.io/badge/Unique%20Views-$unique_views-blue"
 
         # Сохраняем URL в Environment File
-        echo "BADGE_URL=$badge_url" >> $GITHUB_ENV
+        echo "BADGE_TOTAL_URL=$badge_total_url" >> $GITHUB_ENV
+        echo "BADGE_UNIQUE_URL=$badge_unique_url" >> $GITHUB_ENV
 
     - name: Update badge in test.md
       run: |
-        # Проверяем, что BADGE_URL не пустой
-        if [ -z "$BADGE_URL" ]; then
+        # Проверяем, что BADGE_TOTAL_URL не пустой
+        if [ -z "$BADGE_TOTAL_URL" ]; then
+          echo "Error: Badge URL is empty."
+          exit 1
+        fi
+        # Проверяем, что BADGE_UNIQUE_URL не пустой
+        if [ -z "$BADGE_UNIQUE_URL" ]; then
           echo "Error: Badge URL is empty."
           exit 1
         fi
         
         # Обновляем файл с новым значением
-        sed -i "s|!\[Unique Views Badge](.*)|![Unique Views Badge](${BADGE_URL})|" test.md
+        sed -i "s|!\[Total Views Badge](.*)|![Total Views Badge](${BADGE_TOTAL_URL})|" test.md
+        sed -i "s|!\[Unique Views Badge](.*)|![Unique Views Badge](${BADGE_UNIQUE_URL})|" test.md
 
     - name: Set git configuration
       run: |
