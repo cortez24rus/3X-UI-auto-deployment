@@ -30,6 +30,7 @@ jobs:
         badge_url="https://img.shields.io/badge/Unique%20Views-$unique_views-blue"
 
         # Сохраняем URL в Environment File
+        echo ${badge_url}
         echo ${BADGE_URL}
         echo "BADGE_URL=$badge_url" >> $GITHUB_ENV
 
