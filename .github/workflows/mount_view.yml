@@ -50,8 +50,8 @@ jobs:
 
         # Обновляем файл с новым значением
         sed -i \
-          -e "s|!\[Total Views Badge](.*)|![Total Views Badge](${BADGE_TOTAL_URL})|" \
-          -e "s|!\[Unique Views Badge](.*)|![Unique Views Badge](${BADGE_UNIQUE_URL})|" \
+          -e "s|!\[Total Views Month Badge](.*)|![Total Views Month Badge](${BADGE_TOTAL_URL})|" \
+          -e "s|!\[Unique Views Month Badge](.*)|![Unique Views Month Badge](${BADGE_UNIQUE_URL})|" \
           test.md
 
     - name: Set git configuration
