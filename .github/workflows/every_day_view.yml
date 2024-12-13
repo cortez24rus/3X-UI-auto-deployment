@@ -69,8 +69,8 @@ jobs:
       run: |
         git pull origin main || echo "No changes to pull"
 
-    - name: Commit and push changes to day_view.md
+    - name: Commit and push changes to test.md
       run: |
-        git add day_view.md
-        git commit -m "Update traffic data for $today in day_view.md" || echo "No changes to commit"
+        git add test.md
+        git commit -m "Update traffic data for $today in test.md" || echo "No changes to commit"
         git push origin main
