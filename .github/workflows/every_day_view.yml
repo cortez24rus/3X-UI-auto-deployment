@@ -34,17 +34,17 @@ jobs:
         echo "TOTAL_VIEWS=$total_views" >> $GITHUB_ENV
         echo "UNIQUE_VIEWS=$unique_views" >> $GITHUB_ENV
 
-    - name: Read current values from test.md
+    - name: Read current values from README.md
       id: read_values
       run: |
-        # Извлекаем текущие значения Total Views и Unique Views из test.md
-        current_total=$(grep -oP 'Total%20Views%20All%20Time-\K\d+' test.md)
-        current_unique=$(grep -oP 'Unique%20Views%20All%20Time-\K\d+' test.md)
+        # Извлекаем текущие значения Total Views и Unique Views из README.md
+        current_total=$(grep -oP 'Total%20Views%20All%20Time-\K\d+' README.md)
+        current_unique=$(grep -oP 'Unique%20Views%20All%20Time-\K\d+' README.md)
 
         echo "CURRENT_TOTAL=$current_total" >> $GITHUB_ENV
         echo "CURRENT_UNIQUE=$current_unique" >> $GITHUB_ENV
 
-    - name: Update badge in test.md
+    - name: Update badge in README.md
       run: |
         # Прибавляем новые значения к текущим
         new_total_views=$((TOTAL_VIEWS + CURRENT_TOTAL))
@@ -63,7 +63,7 @@ jobs:
         sed -i \
           -e "s|!\[Total Views All Time](.*)|![Total Views All Time](${BADGE_TOTAL_URL})|" \
           -e "s|!\[Unique Views All Time](.*)|![Unique Views All Time](${BADGE_UNIQUE_URL})|" \
-          test.md
+          README.md
 
     - name: Set git configuration
       run: |
@@ -74,8 +74,8 @@ jobs:
       run: |
         git pull origin main || echo "No changes to pull"
 
-    - name: Commit and push changes to test.md
+    - name: Commit and push changes to README.md
       run: |
-        git add test.md
-        git commit -m "Update traffic data for $today in test.md" || echo "No changes to commit"
+        git add README.md
+        git commit -m "Update traffic data for $today in README.md" || echo "No changes to commit"
         git push origin main
