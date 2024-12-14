@@ -1116,7 +1116,6 @@ add_user() {
   touch /home/${USERNAME}/.ssh/authorized_keys
   chown -R ${USERNAME}: /home/${USERNAME}/.ssh
   chmod -R 700 /home/${USERNAME}/.ssh
-  echo ${USERNAME}
 
   tilda "$(text 10)"
 }
