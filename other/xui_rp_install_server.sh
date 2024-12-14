@@ -769,12 +769,10 @@ choise_dns () {
     case $CHOISE_DNS in 
       1)
         info " $(text 32) "
-        tilda "$(text 10)"
         break
         ;;
       2)
         info " $(text 25) "
-        tilda "$(text 10)"
         if [[ ${args[generate]} == "true" ]]; then
           ADGUARDPATH=$(eval ${generate[path]})
         else
@@ -846,10 +844,9 @@ data_entry() {
       validate_path METRICS
     fi
   fi
-  
-  tilda "$(text 10)"
 
   if [[ ${args[ssh]} == "true" ]]; then
+    tilda "$(text 10)"
     reading " $(text 54) " ANSWER_SSH
     if [[ "${ANSWER_SSH,,}" == "y" ]]; then
       info " $(text 48) "
