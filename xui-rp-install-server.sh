@@ -961,8 +961,8 @@ installation_of_utilities() {
   info " $(text 36) "
   case "$SYSTEM" in
     Debian|Ubuntu)
-      DEPS_PACK_CHECK=("jq" "ufw" "zip" "wget" "gpg" "nano" "cron" "sqlite3" "certbot" "openssl" "netstat" "htpasswd" "update-ca-certificates" "add-apt-repository" "certbot-dns-cloudflare")
-      DEPS_PACK_INSTALL=("jq" "ufw" "zip" "wget" "gnupg2" "nano" "cron" "sqlite3" "certbot" "openssl" "net-tools" "apache2-utils" "ca-certificates" "software-properties-common" "python3-certbot-dns-cloudflare")
+      DEPS_PACK_CHECK=("jq" "ufw" "zip" "wget" "gpg" "nano" "cron" "sqlite3" "certbot" "openssl" "netstat" "htpasswd" "update-ca-certificates" "add-apt-repository" "unattended-upgrades" "certbot-dns-cloudflare")
+      DEPS_PACK_INSTALL=("jq" "ufw" "zip" "wget" "gnupg2" "nano" "cron" "sqlite3" "certbot" "openssl" "net-tools" "apache2-utils" "ca-certificates" "software-properties-common" "unattended-upgrades" "python3-certbot-dns-cloudflare")
 
       for g in "${!DEPS_PACK_CHECK[@]}"; do
         [ ! -x "$(type -p ${DEPS_PACK_CHECK[g]})" ] && [[ ! "${DEPS_PACK[@]}" =~ "${DEPS_PACK_INSTALL[g]}" ]] && DEPS_PACK+=(${DEPS_PACK_INSTALL[g]})
@@ -1037,8 +1037,8 @@ dns_adguard_home() {
   done
 
   sed -i \
-    -e "s/\${USERNAME}/username/g" \
-    -e "s/\${HASH}/hash/g" \
+    -e "s/username/${USERNAME}/g" \
+    -e "s/hash/${HASH}/g" \
     AdGuardHome/AdGuardHome.yaml
 
   AdGuardHome/AdGuardHome -s restart
@@ -1872,7 +1872,7 @@ to the fullest extent of the law.
 
 
 EOF
-    systemctl restart sshd
+    systemctl restart ssh
     tilda "$(text 10)"
   fi
 }
