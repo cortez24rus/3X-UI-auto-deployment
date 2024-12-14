@@ -777,6 +777,7 @@ choise_dns () {
           ADGUARDPATH=$(eval ${generate[path]})
         else
           echo
+          tilda "$(text 10)"
           validate_path ADGUARDPATH
         fi        
         echo
