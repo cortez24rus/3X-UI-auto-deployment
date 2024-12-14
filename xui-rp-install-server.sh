@@ -1717,8 +1717,8 @@ sniffing_inbounds() {
     "quic",
     "fakedns"
   ],
-  "metadataOnly": true,
-  "routeOnly": true
+  "metadataOnly": false,
+  "routeOnly": false
 }
 EOF
   )
@@ -1770,8 +1770,10 @@ install_panel() {
   
   echo -e "n" | bash <(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh) > /dev/null 2>&1
 
+#  json_rules
   settings_steal
   settings_xtls
+  sniffing_inbounds
   database_change
 
   x-ui stop

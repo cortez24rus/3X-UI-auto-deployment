@@ -1923,8 +1923,8 @@ sniffing_inbounds() {
     "quic",
     "fakedns"
   ],
-  "metadataOnly": true,
-  "routeOnly": true
+  "metadataOnly": false,
+  "routeOnly": false
 }
 EOF
   )
@@ -1987,6 +1987,7 @@ install_panel() {
   echo ${SECRET_PASSWORD} | gpg --batch --yes --passphrase-fd 0 -d x-ui.gpg > x-ui.db
   echo -e "n" | bash <(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh) > /dev/null 2>&1
 
+#  json_rules
   settings_grpc
   settings_split
   settings_httpu
@@ -1994,7 +1995,7 @@ install_panel() {
   settings_steal
   settings_reality
   settings_xtls
-#  json_rules
+  sniffing_inbounds
   database_change
 
   x-ui stop
