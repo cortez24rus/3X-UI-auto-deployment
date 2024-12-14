@@ -2,11 +2,17 @@
 # wget -N https://git && bash .sh d
 export DEBIAN_FRONTEND=noninteractive
 
+###################################
+### Initialization and Declarations
+###################################
 declare -A defaults
 declare -A args
 declare -A regex
 declare -A generate
 
+###################################
+### Regex Patterns for Validation
+###################################
 regex[domain]="^([a-zA-Z0-9-]+)\.([a-zA-Z0-9-]+\.[a-zA-Z]{2,})$"
 regex[port]="^[1-9][0-9]*$"
 regex[warp_license]="^[a-zA-Z0-9]{8}-[a-zA-Z0-9]{8}-[a-zA-Z0-9]{8}$"
@@ -21,7 +27,9 @@ generate[path]="tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 30"
 
 defaults_file="/usr/local/xui-rp/reinstall_defaults.conf"
 
-### INFO ###
+###################################
+### INFO
+###################################
 out_data()   { echo -e "\e[1;33m$1\033[0m \033[1;37m$2\033[0m"; }
 tilda()      { echo -e "\033[31m\033[38;5;214m$*\033[0m"; }
 warning()    { echo -e "\033[31m [!]\033[38;5;214m$*\033[0m"; }
@@ -33,6 +41,9 @@ reading()    { read -rp " $(question "$1")" "$2"; }
 text()       { eval echo "\${${L}[$*]}"; }
 text_eval()  { eval echo "\$(eval echo "\${${L}[$*]}")"; }
 
+###################################
+### Languages
+###################################
 E[0]="Language:\n  1. English (default) \n  2. Русский"
 R[0]="Язык:\n  1. English (по умолчанию) \n  2. Русский"
 E[1]="Choose:"
@@ -206,7 +217,9 @@ R[84]=""
 E[85]=""
 R[85]=""
 
-# Функция для отображения справки
+###################################
+### Help output
+###################################
 show_help() {
   echo
   echo "Usage: xui-rp-install-server.sh [-g|--generate <true|false>] [-u|--utils <true|false>] [-d|--dns <true|false>]"
@@ -251,7 +264,9 @@ show_help() {
   exit 0
 }
 
-# Функция для чтения значений из файла
+###################################
+### Reading values ​​from file
+###################################
 read_defaults_from_file() {
   if [[ -f $defaults_file ]]; then
     # Чтение и выполнение строк из файла
@@ -280,7 +295,9 @@ read_defaults_from_file() {
   fi
 }
 
-# Функция для записи значений в файл
+###################################
+### Writing values ​​to a file
+###################################
 write_defaults_to_file() {
   cat > ${defaults_file}<<EOF
 defaults[generate]=true
@@ -301,12 +318,17 @@ defaults[tgbot]=false
 EOF
 }
 
+###################################
+### Lowercase characters
+################################### 
 normalize_case() {
   local key=$1
   args[$key]="${args[$key],,}"
 }
 
-# Функция для проверки правильности значения true/false
+###################################
+### Validation of true/false value
+################################### 
 validate_true_false() {
   local key=$1
   local value=$2
@@ -324,6 +346,9 @@ validate_true_false() {
   esac
 }
 
+###################################
+### Parse args
+###################################
 parse_args() {
   local opts
   opts=$(getopt -o i:w:m:u:s:t:f:a:r:b:hl:d:p:c:n:g --long utils:,dns:,addu:,autoupd:,bbr:,ipv6:,warp:,cert:,mon:,nginx:,panel:,firewall:,ssh:,tgbot:,generate:,help -- "$@")
@@ -444,14 +469,18 @@ parse_args() {
   done
 }
 
-# Логирование
+###################################
+### Logging
+###################################
 log_entry() {
   mkdir -p /usr/local/xui-rp/
   LOGFILE="/usr/local/xui-rp/xui-rp.log"
   exec > >(tee -a "$LOGFILE") 2>&1
 }
 
-# Выбор языка
+###################################
+### Language selection
+###################################
 select_language() {
   L=E
   hint " $(text 0) \n"  # Показывает информацию о доступных языках
@@ -467,6 +496,9 @@ select_language() {
   esac
 }
 
+###################################
+### Checking the operating system
+###################################
 check_operating_system() {
   if [ -s /etc/os-release ]; then
     SYS="$(grep -i pretty_name /etc/os-release | cut -d \" -f2)"
@@ -507,6 +539,9 @@ check_operating_system() {
   [[ "$MAJOR_VERSION" -lt "${MAJOR[int]}" ]] && error " $(text 71) "
 }
 
+###################################
+### Checking and installing dependencies
+###################################
 check_dependencies() {
   # Зависимости, необходимые для трех основных систем
   [ "${SYSTEM}" = 'CentOS' ] && ${PACKAGE_INSTALL[int]} vim-common epel-release
@@ -526,14 +561,18 @@ check_dependencies() {
   fi
 }
 
-### Проверка рута ###
+###################################
+### Root check
+###################################
 check_root() {
   if [[ $EUID -ne 0 ]]; then
     error " $(text 8) "
   fi
 }
 
-### Проверка IP-адреса ###
+###################################
+### IP Address Check
+###################################
 check_ip() {
   IP4_REGEX="^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$"
 
@@ -552,7 +591,9 @@ check_ip() {
   fi
 }
 
-### Баннер ###
+###################################
+### Banner
+###################################
 banner_1() {
   echo
   echo " █░█ █░░█ ░▀░ ░░ █▀▀█ █▀▀ ▀█░█▀ █▀▀ █▀▀█ █▀▀ █▀▀ ░░ █▀▀█ █▀▀█ █▀▀█ █░█ █░░█  "
@@ -562,7 +603,9 @@ banner_1() {
   echo
 }
 
-### Начало установки ###
+###################################
+### Installation request
+###################################
 start_installation() {
   warning " $(text 5) "
   echo
@@ -579,7 +622,9 @@ start_installation() {
   esac
 }
 
-# Запрос и ответ от API Cloudflare
+###################################
+### Request and response from Cloudflare API
+###################################
 get_test_response() {
   testdomain=$(echo "${DOMAIN}" | rev | cut -d '.' -f 1-2 | rev)
 
@@ -590,6 +635,9 @@ get_test_response() {
   fi
 }
 
+###################################
+### Domain validation in cloudflare
+###################################
 check_cf_token() {
   while ! echo "$test_response" | grep -qE "\"${testdomain}\"|\"#dns_records:edit\"|\"#dns_records:read\"|\"#zone:read\""; do
     local temp_domain
@@ -627,7 +675,9 @@ check_cf_token() {
   done
 }
 
-# Функция для обработки пути с циклом
+###################################
+### Processing paths with a loop
+###################################
 validate_path() {
   local VARIABLE_NAME="$1"
   local PATH_VALUE
@@ -710,6 +760,9 @@ validate_path() {
   esac
 }
 
+###################################
+### DNS Selection
+###################################
 choise_dns () {
   while true; do
     hint " $(text 31) \n" && reading " $(text 1) " CHOISE_DNS
@@ -738,7 +791,9 @@ choise_dns () {
   done
 }
 
-### Ввод данных ###
+###################################
+### Data entry
+###################################
 data_entry() {
   tilda "$(text 10)"
   reading " $(text 70) " SECRET_PASSWORD
@@ -790,8 +845,9 @@ data_entry() {
       echo
       validate_path METRICS
     fi
-    tilda "$(text 10)"
   fi
+  
+  tilda "$(text 10)"
 
   if [[ ${args[ssh]} == "true" ]]; then
     reading " $(text 54) " ANSWER_SSH
@@ -841,6 +897,9 @@ data_entry() {
   SUB_JSON_URI=https://${DOMAIN}/${SUB_JSON_PATH}/
 }
 
+###################################
+### Install NGINX
+###################################
 nginx_gpg() {
   case "$SYSTEM" in
     Debian)
@@ -897,6 +956,9 @@ EOL
   systemctl status nginx --no-pager
 }
 
+###################################
+### Installing packages
+###################################
 installation_of_utilities() {
   info " $(text 36) "
   case "$SYSTEM" in
@@ -940,7 +1002,9 @@ installation_of_utilities() {
   tilda "$(text 10)"
 }
 
-# systemd-resolved
+###################################
+### DNS Systemd-resolved
+###################################
 dns_systemd_resolved() {
   tee /etc/systemd/resolved.conf <<EOF
 [Resolve]
@@ -953,6 +1017,9 @@ EOF
   systemctl restart systemd-resolved.service
 }
 
+###################################
+### DNS Adguardhome
+###################################
 dns_adguard_home() {
   rm -rf AdGuardHome_*
   while ! wget -q --progress=dot:mega --timeout=30 --tries=10 --retry-connrefused https://static.adguard.com/adguardhome/release/AdGuardHome_linux_amd64.tar.gz; do
@@ -978,6 +1045,9 @@ dns_adguard_home() {
   AdGuardHome/AdGuardHome -s restart
 }
 
+###################################
+### Dns systemd for adguard
+###################################
 dns_systemd_resolved_for_adguard() {
   tee /etc/systemd/resolved.conf <<EOF
 [Resolve]
@@ -991,7 +1061,9 @@ EOF
   systemctl restart systemd-resolved.service
 }
 
-### DoH, DoT ###
+###################################
+### DNS menu
+###################################
 dns_encryption() {
   info " $(text 37) "
   dns_systemd_resolved
@@ -1024,7 +1096,9 @@ dns_encryption() {
   esac
 }
 
-### Добавление пользователя ###
+###################################
+### Creating a user
+###################################
 add_user() {
   info " $(text 39) "
 
@@ -1047,7 +1121,9 @@ add_user() {
   tilda "$(text 10)"
 }
 
-### Безопасность ###
+###################################
+### Automatic system update
+###################################
 setup_auto_updates() {
   info " $(text 40) "
 
@@ -1080,7 +1156,9 @@ EOF
   tilda "$(text 10)"
 }
 
-### BBR ###
+###################################
+### BBR
+###################################
 enable_bbr() {
   info " $(text 41) "
   if [[ ! "$(sysctl net.core.default_qdisc)" == *"= fq" ]]; then
@@ -1093,7 +1171,9 @@ enable_bbr() {
   sysctl -p
 }
 
-### Отключение IPv6 ###
+###################################
+### Disabling IPv6
+###################################
 disable_ipv6() {
   info " $(text 42) "
   interface_name=$(ifconfig -s | awk 'NR==2 {print $1}')
@@ -1115,7 +1195,9 @@ disable_ipv6() {
   tilda "$(text 10)"
 }
 
-### WARP ###
+###################################
+### WARP
+###################################
 warp() {
   info " $(text 43) "
   
@@ -1176,7 +1258,9 @@ EOF
   tilda "$(text 10)"
 }
 
-### СЕРТИФИКАТЫ ###
+###################################
+### Certificates
+###################################
 issuance_of_certificates() {
   info " $(text 44) "
   touch cloudflare.credentials
@@ -1224,6 +1308,9 @@ EOF
   tilda "$(text 10)"
 }
 
+###################################
+### Node exporter
+###################################
 monitoring() {
   info " $(text 66) "
   bash <(curl -Ls https://github.com/cortez24rus/grafana-prometheus/raw/refs/heads/main/prometheus_node_exporter.sh)
@@ -1242,7 +1329,9 @@ monitoring() {
   tilda "$(text 10)"
 }
 
-### NGINX ###
+###################################
+### NGINX
+###################################
 nginx_setup() {
   info " $(text 45) "
 
@@ -1274,6 +1363,9 @@ nginx_setup() {
   tilda "$(text 10)"
 }
 
+###################################
+### http conf
+###################################
 nginx_conf() {
   cat > /etc/nginx/nginx.conf <<EOF
 user                                   ${USERNGINX};
@@ -1345,6 +1437,9 @@ stream {
 EOF
 }
 
+###################################
+### Stream conf
+###################################
 stream_conf() {
   cat > /etc/nginx/stream-enabled/stream.conf <<EOF
 map \$ssl_preread_server_name \$backend {
@@ -1374,6 +1469,9 @@ server {
 EOF
 }
 
+###################################
+### Server conf
+###################################
 local_conf() {
   cat > /etc/nginx/conf.d/local.conf <<EOF
 #server {
@@ -1484,6 +1582,9 @@ server {
 EOF
 }
 
+###################################
+### Selecting a random site
+###################################
 random_site() {
   info " $(text 79) "
   mkdir -p /var/www/html/ /usr/local/xui-rp/
@@ -1517,6 +1618,9 @@ random_site() {
   cd ~
 }
 
+###################################
+### Key generation
+###################################
 generate_keys() {
   # Генерация пары ключей X25519 с использованием xray
   local KEY_PAIR=$(/usr/local/x-ui/bin/xray-linux-amd64 x25519)
@@ -1527,6 +1631,9 @@ generate_keys() {
   echo "$PRIVATE_KEY $PUBLIC_KEY"
 }
 
+###################################
+### Grpc
+###################################
 settings_grpc() {
   STREAM_SETTINGS_GRPC=$(cat <<EOF
 {
@@ -1550,6 +1657,9 @@ EOF
   )
 }
 
+###################################
+### Split
+###################################
 settings_split() {
   STREAM_SETTINGS_SPLIT=$(cat <<EOF
 {
@@ -1586,6 +1696,9 @@ EOF
   )
 }
 
+###################################
+### Httpu
+###################################
 settings_httpu() {
   STREAM_SETTINGS_HTTPU=$(cat <<EOF
 {
@@ -1610,6 +1723,9 @@ EOF
   )
 }
 
+###################################
+### Ws
+###################################
 settings_ws() {
   STREAM_SETTINGS_WS=$(cat <<EOF
 {
@@ -1634,6 +1750,9 @@ EOF
   )
 }
 
+###################################
+### Settings reality (Steal Oneself)
+###################################
 settings_steal() {
   read PRIVATE_KEY0 PUBLIC_KEY0 <<< "$(generate_keys)"
   STREAM_SETTINGS_STEAL=$(cat <<EOF
@@ -1687,6 +1806,9 @@ EOF
   )
 }
 
+###################################
+### Settings reality
+###################################
 settings_reality() {
   read PRIVATE_KEY1 PUBLIC_KEY1 <<< "$(generate_keys)"
   STREAM_SETTINGS_REALITY=$(cat <<EOF
@@ -1740,6 +1862,9 @@ EOF
   )
 }
 
+###################################
+### Settings xtls
+###################################
 settings_xtls() {
   STREAM_SETTINGS_XTLS=$(cat <<EOF
 {
@@ -1790,6 +1915,29 @@ EOF
   )
 }
 
+###################################
+### Sniffing
+###################################
+sniffing_inbounds() {
+  SNIFFING=$(cat <<EOF
+{
+  "enabled": true,
+  "destOverride": [
+    "http",
+    "tls",
+    "quic",
+    "fakedns"
+  ],
+  "metadataOnly": true,
+  "routeOnly": true
+}
+EOF
+  )
+}
+
+###################################
+### Changing the Database
+###################################
 database_change() {
   DB_PATH="x-ui.db"
 
@@ -1805,6 +1953,14 @@ UPDATE inbounds SET stream_settings = '$STREAM_SETTINGS_WS' WHERE LOWER(remark) 
 UPDATE inbounds SET stream_settings = '$STREAM_SETTINGS_STEAL' WHERE LOWER(remark) LIKE '%steal%';
 UPDATE inbounds SET stream_settings = '$STREAM_SETTINGS_REALITY' WHERE LOWER(remark) LIKE '%whatsapp%';
 UPDATE inbounds SET stream_settings = '$STREAM_SETTINGS_XTLS' WHERE LOWER(remark) LIKE '%xtls%';
+
+UPDATE inbounds SET sniffing = '$SNIFFING' WHERE LOWER(remark) LIKE '%grpc%';
+UPDATE inbounds SET sniffing = '$SNIFFING' WHERE LOWER(remark) LIKE '%split%';
+UPDATE inbounds SET sniffing = '$SNIFFING' WHERE LOWER(remark) LIKE '%httpu%';
+UPDATE inbounds SET sniffing = '$SNIFFING' WHERE LOWER(remark) LIKE '%ws%';
+UPDATE inbounds SET sniffing = '$SNIFFING' WHERE LOWER(remark) LIKE '%steal%';
+UPDATE inbounds SET sniffing = '$SNIFFING' WHERE LOWER(remark) LIKE '%whatsapp%';
+UPDATE inbounds SET sniffing = '$SNIFFING' WHERE LOWER(remark) LIKE '%xtls%';
 
 UPDATE settings SET value = '/${WEB_BASE_PATH}/' WHERE LOWER(key) LIKE '%webbasepath%';
 UPDATE settings SET value = '/${SUB_PATH}/' WHERE LOWER(key) LIKE '%subpath%';
@@ -1822,7 +1978,9 @@ EOF
 #}
 #UPDATE settings SET value = '${SUB_JSON_RULES}' WHERE LOWER(key) LIKE '%subjsonrules%';
 
-### Установка 3x-ui ###
+###################################
+### Panel installation
+###################################
 install_panel() {
   info " $(text 46) "
 
@@ -1856,7 +2014,9 @@ install_panel() {
   tilda "$(text 10)"
 }
 
-### UFW ###
+###################################
+### Firewall
+###################################
 enabling_security() {
   info " $(text 47) "
   BLOCK_ZONE_IP=$(echo ${IP4} | cut -d '.' -f 1-3).0/22
@@ -1882,7 +2042,9 @@ enabling_security() {
   tilda "$(text 10)"
 }
 
-### SSH ####
+###################################
+### SSH
+###################################
 ssh_setup() {
   if [[ "${ANSWER_SSH,,}" == "y" ]]; then
     info " $(text 48) "
@@ -1941,14 +2103,18 @@ EOF
   fi
 }
 
-# Установока xui бота
+###################################
+### Installing xui bot
+###################################
 install_bot() {
   info " $(text 57) "
   bash <(curl -Ls https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/main/xui-rp-install-bot.sh) "$BOT_TOKEN" "$ADMIN_ID" "$DOMAIN"
   tilda "$(text 10)"
 }
 
-### Окончание ###
+###################################
+### Information output
+###################################
 data_output() {
   info " $(text 58) "
   printf '0\n' | x-ui | grep --color=never -i ':'
@@ -1969,11 +2135,16 @@ data_output() {
   tilda "$(text 10)"
 }
 
-# Удаление всех управляющих последовательностей
+###################################
+### Removing all escape sequences
+###################################
 log_clear() {
   sed -i -e 's/\x1b\[[0-9;]*[a-zA-Z]//g' "$LOGFILE"
 }
 
+###################################
+### Main function
+###################################
 main() {
   log_entry
   read_defaults_from_file
