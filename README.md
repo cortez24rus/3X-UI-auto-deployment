@@ -1,6 +1,6 @@
 # XUI-REVERSE-PROXY ([Russian](/README_RU.md)) <img src="https://img.shields.io/github/stars/cortez24rus/xui-reverse-proxy?style=social" /> 
-![Total Views Month Badge](https://img.shields.io/badge/Total%20V%20Per%20Month-2214-blue)
-![Unique Views Month Badge](https://img.shields.io/badge/Unique%20V%20Per%20Month-333-green)
+![Total Views Month Badge](https://img.shields.io/badge/Total%20V%20Per%20Month-2212-blue)
+![Unique Views Month Badge](https://img.shields.io/badge/Unique%20V%20Per%20Month-332-green)
 <p align="center"><a href="#"><img src="./media/3X-UI.png" alt="Image" ></a></p>
 
 -----
