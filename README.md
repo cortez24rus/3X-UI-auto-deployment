@@ -102,7 +102,7 @@ bash <(curl -Ls https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/
 
 The script will then prompt you for the necessary configuration information:
 
-![image](https://github.com/user-attachments/assets/dc60caee-1b01-40c9-a344-e0a67ebfc2ee)
+<p align="center"><a href="#"><img src="./media/xui_rp_install.png" alt="Image"></a></p>
 
 ### Note: 
 - Once the configuration is complete, the script will display all the necessary links and login information for the XUI administration panel.
