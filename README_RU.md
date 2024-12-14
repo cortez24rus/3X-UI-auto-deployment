@@ -101,7 +101,7 @@ bash <(curl -Ls https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/
 
 Скрипт запросит у вас необходимую конфигурационную информацию:
 
-![image](https://github.com/user-attachments/assets/dc60caee-1b01-40c9-a344-e0a67ebfc2ee)
+<p align="center"><a href="#"><img src="./media/xui_rp_install_RU.png" alt="Image"></a></p>
 
 ### Примечание: 
 - После завершения настройки скрипт отобразит все необходимые ссылки и данные для входа в административную панель.
