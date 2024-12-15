@@ -5,7 +5,7 @@ on:
     branches:
       - main  # Этот workflow запускается при пуше в основную ветку
   schedule:
-    - cron: '0 * * * *'  # Работает каждый час
+    - cron: '59 23 * * *'  # Работает каждый день в 23:59 UTC
 
 jobs:
   fetch_traffic:
