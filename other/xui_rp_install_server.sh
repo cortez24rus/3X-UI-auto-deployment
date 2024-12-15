@@ -1035,10 +1035,10 @@ dns_adguard_home() {
     sleep 3
   done
 
-  sed -i \
-    -e "s/username/${USERNAME}/g" \
-    -e "s/hash/${HASH}/g" \
-    AdGuardHome/AdGuardHome.yaml
+sed -i \
+-e "s/username/${USERNAME}/g" \
+-e "s/hash/${HASH}/g" \
+AdGuardHome/AdGuardHome.yaml
 
   AdGuardHome/AdGuardHome -s restart
 }
