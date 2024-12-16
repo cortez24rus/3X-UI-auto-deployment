@@ -125,3 +125,4 @@ The script will then prompt you for the necessary configuration information:
 
 ## Stargazers over time
 [![Stargazers over time](https://starchart.cc/cortez24rus/xui-reverse-proxy.svg?variant=adaptive)](https://starchart.cc/cortez24rus/xui-reverse-proxy)
+[![Stargazers over time](https://star-history.com/#cortez24rus/xui-reverse-proxy&Date)
