@@ -25,7 +25,7 @@ regex[file_path]="^[a-zA-Z0-9_/.-]+$"
 regex[url]="^(http|https)://([a-zA-Z0-9.-]+\.[a-zA-Z]{2,})(:[0-9]{1,5})?(/.*)?$"
 generate[path]="tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 30"
 
-defaults_file="/usr/local/xui-rp/reinstall_defaults.conf"
+defaults_file="/usr/local/xui_rp/reinstall_defaults.conf"
 
 ###################################
 ### INFO
@@ -483,8 +483,8 @@ parse_args() {
 ### Logging
 ###################################
 log_entry() {
-  mkdir -p /usr/local/xui-rp/
-  LOGFILE="/usr/local/xui-rp/xui-rp.log"
+  mkdir -p /usr/local/xui_rp/
+  LOGFILE="/usr/local/xui_rp/xui_rp.log"
   exec > >(tee -a "$LOGFILE") 2>&1
 }
 
@@ -1218,14 +1218,41 @@ disable_ipv6() {
 }
 
 ###################################
+### Swapfile
+###################################
+swapfile() {
+  swapoff /swapfile*
+  dd if=/dev/zero of=/swapfile bs=1M count=512
+  chmod 600 /swapfile
+  mkswap /swapfile
+  swapon /swapfile
+  swapon --show
+  
+  cat > /usr/local/xui_rp/restart_warp <<EOF
+#!/bin/bash
+# Получаем количество занятого пространства в swap (в мегабайтах)
+SWAP_USED=$(free -m | grep Swap | awk '{print $3}')
+# Проверяем, больше ли оно 300 Мб
+if [ "$SWAP_USED" -gt 200 ]; then
+    # Перезапускаем warp-svc.service
+    systemctl restart warp-svc.service
+    # Записываем дату и время в лог-файл
+    echo "$(date '+%Y-%m-%d %H:%M:%S') - warp-svc.service перезапущен из-за превышения swap" >> /root/warp_restart_time
+fi
+EOF
+  chmod +x /usr/local/xui_rp/restart_warp
+  { crontab -l; echo "* * * * * /usr/local/xui_rp/restart_warp"; } | crontab -
+}
+
+###################################
 ### WARP
 ###################################
 warp() {
   info " $(text 43) "
   
-  mkdir -p /usr/local/xui-rp/
+  mkdir -p /usr/local/xui_rp/
   mkdir -p /etc/systemd/system/warp-svc.service.d
-  cd /usr/local/xui-rp/
+  cd /usr/local/xui_rp/
 
   case "$SYSTEM" in
     Debian|Ubuntu)
@@ -1276,7 +1303,8 @@ EOF
   else
     echo "Ошибка: не удалось подключиться к WARP через прокси. Проверьте настройки."
   fi
-
+  
+  swapfile
   tilda "$(text 10)"
 }
 
@@ -1657,9 +1685,9 @@ EOF
 ###################################
 random_site() {
   info " $(text 79) "
-  mkdir -p /var/www/html/ /usr/local/xui-rp/
+  mkdir -p /var/www/html/ /usr/local/xui_rp/
 
-  cd /usr/local/xui-rp/ || echo "Не удалось перейти в /usr/local/xui-rp/"
+  cd /usr/local/xui_rp/ || echo "Не удалось перейти в /usr/local/xui_rp/"
 
   if [[ ! -d "simple-web-templates-main" ]]; then
       while ! wget -q --progress=dot:mega --timeout=30 --tries=10 --retry-connrefused "https://github.com/cortez24rus/simple-web-templates/archive/refs/heads/main.zip"; do
