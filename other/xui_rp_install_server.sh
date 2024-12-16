@@ -1514,8 +1514,15 @@ server {
   if (\$host = ${IP4}) {
     return 444;
   }
+  location / {
+    if (\$hack = 1) {return 404;}
+    auth_basic "Restricted Area";
+    auth_basic_user_file /etc/nginx/.htpasswd;
+  }
   ${COMMENT_METRIC}
+  ${COMMENT_SHELL}
   location /${WEB_BASE_PATH} {
+    if (\$hack = 1) {return 404;}
     proxy_redirect off;
     proxy_set_header Host \$host;
     proxy_set_header X-Real-IP \$remote_addr;
@@ -1545,6 +1552,7 @@ server {
     break;
   }
   location /${CDNSPLIT} {
+    if (\$hack = 1) {return 404;}
     proxy_pass http://127.0.0.1:2063;
     proxy_http_version 1.1;
     proxy_redirect off;
