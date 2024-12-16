@@ -224,9 +224,9 @@ show_help() {
   echo
   echo "Usage: xui-rp-install-server.sh [-g|--generate <true|false>] [-u|--utils <true|false>] [-d|--dns <true|false>]"
   echo "       [-a|--addu <true|false>] [-r|--autoupd <true|false>] [-b|--bbr <true|false>] [-i|--ipv6 <true|false>]"
-  echo "       [-w|--warp <true|false>] [-c|--cert <true|false>] [-m|--mon <true|false>] [-n|--nginx <true|false>]"
-  echo "       [-p|--panel <true|false>] [-f|--firewall <true|false>] [-s|--ssh <true|false>] [-t|--tgbot <true|false>]"
-  echo "       [-h|--help]"
+  echo "       [-w|--warp <true|false>] [-c|--cert <true|false>] [-m|--mon <true|false>] [-x|--shell <true|false>]"
+  echo "       [-n|--nginx <true|false>] [-p|--panel <true|false>] [-f|--firewall <true|false>] [-s|--ssh <true|false>]"
+  echo "       [-t|--tgbot <true|false>] [-h|--help]"
   echo
   echo "  -g, --generate <true|false>    Generate a random string for configuration       (default: ${defaults[generate]})"
   echo "                                 Генерация случайных путей для конфигурации"
@@ -248,6 +248,8 @@ show_help() {
   echo "                                 Выпуск сертификатов для домена"
   echo "  -m, --mon <true|false>         Monitoring services (node_exporter)              (default: ${defaults[mon]})"
   echo "                                 Сервисы мониторинга (node_exporter)"
+  echo "  -x, --shell <true|false>       Shell In A Box installation                      (default: ${defaults[shell]})"
+  echo "                                 Установка Shell In A Box"
   echo "  -n, --nginx <true|false>       NGINX installation                               (default: ${defaults[nginx]})"
   echo "                                 Установка NGINX"
   echo "  -p, --panel <true|false>       Panel installation for user management           (default: ${defaults[panel]})"
@@ -287,6 +289,7 @@ read_defaults_from_file() {
     defaults[warp]=true
     defaults[cert]=true
     defaults[mon]=false
+    defaults[shell]=false
     defaults[nginx]=true
     defaults[panel]=true
     defaults[firewall]=true
@@ -310,6 +313,7 @@ defaults[ipv6]=false
 defaults[warp]=false
 defaults[cert]=false
 defaults[mon]=false
+defaults[shell]=false
 defaults[nginx]=true
 defaults[panel]=true
 defaults[firewall]=false
@@ -412,6 +416,12 @@ parse_args() {
         validate_true_false mon "$2" || return 1
         shift 2
         ;;
+      -x|--shell)
+        args[shell]="$2"
+        normalize_case shell
+        validate_true_false shell "$2" || return 1
+        shift 2
+        ;;	
       -n|--nginx)
         args[nginx]="$2"
         normalize_case nginx
@@ -700,6 +710,9 @@ validate_path() {
       METRICS)
         reading " $(text 24) " PATH_VALUE
         ;;
+      SHELLBOX)
+        reading " $(text 24) " PATH_VALUE
+        ;;	
       ADGUARDPATH)
         reading " $(text 25) " PATH_VALUE
         ;;
@@ -745,6 +758,9 @@ validate_path() {
     METRICS)
       export METRICS="$ESCAPED_PATH"
       ;;
+    SHELLBOX)
+      export SHELLBOX="$ESCAPED_PATH"
+      ;;      
     ADGUARDPATH)
       export ADGUARDPATH="$ESCAPED_PATH"
       ;;
@@ -843,6 +859,15 @@ data_entry() {
     else
       echo
       validate_path METRICS
+    fi
+  fi
+
+  if [[ ${args[shell]} == "true" ]]; then
+    if [[ ${args[generate]} == "true" ]]; then
+      SHELLBOX=$(eval ${generate[path]})
+    else
+      echo
+      validate_path SHELLBOX
     fi
   fi
 
@@ -1310,6 +1335,7 @@ monitoring() {
   bash <(curl -Ls https://github.com/cortez24rus/grafana-prometheus/raw/refs/heads/main/prometheus_node_exporter.sh)
   
   COMMENT_METRIC="location /${METRICS} {
+    if (\$hack = 1) {return 404;}
     auth_basic \"Restricted Content\";
     auth_basic_user_file /etc/nginx/.htpasswd;
     proxy_pass http://127.0.0.1:9100/metrics;
@@ -1320,6 +1346,47 @@ monitoring() {
     break;
   }"
   
+  tilda "$(text 10)"
+}
+
+###################################
+### Shell In A Box
+###################################
+shellinabox() {
+  info " $(text 66) "
+  apt-get install shellinabox
+
+  cat > /etc/default/shellinabox <<EOF
+# Should shellinaboxd start automatically
+SHELLINABOX_DAEMON_START=1
+# TCP port that shellinboxds webserver listens on
+SHELLINABOX_PORT=4200
+# Parameters that are managed by the system and usually should not need
+# changing:
+# SHELLINABOX_DATADIR=/var/lib/shellinabox
+# SHELLINABOX_USER=shellinabox
+# SHELLINABOX_GROUP=shellinabox
+# Any optional arguments (e.g. extra service definitions).  Make sure
+# that that argument is quoted.
+#   Beeps are disabled because of reports of the VLC plugin crashing
+#   Firefox on Linux/x86_64.
+SHELLINABOX_ARGS="--no-beep --localhost-only --disable-ssl"
+}
+EOF
+
+  COMMENT_SHELLBOX="location /${SHELLBOX} {
+    if (\$hack = 1) {return 404;}
+    auth_basic \"Restricted Content\";
+    auth_basic_user_file /etc/nginx/.htpasswd;
+    proxy_pass http://127.0.0.1:4200;
+    proxy_set_header Host \$host;
+    proxy_set_header X-Real-IP \$remote_addr;
+    proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto \$scheme;
+    break;
+  }"
+  
+  systemctl restart shellinabox
   tilda "$(text 10)"
 }
 
@@ -1520,7 +1587,7 @@ server {
     auth_basic_user_file /etc/nginx/.htpasswd;
   }
   ${COMMENT_METRIC}
-  ${COMMENT_SHELL}
+  ${COMMENT_SHELLBOX}
   location /${WEB_BASE_PATH} {
     if (\$hack = 1) {return 404;}
     proxy_redirect off;
@@ -2173,6 +2240,7 @@ main() {
   [[ ${args[warp]} == "true" ]] && warp
   [[ ${args[cert]} == "true" ]] && issuance_of_certificates
   [[ ${args[mon]} == "true" ]] && monitoring
+  [[ ${args[shell]} == "true" ]] && shellinabox
   write_defaults_to_file
   [[ ${args[nginx]} == "true" ]] && nginx_setup
   [[ ${args[panel]} == "true" ]] && install_panel
