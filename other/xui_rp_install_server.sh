@@ -1049,7 +1049,7 @@ dns_adguard_home() {
     warning " $(text 38) "
     sleep 3
   done
-  tar xvf AdGuardHome_linux_amd64.tar.gz
+  tar -zxvf AdGuardHome_linux_amd64.tar.gz
 
   AdGuardHome/AdGuardHome -s install
   HASH=$(htpasswd -B -C 10 -n -b ${USERNAME} ${PASSWORD} | cut -d ":" -f 2)
