@@ -23,9 +23,9 @@ msg_banner "Обновляем пакеты и устанавливаем zip...
 apt-get update -y && apt-get install -y zip wget unzip || { msg_err "Ошибка при установке пакетов"; exit 1; }
 
 msg_banner "Создаем необходимые папки..."
-mkdir -p /var/www/html/ /usr/local/xui-rp/
+mkdir -p /var/www/html/ /usr/local/reverse_proxy/
 
-cd /usr/local/xui-rp/ || { msg_err "Не удалось перейти в /usr/local/xui-rp/"; exit 1; }
+cd /usr/local/reverse_proxy/ || { msg_err "Не удалось перейти в /usr/local/reverse_proxy/"; exit 1; }
 
 if [[ ! -d "simple-web-templates-main" ]]; then
     msg_inf "Скачиваем шаблоны..."

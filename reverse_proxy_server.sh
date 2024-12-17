@@ -1878,11 +1878,11 @@ EOF
 }
 
 ###################################
-### Installing xui bot
+### Installing bot
 ###################################
 install_bot() {
   info " $(text 57) "
-  bash <(curl -Ls https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/main/xui-rp-install-bot.sh) "$BOT_TOKEN" "$ADMIN_ID" "$DOMAIN"
+  bash <(curl -Ls https://github.com/cortez24rus/xui-reverse-proxy/raw/refs/heads/main/reverse_proxy_bot.sh) "$BOT_TOKEN" "$ADMIN_ID" "$DOMAIN"
   tilda "$(text 10)"
 }
 
