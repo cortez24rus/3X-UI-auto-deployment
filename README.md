@@ -16,11 +16,11 @@ This script is designed to quickly and easily set up a hidden proxy server, with
 
 ### Supported Operating Systems:
 
-| **Ubuntu**       | **Debian**        | **CentOS**       |
-|------------------|-------------------|------------------|
-| 24.04 LTS        | 12 (bookworm)     | Stream 9         |
-| 22.04 LTS        | 11 (bullseye)     | Stream 8         |
-| 20.04 LTS        | 10 (buster)       | 7                |
+| **Ubuntu**       | **Debian**      | **CentOS**      |
+|------------------|-----------------|-----------------|
+| 24.04 LTS        | 12 bookworm     | Stream 9        |
+| 22.04 LTS        | 11 bullseye     | Stream 8        |
+| 20.04 LTS        | 10 buster       | 7               |
 
 -----
 
