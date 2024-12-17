@@ -25,7 +25,7 @@ regex[file_path]="^[a-zA-Z0-9_/.-]+$"
 regex[url]="^(http|https)://([a-zA-Z0-9.-]+\.[a-zA-Z]{2,})(:[0-9]{1,5})?(/.*)?$"
 generate[path]="tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 30"
 
-defaults_file="/usr/local/xui-rp/reinstall_defaults.conf"
+defaults_file="/usr/local/reverse_proxy/reinstall_defaults.conf"
 
 ###################################
 ### INFO
@@ -222,7 +222,7 @@ R[85]=""
 ###################################
 show_help() {
   echo
-  echo "Usage: xui-rp-install-server.sh [-g|--generate <true|false>] [-u|--utils <true|false>] [-d|--dns <true|false>]"
+  echo "Usage: reverse_proxy_server.sh [-g|--generate <true|false>] [-u|--utils <true|false>] [-d|--dns <true|false>]"
   echo "       [-a|--addu <true|false>] [-r|--autoupd <true|false>] [-b|--bbr <true|false>] [-i|--ipv6 <true|false>]"
   echo "       [-w|--warp <true|false>] [-c|--cert <true|false>] [-m|--mon <true|false>] [-n|--nginx <true|false>]"
   echo "       [-p|--panel <true|false>] [-f|--firewall <true|false>] [-s|--ssh <true|false>] [-t|--tgbot <true|false>]"
@@ -473,8 +473,8 @@ parse_args() {
 ### Logging
 ###################################
 log_entry() {
-  mkdir -p /usr/local/xui-rp/
-  LOGFILE="/usr/local/xui-rp/xui-rp.log"
+  mkdir -p /usr/local/reverse_proxy/
+  LOGFILE="/usr/local/reverse_proxy/reverse_proxy.log"
   exec > >(tee -a "$LOGFILE") 2>&1
 }
 
@@ -1199,9 +1199,9 @@ disable_ipv6() {
 warp() {
   info " $(text 43) "
   
-  mkdir -p /usr/local/xui-rp/
+  mkdir -p /usr/local/reverse_proxy/
   mkdir -p /etc/systemd/system/warp-svc.service.d
-  cd /usr/local/xui-rp/
+  cd /usr/local/reverse_proxy/
 
   case "$SYSTEM" in
     Debian|Ubuntu)
@@ -1551,9 +1551,9 @@ EOF
 ###################################
 random_site() {
   info " $(text 79) "
-  mkdir -p /var/www/html/ /usr/local/xui-rp/
+  mkdir -p /var/www/html/ /usr/local/reverse_proxy/
 
-  cd /usr/local/xui-rp/ || echo "Не удалось перейти в /usr/local/xui-rp/"
+  cd /usr/local/reverse_proxy/ || echo "Не удалось перейти в /usr/local/reverse_proxy/"
 
   if [[ ! -d "simple-web-templates-main" ]]; then
       while ! wget -q --progress=dot:mega --timeout=30 --tries=10 --retry-connrefused "https://github.com/cortez24rus/simple-web-templates/archive/refs/heads/main.zip"; do
