@@ -1,4 +1,4 @@
-# XUI-REVERSE-PROXY ([Russian](/README_RU.md)) <img src="https://img.shields.io/github/stars/cortez24rus/xui-reverse-proxy?style=social" /> 
+# REVERSE_RPOXY ([Russian](/README_RU.md)) <img src="https://img.shields.io/github/stars/cortez24rus/xui-reverse-proxy?style=social" /> 
 ![Total Views Month Badge](https://img.shields.io/badge/Total%20V%20Per%20Month-2165-blue)
 ![Unique Views Month Badge](https://img.shields.io/badge/Unique%20V%20Per%20Month-342-green)
 <p align="center"><a href="#"><img src="./media/3X-UI.png" alt="Image" ></a></p>
@@ -63,7 +63,7 @@ This script is designed to quickly and easily set up a hidden proxy server, with
 
 ### Help message of the script:
 ```
-Usage: xui-rp-install-server.sh [-g|--generate <true|false>] [-u|--utils <true|false>] [-d|--dns <true|false>]
+Usage: reverse_proxy_server.sh [-g|--generate <true|false>] [-u|--utils <true|false>] [-d|--dns <true|false>]
                  [-a|--addu <true|false>] [-r|--autoupd <true|false>] [-b|--bbr <true|false>] [-i|--ipv6 <true|false>]
                  [-w|--warp <true|false>] [-c|--cert <true|false>] [-m|--mon <true|false>] [-n|--nginx <true|false>]
                  [-p|--panel <true|false>] [-f|--firewall <true|false>] [-s|--ssh <true|false>] [-t|--tgbot <true|false>]
@@ -88,16 +88,16 @@ Usage: xui-rp-install-server.sh [-g|--generate <true|false>] [-u|--utils <true|f
 
 ```
 
-### Installation of XUI-RP:
+### Installation of REVERSE_PROXY:
 
 To begin configuring the server, simply run the following command in a terminal:
 ```sh
-bash <(curl -Ls https://raw.githubusercontent.com/cortez24rus/xui-reverse-proxy/refs/heads/main/xui-rp-install-server.sh)
+bash <(curl -Ls https://raw.githubusercontent.com/cortez24rus/xui-reverse-proxy/refs/heads/main/reverse_proxy_server.sh)
 ```
 
 ### Installing a random template for the website:
 ```sh
-bash <(curl -Ls https://raw.githubusercontent.com/cortez24rus/xui-reverse-proxy/refs/heads/main/xui-rp-random-site.sh)
+bash <(curl -Ls https://raw.githubusercontent.com/cortez24rus/xui-reverse-proxy/refs/heads/main/reverse_proxy_random_site.sh)
 ```
 
 The script will then prompt you for the necessary configuration information:
