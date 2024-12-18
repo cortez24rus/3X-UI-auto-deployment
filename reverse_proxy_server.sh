@@ -668,7 +668,6 @@ check_cf_token() {
 
     while [[ -z $CFTOKEN ]]; do
       reading " $(text 16) " CFTOKEN
-      echo
     done
     get_test_response
     info " $(text 17) "
