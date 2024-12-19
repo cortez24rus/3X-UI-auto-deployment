@@ -61,40 +61,43 @@ check_domain_ip() {
   DOMAIN_IPS=($(get_domain_ips))
 
   if [[ $? -ne 0 ]]; then
-    echo "Не удалось получить внешний IP, завершение выполнения"
+    echo "  Не удалось получить внешний IP, завершение выполнения"
     exit 1
   fi
 
-  echo "IP-адреса домена $DOMAIN: ${DOMAIN_IPS[@]}"
+  echo "  IP-адреса домена $DOMAIN: ${DOMAIN_IPS[@]}"
 
   if echo "${DOMAIN_IPS[@]}" | grep -qw "$MY_IP"; then
-    echo "Ваш IP совпадает с одним из IP домена $DOMAIN (Status Dns only)"
+    echo "  Ваш IP совпадает с одним из IP домена $DOMAIN (Status Dns only)"
     echo
     return 0
   fi
 
   for IP in "${DOMAIN_IPS[@]}"; do
     if check_ip_in_cloudflare "$IP"; then
-      echo "IP-адрес $IP входит в диапазоны Cloudflare (Status Proxied)"
+      echo "  IP-адрес $IP входит в диапазоны Cloudflare (Status Proxied)"
       echo
       return 0
     fi
   done
 
-  echo "Ни один из IP-адресов ${DOMAIN_IPS[@]} не входит в диапазоны Cloudflare."
+  echo "  Ни один из IP-адресов ${DOMAIN_IPS[@]} не входит в диапазоны Cloudflare."
+  echo "|-------------------------------------------------------------------------|"
   exit 1
 }
 
 final() {
-  echo "Отработал на ура"
+  echo "  Отработал на ура"
 }
 
 main() {
-  echo "------------------------------------------------"
+  echo
+  echo "|-------------------------------------------------------------------------|"
   DOMAIN="$@"
   check_domain_ip
   final
-  echo "------------------------------------------------"
+  echo "|-------------------------------------------------------------------------|"
+  echo
 }
 
 main "$@"
