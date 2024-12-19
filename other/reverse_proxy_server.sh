@@ -622,14 +622,6 @@ start_installation() {
 }
 
 ###################################
-### Obtaining a domain IP address
-###################################
-get_domain_ips() {
-    IPS=($(dig @1.1.1.1 +short "$DOMAIN"))
-    echo "${IPS[@]}"
-}
-
-###################################
 ### Obtaining your external IP address
 ###################################
 check_ip() {
@@ -646,6 +638,14 @@ check_ip() {
         return 1
     fi
     echo "$IP4"
+}
+
+###################################
+### Obtaining a domain IP address
+###################################
+get_domain_ips() {
+    IPS=($(dig @1.1.1.1 +short "$DOMAIN"))
+    echo "${IPS[@]}"
 }
 
 ###################################
@@ -733,19 +733,18 @@ check_cf_token() {
         echo
     done
 
-    [[ ${args[skip_check]} == "true" ]] && check_domain_ip
-
     # Удаляем http:// или https:// (если они есть), порты и пути
     temp_domain=$(echo "$temp_domain" | sed -E 's/^https?:\/\///' | sed -E 's/(:[0-9]+)?(\/[a-zA-Z0-9_\-\/]+)?$//')
 
-    # Проверка на наличие домена третьего уровня (например, grf.x.com)
     if [[ "$temp_domain" =~ ${regex[domain]} ]]; then
       SUBDOMAIN="$temp_domain"           # Весь домен сохраняем в SUBDOMAIN
-      DOMAIN="${BASH_REMATCH[2]}"        # Извлекаем домен второго уровня (x.com)
+      DOMAIN="${BASH_REMATCH[2]}"        # Извлекаем домен второго уровня
     else
       DOMAIN="$temp_domain"              # Если это домен второго уровня, то просто сохраняем
       SUBDOMAIN="www.$temp_domain"       # Для домена второго уровня подставляем www в SUBDOMAIN
     fi
+
+    [[ ${args[skip_check]} == "true" ]] && check_domain_ip
 
     while [[ -z $EMAIL ]]; do
       reading " $(text 15) " EMAIL
