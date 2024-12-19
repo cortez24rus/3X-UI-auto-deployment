@@ -1677,19 +1677,13 @@ server {
   if (\$ssl_server_name !~* ^(.+\.)?${DOMAIN}\$ ) {set \$safe "\${safe}0"; }
   if (\$safe = 10){return 444;}
   if (\$request_uri ~ "(\"|'|\`|~|,|:|--|;|%|\\$|&&|\?\?|0x00|0X00|\||\\|\{|\}|\[|\]|<|>|\.\.\.|\.\.\/|\/\/\/)"){set \$hack 1;}
-  error_page 400 401 402 403 500 501 502 503 504 =404 /404;
+  error_page 400 402 403 500 501 502 503 504 =404 /404;
   proxy_intercept_errors on;
 
   if (\$host = ${IP4}) {
     return 444;
   }
-  location / {
-    if (\$hack = 1) {return 404;}
-    auth_basic "Restricted Area";
-    auth_basic_user_file /etc/nginx/.htpasswd;
-  }
-  ${COMMENT_METRIC}
-  ${COMMENT_SHELLBOX}
+  # PANEL
   location /${WEB_BASE_PATH} {
     if (\$hack = 1) {return 404;}
     proxy_redirect off;
@@ -1702,6 +1696,7 @@ server {
     proxy_pass http://127.0.0.1:36075/${WEB_BASE_PATH};
     break;
   }
+  # SUB
   location /${SUB_PATH} {
     if (\$hack = 1) {return 404;}
     proxy_redirect off;
@@ -1711,6 +1706,7 @@ server {
     proxy_pass http://127.0.0.1:36074/${SUB_PATH};
     break;
   }
+  # SUB JSON
   location /${SUB_JSON_PATH} {
     if (\$hack = 1) {return 404;}
     proxy_redirect off;
@@ -1720,12 +1716,14 @@ server {
     proxy_pass http://127.0.0.1:36074/${SUB_JSON_PATH};
     break;
   }
+  # SPLIT
   location /${CDNSPLIT} {
     if (\$hack = 1) {return 404;}
     proxy_pass http://127.0.0.1:2063;
     proxy_http_version 1.1;
     proxy_redirect off;
   }
+  # GRPC WEBSOCKET HTTPUpgrade
   location ~ ^/(?<fwdport>\d+)/(?<fwdpath>.*)\$ {
     if (\$hack = 1) {return 404;}
     client_max_body_size 0;
@@ -1749,6 +1747,11 @@ server {
     proxy_pass http://127.0.0.1:\$fwdport\$is_args\$args;
     break;
   }
+  # Node exporter
+  ${COMMENT_METRIC}
+  # SHELLBOX
+  ${COMMENT_SHELLBOX}
+  # Adguard Home
   ${COMMENT_AGH}
 }
 EOF
