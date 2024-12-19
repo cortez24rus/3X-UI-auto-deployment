@@ -82,7 +82,7 @@
   -s, --ssh <true|false>         SSH доступ                                     (по умолчанию: true)
   -t, --tgbot <true|false>       Интеграция Telegram бота                       (по умолчанию: false)
   -g, --generate <true|false>    Генерация случайных путей для конфигурации     (по умолчанию: true)
-  -x, --skip-check <true|false>  Disable the check functionality                (по умолчанию: false)
+  -x, --skip-check <true|false>  Отключение проверки                            (по умолчанию: false)
   -h, --help                     Показать это сообщение помощи
 ```
 
