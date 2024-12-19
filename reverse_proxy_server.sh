@@ -737,7 +737,9 @@ check_cf_token() {
       SUBDOMAIN="www.$temp_domain"       # Для домена второго уровня подставляем www в SUBDOMAIN
     fi
 
+    echo "1"
     [[ ${args[skip_check]} == "true" ]] && check_domain_ip
+    echo "2"
 
     while [[ -z $EMAIL ]]; do
       reading " $(text 15) " EMAIL
