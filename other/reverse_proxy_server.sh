@@ -736,7 +736,7 @@ check_cf_token() {
       SUBDOMAIN="www.$temp_domain"       # Для домена второго уровня подставляем www в SUBDOMAIN
     fi
 
-    [[ ${args[skip-check]} == "false" ]] && check_domain_ip
+#    [[ ${args[skip-check]} == "false" ]] && check_domain_ip
 
     while [[ -z $EMAIL ]]; do
       reading " $(text 15) " EMAIL
@@ -2319,7 +2319,7 @@ main() {
   parse_args "$@" || show_help
   [[ ${args[skip-check]} == "false" ]] && check_root
   check_operating_system
-  [[ ${args[skip-check]} == "true" ]] && check_ip
+  [[ ${args[skip-check]} == "false" ]] && check_ip
   select_language
   if [ -f ${defaults_file} ]; then
     tilda "$(text 4)"
