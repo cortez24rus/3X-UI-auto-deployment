@@ -296,7 +296,7 @@ read_defaults_from_file() {
     defaults[ssh]=true
     defaults[tgbot]=false
     defaults[generate]=true
-    defaults[skip_check]=true
+    defaults[skip_check]=false
   fi
 }
 
@@ -321,7 +321,7 @@ defaults[firewall]=false
 defaults[ssh]=false
 defaults[tgbot]=false
 defaults[generate]=true
-defaults[skip_check]=true
+defaults[skip_check]=false
 EOF
 }
 
@@ -738,7 +738,7 @@ check_cf_token() {
     fi
 
     echo "1"
-    [[ ${args[skip_check]} == "true" ]] && check_domain_ip
+    [[ ${args[skip_check]} == "false" ]] && check_domain_ip
     echo "2"
 
     while [[ -z $EMAIL ]]; do
@@ -749,7 +749,7 @@ check_cf_token() {
     while [[ -z $CFTOKEN ]]; do
       reading " $(text 16) " CFTOKEN
     done
-    [[ ${args[skip_check]} == "true" ]] && get_test_response
+    [[ ${args[skip_check]} == "false" ]] && get_test_response
     info " $(text 17) "
   done
 }
@@ -2007,7 +2007,7 @@ main() {
   log_entry
   read_defaults_from_file
   parse_args "$@" || show_help
-  [[ ${args[skip_check]} == "true" ]] && check_root
+  [[ ${args[skip_check]} == "false" ]] && check_root
   check_operating_system
   select_language
   if [ -f ${defaults_file} ]; then
@@ -2016,7 +2016,7 @@ main() {
   sleep 2
   clear
   banner_1
-  [[ ${args[skip_check]} == "true" ]] && start_installation
+  [[ ${args[skip_check]} == "false" ]] && start_installation
   data_entry
   [[ ${args[utils]} == "true" ]] && installation_of_utilities
   [[ ${args[dns]} == "true" ]] && dns_encryption
