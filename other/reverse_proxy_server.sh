@@ -628,8 +628,8 @@ check_ip() {
     fi
 
     if [[ ! $IP4 =~ $IP4_REGEX ]]; then
-        echo "Не удалось получить внешний IP."
-        return 1
+      echo "Не удалось получить внешний IP."
+      return 1
     fi
 }
 
@@ -675,22 +675,24 @@ check_domain_ip() {
     DOMAIN_IPS=($(get_domain_ips))
 
     if [[ $? -ne 0 ]]; then
-        echo "Не удалось получить внешний IP, завершение выполнения"
-        exit 1
+      echo "Не удалось получить внешний IP, завершение выполнения"
+      exit 1
     fi
 
     echo "IP-адреса домена $DOMAIN: ${DOMAIN_IPS[@]}"
 
     if echo "${DOMAIN_IPS[@]}" | grep -qw "$MY_IP"; then
-        echo "Ваш IP совпадает с одним из IP домена $DOMAIN."
-        return 0
+      echo "Ваш IP совпадает с одним из IP домена $DOMAIN."
+      echo
+      return 0
     fi
 
     for IP in "${DOMAIN_IPS[@]}"; do
-        if check_ip_in_cloudflare "$IP"; then
-          echo "IP-адрес $IP входит в диапазоны Cloudflare."
-          return 0
-        fi
+      if check_ip_in_cloudflare "$IP"; then
+        echo "IP-адрес $IP входит в диапазоны Cloudflare."
+        echo
+        return 0
+      fi
     done
 
     echo "Ни один из IP-адресов ${DOMAIN_IPS[@]} не входит в диапазоны Cloudflare."
@@ -724,7 +726,6 @@ check_cf_token() {
         echo
     done
 
-    # Удаляем http:// или https:// (если они есть), порты и пути
     temp_domain=$(echo "$temp_domain" | sed -E 's/^https?:\/\///' | sed -E 's/(:[0-9]+)?(\/[a-zA-Z0-9_\-\/]+)?$//')
 
     if [[ "$temp_domain" =~ ${regex[domain]} ]]; then

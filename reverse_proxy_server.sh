@@ -625,10 +625,9 @@ check_ip() {
     fi
 
     if [[ ! $IP4 =~ $IP4_REGEX ]]; then
-        echo "Не удалось получить внешний IP."
-        return 1
+      echo "Не удалось получить внешний IP."
+      return 1
     fi
-    echo "$IP4"
 }
 
 ###################################
@@ -673,23 +672,24 @@ check_domain_ip() {
     DOMAIN_IPS=($(get_domain_ips))
 
     if [[ $? -ne 0 ]]; then
-        echo "Не удалось получить внешний IP, завершение выполнения"
-        exit 1
+      echo "Не удалось получить внешний IP, завершение выполнения"
+      exit 1
     fi
 
-    echo "Ваш внешний IP: $MY_IP"
     echo "IP-адреса домена $DOMAIN: ${DOMAIN_IPS[@]}"
 
     if echo "${DOMAIN_IPS[@]}" | grep -qw "$MY_IP"; then
-        echo "Ваш IP совпадает с одним из IP домена $DOMAIN."
-        return 0
+      echo "Ваш IP совпадает с одним из IP домена $DOMAIN."
+      echo
+      return 0
     fi
 
     for IP in "${DOMAIN_IPS[@]}"; do
-        if check_ip_in_cloudflare "$IP"; then
-          echo "IP-адрес $IP входит в диапазоны Cloudflare."
-          return 0
-        fi
+      if check_ip_in_cloudflare "$IP"; then
+        echo "IP-адрес $IP входит в диапазоны Cloudflare."
+        echo
+        return 0
+      fi
     done
 
     echo "Ни один из IP-адресов ${DOMAIN_IPS[@]} не входит в диапазоны Cloudflare."
@@ -723,7 +723,6 @@ check_cf_token() {
         echo
     done
 
-    # Удаляем http:// или https:// (если они есть), порты и пути
     temp_domain=$(echo "$temp_domain" | sed -E 's/^https?:\/\///' | sed -E 's/(:[0-9]+)?(\/[a-zA-Z0-9_\-\/]+)?$//')
 
     if [[ "$temp_domain" =~ ${regex[domain]} ]]; then
@@ -734,7 +733,7 @@ check_cf_token() {
       SUBDOMAIN="www.$temp_domain"       # Для домена второго уровня подставляем www в SUBDOMAIN
     fi
 
-#    [[ ${args[skip-check]} == "false" ]] && check_domain_ip
+    [[ ${args[skip-check]} == "false" ]] && check_domain_ip
 
     while [[ -z $EMAIL ]]; do
       reading " $(text 15) " EMAIL
@@ -2004,7 +2003,7 @@ main() {
   parse_args "$@" || show_help
   [[ ${args[skip-check]} == "false" ]] && check_root
   check_operating_system
-  check_ip
+  [[ ${args[skip-check]} == "true" ]] && check_ip
   select_language
   if [ -f ${defaults_file} ]; then
     tilda "$(text 4)"
