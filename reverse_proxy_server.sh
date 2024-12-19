@@ -1154,7 +1154,6 @@ dns_encryption() {
     proxy_set_header Host \$host;
     proxy_set_header X-Real-IP \$remote_addr;
     proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-    proxy_set_header X-Real-IP \$remote_addr;
     proxy_set_header Range \$http_range;
     proxy_set_header If-Range \$http_if_range;
     proxy_redirect /login.html /${ADGUARDPATH}/login.html;
