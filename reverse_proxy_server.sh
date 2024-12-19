@@ -679,17 +679,14 @@ check_domain_ip() {
 
     echo "Ваш внешний IP: $MY_IP"
     echo "IP-адреса домена $DOMAIN: ${DOMAIN_IPS[@]}"
-    echo
 
     if echo "${DOMAIN_IPS[@]}" | grep -qw "$MY_IP"; then
         echo "Ваш IP совпадает с одним из IP домена $DOMAIN."
-        exit 0
     fi
 
     for IP in "${DOMAIN_IPS[@]}"; do
         if check_ip_in_cloudflare "$IP"; then
             echo "IP-адрес $IP входит в диапазоны Cloudflare."
-            exit 0
         fi
     done
 
