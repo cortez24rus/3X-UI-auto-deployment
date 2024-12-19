@@ -228,8 +228,6 @@ show_help() {
   echo "       [-f|--firewall <true|false>] [-s|--ssh <true|false>] [-t|--tgbot <true|false>] [-g|--generate <true|false>]"
   echo "       [-x|--skip-check <true|false>] [-h|--help]"
   echo
-  echo "  -g, --generate <true|false>    Generate a random string for configuration       (default: ${defaults[generate]})"
-  echo "                                 Генерация случайных путей для конфигурации"
   echo "  -u, --utils <true|false>       Additional utilities                             (default: ${defaults[utils]})"
   echo "                                 Дополнительные утилиты"
   echo "  -d, --dns <true|false>         DNS encryption                                   (default: ${defaults[dns]})"
@@ -358,7 +356,7 @@ validate_true_false() {
 ###################################
 parse_args() {
   local opts
-  opts=$(getopt -o i:w:m:u:s:t:f:a:r:b:hl:d:p:c:n:g --long utils:,dns:,addu:,autoupd:,bbr:,ipv6:,warp:,cert:,mon:,nginx:,panel:,firewall:,ssh:,tgbot:,generate:,help -- "$@")
+  opts=$(getopt -o i:w:m:u:s:t:f:a:r:b:hl:d:p:c:n:g:x --long utils:,dns:,addu:,autoupd:,bbr:,ipv6:,warp:,cert:,mon:,nginx:,panel:,firewall:,ssh:,tgbot:,generate:,skip-check:,help -- "$@")
   if [[ $? -ne 0 ]]; then
     return 1
   fi
