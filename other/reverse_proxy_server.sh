@@ -2321,6 +2321,7 @@ main() {
   parse_args "$@" || show_help
   [[ ${args[skip-check]} == "false" ]] && check_root
   check_operating_system
+  check_ip
   select_language
   if [ -f ${defaults_file} ]; then
     tilda "$(text 4)"
