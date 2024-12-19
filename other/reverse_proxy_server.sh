@@ -631,7 +631,6 @@ check_ip() {
         echo "Не удалось получить внешний IP."
         return 1
     fi
-    echo "$IP4"
 }
 
 ###################################
@@ -680,9 +679,7 @@ check_domain_ip() {
         exit 1
     fi
 
-    echo "Ваш внешний IP: $MY_IP"
     echo "IP-адреса домена $DOMAIN: ${DOMAIN_IPS[@]}"
-    echo
 
     if echo "${DOMAIN_IPS[@]}" | grep -qw "$MY_IP"; then
         echo "Ваш IP совпадает с одним из IP домена $DOMAIN."
@@ -2321,7 +2318,7 @@ main() {
   parse_args "$@" || show_help
   [[ ${args[skip-check]} == "false" ]] && check_root
   check_operating_system
-  check_ip
+  [[ ${args[skip-check]} == "true" ]] && check_ip
   select_language
   if [ -f ${defaults_file} ]; then
     tilda "$(text 4)"
