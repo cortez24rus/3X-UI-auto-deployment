@@ -686,13 +686,13 @@ check_domain_ip() {
 
     if echo "${DOMAIN_IPS[@]}" | grep -qw "$MY_IP"; then
         echo "Ваш IP совпадает с одним из IP домена $DOMAIN."
-        continue
+        return 0
     fi
 
     for IP in "${DOMAIN_IPS[@]}"; do
         if check_ip_in_cloudflare "$IP"; then
           echo "IP-адрес $IP входит в диапазоны Cloudflare."
-          continue
+          return 0
         fi
     done
 
