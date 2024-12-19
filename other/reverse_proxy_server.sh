@@ -222,14 +222,12 @@ R[85]=""
 ###################################
 show_help() {
   echo
-  echo "Usage: reverse_proxy_server.sh [-g|--generate <true|false>] [-u|--utils <true|false>] [-d|--dns <true|false>]"
-  echo "       [-a|--addu <true|false>] [-r|--autoupd <true|false>] [-b|--bbr <true|false>] [-i|--ipv6 <true|false>]"
-  echo "       [-w|--warp <true|false>] [-c|--cert <true|false>] [-m|--mon <true|false>] [-x|--shell <true|false>]"
-  echo "       [-n|--nginx <true|false>] [-p|--panel <true|false>] [-f|--firewall <true|false>] [-s|--ssh <true|false>]"
-  echo "       [-t|--tgbot <true|false>] [-h|--help]"
+  echo "Usage: reverse_proxy_server.sh [-u|--utils <true|false>] [-d|--dns <true|false>] [-a|--addu <true|false>]"
+  echo "       [-r|--autoupd <true|false>] [-b|--bbr <true|false>] [-i|--ipv6 <true|false>] [-w|--warp <true|false>]"
+  echo "       [-c|--cert <true|false>] [-m|--mon <true|false>] [-n|--nginx <true|false>] [-p|--panel <true|false>]"
+  echo "       [-f|--firewall <true|false>] [-s|--ssh <true|false>] [-t|--tgbot <true|false>] [-g|--generate <true|false>]"
+  echo "       [-x|--skip-check <true|false>] [-h|--help]"
   echo
-  echo "  -g, --generate <true|false>    Generate a random string for configuration       (default: ${defaults[generate]})"
-  echo "                                 Генерация случайных путей для конфигурации"
   echo "  -u, --utils <true|false>       Additional utilities                             (default: ${defaults[utils]})"
   echo "                                 Дополнительные утилиты"
   echo "  -d, --dns <true|false>         DNS encryption                                   (default: ${defaults[dns]})"
@@ -260,7 +258,11 @@ show_help() {
   echo "                                 SSH доступ"
   echo "  -t, --tgbot <true|false>       Telegram bot integration                         (default: ${defaults[tgbot]})"
   echo "                                 Интеграция Telegram бота"
-  echo "  -h, --help                     Display this help message                        "
+  echo "  -g, --generate <true|false>    Generate a random string for configuration       (default: ${defaults[generate]})"
+  echo "                                 Генерация случайных путей для конфигурации"
+  echo "  -x, --skip-check <true|false>  Disable the check functionality                  (default: ${defaults[skip_check]})"
+  echo "                                 Отключение проверки"
+  echo "  -h, --help                     Display this help message"
   echo "                                 Показать это сообщение помощи"
   echo
   exit 0
@@ -279,7 +281,6 @@ read_defaults_from_file() {
     done < $defaults_file
   else
     # Если файл не найден, используем значения по умолчанию
-    defaults[generate]=true
     defaults[utils]=true
     defaults[dns]=true
     defaults[addu]=true
@@ -295,6 +296,8 @@ read_defaults_from_file() {
     defaults[firewall]=true
     defaults[ssh]=true
     defaults[tgbot]=false
+    defaults[generate]=true
+    defaults[skip_check]=false
   fi
 }
 
@@ -303,7 +306,6 @@ read_defaults_from_file() {
 ###################################
 write_defaults_to_file() {
   cat > ${defaults_file}<<EOF
-defaults[generate]=true
 defaults[utils]=false
 defaults[dns]=false
 defaults[addu]=false
@@ -319,6 +321,8 @@ defaults[panel]=true
 defaults[firewall]=false
 defaults[ssh]=false
 defaults[tgbot]=false
+defaults[generate]=true
+defaults[skip_check]=false
 EOF
 }
 
@@ -458,6 +462,12 @@ parse_args() {
         validate_true_false generate "$2" || return 1
         shift 2
         ;;
+      -x|--skip-check)
+        args[skip_check]="$2"
+        normalize_case skip_check
+        validate_true_false skip_check "$2" || return 1
+        shift 2
+        ;;
       -h|--help)
         return 1
         ;;
@@ -581,27 +591,6 @@ check_root() {
 }
 
 ###################################
-### IP Address Check
-###################################
-check_ip() {
-  IP4_REGEX="^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$"
-
-  # Попробуем получить IP через ip route
-  IP4=$(ip route get 8.8.8.8 2>/dev/null | grep -Po -- 'src \K\S*')
-
-  # Если не получилось, пробуем через curl
-  if [[ ! $IP4 =~ $IP4_REGEX ]]; then
-  IP4=$(curl -s --max-time 5 ipinfo.io/ip 2>/dev/null)  # Устанавливаем таймаут для curl
-  fi
-
-  # Если не удается получить IP, выводим ошибку
-  if [[ ! $IP4 =~ $IP4_REGEX ]]; then
-    error " $(text 3)"
-    return 1
-  fi
-}
-
-###################################
 ### Banner
 ###################################
 banner_1() {
@@ -633,6 +622,91 @@ start_installation() {
 }
 
 ###################################
+### Obtaining a domain IP address
+###################################
+get_domain_ips() {
+    IPS=($(dig @1.1.1.1 +short "$DOMAIN"))
+    echo "${IPS[@]}"
+}
+
+###################################
+### Obtaining your external IP address
+###################################
+check_ip() {
+    IP4_REGEX="^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$"
+
+    IP4=$(ip route get 8.8.8.8 2>/dev/null | grep -Po -- 'src \K\S*')
+
+    if [[ ! $IP4 =~ $IP4_REGEX ]]; then
+        IP4=$(curl -s --max-time 5 ipinfo.io/ip 2>/dev/null)
+    fi
+
+    if [[ ! $IP4 =~ $IP4_REGEX ]]; then
+        echo "Не удалось получить внешний IP."
+        return 1
+    fi
+    echo "$IP4"
+}
+
+###################################
+### Checking if the IP is in range
+###################################
+ip_in_range() {
+    local IP=$1
+    local RANGE=$2
+    ipcalc -n -c "$RANGE" | grep -q "$IP"
+}
+
+###################################
+### IP checks
+###################################
+check_ip_in_cloudflare() {
+    DOMAIN_IP=$1
+    CLOUDFLARE_IPS=($(curl -s https://www.cloudflare.com/ips-v4))
+    
+    for RANGE in "${CLOUDFLARE_IPS[@]}"; do
+        if ip_in_range "$DOMAIN_IP" "$RANGE"; then
+            return 0
+        fi
+    done
+    return 1
+}
+
+###################################
+### Domain address verification
+###################################
+check_domain_ip() {
+    local MY_IP
+    local DOMAIN_IPS
+    MY_IP=$(check_ip)
+    DOMAIN_IPS=($(get_domain_ips))
+
+    if [[ $? -ne 0 ]]; then
+        echo "Не удалось получить внешний IP, завершение выполнения"
+        exit 1
+    fi
+
+    echo "Ваш внешний IP: $MY_IP"
+    echo "IP-адреса домена $DOMAIN: ${DOMAIN_IPS[@]}"
+    echo
+
+    if echo "${DOMAIN_IPS[@]}" | grep -qw "$MY_IP"; then
+        echo "Ваш IP совпадает с одним из IP домена $DOMAIN."
+        exit 0
+    fi
+
+    for IP in "${DOMAIN_IPS[@]}"; do
+        if check_ip_in_cloudflare "$IP"; then
+            echo "IP-адрес $IP входит в диапазоны Cloudflare."
+            exit 0
+        fi
+    done
+
+    echo "Ни один из IP-адресов ${DOMAIN_IPS[@]} не входит в диапазоны Cloudflare."
+    exit 1
+}
+
+###################################
 ### Request and response from Cloudflare API
 ###################################
 get_test_response() {
@@ -659,6 +733,8 @@ check_cf_token() {
         echo
     done
 
+    [[ ${args[skip_check]} == "true" ]] && check_domain_ip
+
     # Удаляем http:// или https:// (если они есть), порты и пути
     temp_domain=$(echo "$temp_domain" | sed -E 's/^https?:\/\///' | sed -E 's/(:[0-9]+)?(\/[a-zA-Z0-9_\-\/]+)?$//')
 
@@ -679,7 +755,7 @@ check_cf_token() {
     while [[ -z $CFTOKEN ]]; do
       reading " $(text 16) " CFTOKEN
     done
-    get_test_response
+    [[ ${args[skip_check]} == "true" ]] && get_test_response
     info " $(text 17) "
   done
 }
@@ -2247,8 +2323,7 @@ main() {
   log_entry
   read_defaults_from_file
   parse_args "$@" || show_help
-  check_root
-  check_ip
+  [[ ${args[skip_check]} == "true" ]] && check_root
   check_operating_system
   select_language
   if [ -f ${defaults_file} ]; then
@@ -2257,7 +2332,7 @@ main() {
   sleep 2
   clear
   banner_1
-  start_installation
+  [[ ${args[skip_check]} == "true" ]] && start_installation
   data_entry
   [[ ${args[utils]} == "true" ]] && installation_of_utilities
   [[ ${args[dns]} == "true" ]] && dns_encryption
