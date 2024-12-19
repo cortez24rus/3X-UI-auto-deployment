@@ -296,7 +296,7 @@ read_defaults_from_file() {
     defaults[ssh]=true
     defaults[tgbot]=false
     defaults[generate]=true
-    defaults[skip_check]=false
+    defaults[skip_check]=true
   fi
 }
 
@@ -321,7 +321,7 @@ defaults[firewall]=false
 defaults[ssh]=false
 defaults[tgbot]=false
 defaults[generate]=true
-defaults[skip_check]=false
+defaults[skip_check]=true
 EOF
 }
 
