@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # wget -N https://git && bash .sh d
 export DEBIAN_FRONTEND=noninteractive
+defaults_file="/usr/local/reverse_proxy/reinstall_defaults.conf"
 
 ###################################
 ### Initialization and Declarations
@@ -24,8 +25,6 @@ regex[domain_port]="^[a-zA-Z0-9]+([-.][a-zA-Z0-9]+)*\.[a-zA-Z]{2,}(:[1-9][0-9]*)
 regex[file_path]="^[a-zA-Z0-9_/.-]+$"
 regex[url]="^(http|https)://([a-zA-Z0-9.-]+\.[a-zA-Z]{2,})(:[0-9]{1,5})?(/.*)?$"
 generate[path]="tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 30"
-
-defaults_file="/usr/local/reverse_proxy/reinstall_defaults.conf"
 
 ###################################
 ### INFO
@@ -631,72 +630,6 @@ check_ip() {
 }
 
 ###################################
-### Obtaining a domain IP address
-###################################
-get_domain_ips() {
-    IPS=($(dig @1.1.1.1 +short "$DOMAIN"))
-    echo "${IPS[@]}"
-}
-
-###################################
-### Checking if the IP is in range
-###################################
-ip_in_range() {
-    local IP=$1
-    local RANGE=$2
-    ipcalc -n -c "$RANGE" | grep -q "$IP"
-}
-
-###################################
-### IP checks
-###################################
-check_ip_in_cloudflare() {
-    DOMAIN_IP=$1
-    CLOUDFLARE_IPS=($(curl -s https://www.cloudflare.com/ips-v4))
-    
-    for RANGE in "${CLOUDFLARE_IPS[@]}"; do
-        if ip_in_range "$DOMAIN_IP" "$RANGE"; then
-            return 0
-        fi
-    done
-    return 1
-}
-
-###################################
-### Domain address verification
-###################################
-check_domain_ip() {
-    local MY_IP
-    local DOMAIN_IPS
-    MY_IP=$(check_ip)
-    DOMAIN_IPS=($(get_domain_ips))
-
-    if [[ $? -ne 0 ]]; then
-      echo "Не удалось получить внешний IP, завершение выполнения"
-      exit 1
-    fi
-
-    echo "IP-адреса домена $DOMAIN: ${DOMAIN_IPS[@]}"
-
-    if echo "${DOMAIN_IPS[@]}" | grep -qw "$MY_IP"; then
-      echo "Ваш IP совпадает с одним из IP домена $DOMAIN."
-      echo
-      return 0
-    fi
-
-    for IP in "${DOMAIN_IPS[@]}"; do
-      if check_ip_in_cloudflare "$IP"; then
-        echo "IP-адрес $IP входит в диапазоны Cloudflare."
-        echo
-        return 0
-      fi
-    done
-
-    echo "Ни один из IP-адресов ${DOMAIN_IPS[@]} не входит в диапазоны Cloudflare."
-    exit 1
-}
-
-###################################
 ### Request and response from Cloudflare API
 ###################################
 get_test_response() {
@@ -719,8 +652,8 @@ check_cf_token() {
     SUBDOMAIN=""
 
     while [[ -z "$temp_domain" ]]; do
-        reading " $(text 13) " temp_domain
-        echo
+      reading " $(text 13) " temp_domain
+      echo
     done
 
     temp_domain=$(echo "$temp_domain" | sed -E 's/^https?:\/\///' | sed -E 's/(:[0-9]+)?(\/[a-zA-Z0-9_\-\/]+)?$//')
@@ -733,8 +666,6 @@ check_cf_token() {
       SUBDOMAIN="www.$temp_domain"       # Для домена второго уровня подставляем www в SUBDOMAIN
     fi
 
-    [[ ${args[skip-check]} == "false" ]] && check_domain_ip
-
     while [[ -z $EMAIL ]]; do
       reading " $(text 15) " EMAIL
       echo
@@ -743,6 +674,7 @@ check_cf_token() {
     while [[ -z $CFTOKEN ]]; do
       reading " $(text 16) " CFTOKEN
     done
+    
     [[ ${args[skip-check]} == "false" ]] && get_test_response
     info " $(text 17) "
   done
@@ -2003,7 +1935,7 @@ main() {
   parse_args "$@" || show_help
   [[ ${args[skip-check]} == "false" ]] && check_root
   check_operating_system
-  [[ ${args[skip-check]} == "true" ]] && check_ip
+  [[ ${args[skip-check]} == "false" ]] && check_ip
   select_language
   if [ -f ${defaults_file} ]; then
     tilda "$(text 4)"
