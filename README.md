@@ -63,13 +63,12 @@ This script is designed for quick and easy setup of a reverse proxy server using
 
 ### Help message of the script:
 ```
-Usage: reverse_proxy_server.sh [-g|--generate <true|false>] [-u|--utils <true|false>] [-d|--dns <true|false>]
-                 [-a|--addu <true|false>] [-r|--autoupd <true|false>] [-b|--bbr <true|false>] [-i|--ipv6 <true|false>]
-                 [-w|--warp <true|false>] [-c|--cert <true|false>] [-m|--mon <true|false>] [-n|--nginx <true|false>]
-                 [-p|--panel <true|false>] [-f|--firewall <true|false>] [-s|--ssh <true|false>] [-t|--tgbot <true|false>]
-                 [-h|--help]
+Usage: reverse_proxy_server.sh [-u|--utils <true|false>] [-d|--dns <true|false>] [-a|--addu <true|false>]
+                 [-r|--autoupd <true|false>] [-b|--bbr <true|false>] [-i|--ipv6 <true|false>] [-w|--warp <true|false>]
+                 [-c|--cert <true|false>] [-m|--mon <true|false>] [-n|--nginx <true|false>] [-p|--panel <true|false>]
+                 [-f|--firewall <true|false>] [-s|--ssh <true|false>] [-t|--tgbot <true|false>] [-g|--generate <true|false>]
+                 [-x|--skip-check <true|false>] [-h|--help]
 
-  -g, --generate <true|false>    Generate a random string for configuration     (default: true)
   -u, --utils <true|false>       Additional utilities                           (default: true)
   -d, --dns <true|false>         DNS encryption                                 (default: true)
   -a, --addu <true|false>        User addition                                  (default: true)
@@ -84,6 +83,8 @@ Usage: reverse_proxy_server.sh [-g|--generate <true|false>] [-u|--utils <true|fa
   -f, --firewall <true|false>    Firewall configuration                         (default: true)
   -s, --ssh <true|false>         SSH access                                     (default: true)
   -t, --tgbot <true|false>       Telegram bot integration                       (default: false)
+  -g, --generate <true|false>    Generate a random string for configuration     (default: true)
+  -x, --skip-check <true|false>  Disable the check functionality                (default: false)
   -h, --help                     Display this help message
 
 ```

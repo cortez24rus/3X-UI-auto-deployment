@@ -61,13 +61,12 @@
 
 ### Сообщение помощи для скрипта:
 ```
-Использование: reverse_proxy_server.sh [-g|--generate <true|false>] [-u|--utils <true|false>] [-d|--dns <true|false>]
-                 [-a|--addu <true|false>] [-r|--autoupd <true|false>] [-b|--bbr <true|false>] [-i|--ipv6 <true|false>]
-                 [-w|--warp <true|false>] [-c|--cert <true|false>] [-m|--mon <true|false>] [-n|--nginx <true|false>]
-                 [-p|--panel <true|false>] [-f|--firewall <true|false>] [-s|--ssh <true|false>] [-t|--tgbot <true|false>]
-                 [-h|--help]
+Использование: reverse_proxy_server.sh [-u|--utils <true|false>] [-d|--dns <true|false>] [-a|--addu <true|false>]
+                 [-r|--autoupd <true|false>] [-b|--bbr <true|false>] [-i|--ipv6 <true|false>] [-w|--warp <true|false>]
+                 [-c|--cert <true|false>] [-m|--mon <true|false>] [-n|--nginx <true|false>] [-p|--panel <true|false>]
+                 [-f|--firewall <true|false>] [-s|--ssh <true|false>] [-t|--tgbot <true|false>] [-g|--generate <true|false>]
+                 [-x|--skip-check <true|false>] [-h|--help]
 
-  -g, --generate <true|false>    Генерация случайных путей для конфигурации     (по умолчанию: true)
   -u, --utils <true|false>       Дополнительные утилиты                         (по умолчанию: true)
   -d, --dns <true|false>         Шифрование DNS                                 (по умолчанию: true)
   -a, --addu <true|false>        Добавление пользователя                        (по умолчанию: true)
@@ -82,6 +81,8 @@
   -f, --firewall <true|false>    Настройка файрвола                             (по умолчанию: true)
   -s, --ssh <true|false>         SSH доступ                                     (по умолчанию: true)
   -t, --tgbot <true|false>       Интеграция Telegram бота                       (по умолчанию: false)
+  -g, --generate <true|false>    Генерация случайных путей для конфигурации     (по умолчанию: true)
+  -x, --skip-check <true|false>  Disable the check functionality                (по умолчанию: false)
   -h, --help                     Показать это сообщение помощи
 ```
 
