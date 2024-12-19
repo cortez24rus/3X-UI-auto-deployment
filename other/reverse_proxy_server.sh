@@ -260,7 +260,7 @@ show_help() {
   echo "                                 Интеграция Telegram бота"
   echo "  -g, --generate <true|false>    Generate a random string for configuration       (default: ${defaults[generate]})"
   echo "                                 Генерация случайных путей для конфигурации"
-  echo "  -x, --skip-check <true|false>  Disable the check functionality                  (default: ${defaults[skip_check]})"
+  echo "  -x, --skip-check <true|false>  Disable the check functionality                  (default: ${defaults[skip-check]})"
   echo "                                 Отключение проверки"
   echo "  -h, --help                     Display this help message"
   echo "                                 Показать это сообщение помощи"
@@ -297,7 +297,7 @@ read_defaults_from_file() {
     defaults[ssh]=true
     defaults[tgbot]=false
     defaults[generate]=true
-    defaults[skip_check]=false
+    defaults[skip-check]=false
   fi
 }
 
@@ -322,7 +322,7 @@ defaults[firewall]=false
 defaults[ssh]=false
 defaults[tgbot]=false
 defaults[generate]=true
-defaults[skip_check]=false
+defaults[skip-check]=false
 EOF
 }
 
@@ -359,7 +359,7 @@ validate_true_false() {
 ###################################
 parse_args() {
   local opts
-  opts=$(getopt -o i:w:m:u:s:t:f:a:r:b:hl:d:p:c:n:g --long utils:,dns:,addu:,autoupd:,bbr:,ipv6:,warp:,cert:,mon:,nginx:,panel:,firewall:,ssh:,tgbot:,generate:,help -- "$@")
+  opts=$(getopt -o i:w:m:u:s:t:f:a:r:b:hl:d:p:c:n:g:x --long utils:,dns:,addu:,autoupd:,bbr:,ipv6:,warp:,cert:,mon:,nginx:,panel:,firewall:,ssh:,tgbot:,generate:,skip-check:,help -- "$@")
   if [[ $? -ne 0 ]]; then
     return 1
   fi
@@ -420,12 +420,6 @@ parse_args() {
         validate_true_false mon "$2" || return 1
         shift 2
         ;;
-      -x|--shell)
-        args[shell]="$2"
-        normalize_case shell
-        validate_true_false shell "$2" || return 1
-        shift 2
-        ;;	
       -n|--nginx)
         args[nginx]="$2"
         normalize_case nginx
@@ -463,9 +457,9 @@ parse_args() {
         shift 2
         ;;
       -x|--skip-check)
-        args[skip_check]="$2"
-        normalize_case skip_check
-        validate_true_false skip_check "$2" || return 1
+        args[skip-check]="$2"
+        normalize_case skip-check
+        validate_true_false skip-check "$2" || return 1
         shift 2
         ;;
       -h|--help)
@@ -692,13 +686,13 @@ check_domain_ip() {
 
     if echo "${DOMAIN_IPS[@]}" | grep -qw "$MY_IP"; then
         echo "Ваш IP совпадает с одним из IP домена $DOMAIN."
-        exit 0
+        continue
     fi
 
     for IP in "${DOMAIN_IPS[@]}"; do
         if check_ip_in_cloudflare "$IP"; then
-            echo "IP-адрес $IP входит в диапазоны Cloudflare."
-            exit 0
+          echo "IP-адрес $IP входит в диапазоны Cloudflare."
+          continue
         fi
     done
 
@@ -744,7 +738,7 @@ check_cf_token() {
       SUBDOMAIN="www.$temp_domain"       # Для домена второго уровня подставляем www в SUBDOMAIN
     fi
 
-    [[ ${args[skip_check]} == "true" ]] && check_domain_ip
+    [[ ${args[skip-check]} == "false" ]] && check_domain_ip
 
     while [[ -z $EMAIL ]]; do
       reading " $(text 15) " EMAIL
@@ -754,7 +748,7 @@ check_cf_token() {
     while [[ -z $CFTOKEN ]]; do
       reading " $(text 16) " CFTOKEN
     done
-    [[ ${args[skip_check]} == "true" ]] && get_test_response
+    [[ ${args[skip-check]} == "false" ]] && get_test_response
     info " $(text 17) "
   done
 }
@@ -2325,7 +2319,7 @@ main() {
   log_entry
   read_defaults_from_file
   parse_args "$@" || show_help
-  [[ ${args[skip_check]} == "true" ]] && check_root
+  [[ ${args[skip-check]} == "false" ]] && check_root
   check_operating_system
   select_language
   if [ -f ${defaults_file} ]; then
@@ -2334,7 +2328,7 @@ main() {
   sleep 2
   clear
   banner_1
-  [[ ${args[skip_check]} == "true" ]] && start_installation
+  [[ ${args[skip-check]} == "false" ]] && start_installation
   data_entry
   [[ ${args[utils]} == "true" ]] && installation_of_utilities
   [[ ${args[dns]} == "true" ]] && dns_encryption
